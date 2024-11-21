@@ -1,1 +1,12 @@
+/bin/
+/build/
+/target/
+out/
+
 /.idea/
+/*.iml
+/out/
+/node_modules
+
+*.jar
+*.env
