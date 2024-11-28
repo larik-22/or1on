@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+//TODO uncomment after backend password validation sync
 export const loginSchema = z
 	.object({
 		email: z.string().email(),

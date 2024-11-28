@@ -14,7 +14,8 @@ if (!JWT_SECRET) {
 
 /**
  * Generates a JSON Web Token (JWT) for the specified user.
- *
+ * @param user - The user object for which the token is generated.
+ *                 The user's password is excluded from the token payload.
  * @returns {Promise<string>} A promise that resolves to the generated JWT as a string.
  * @throws An error if the token generation process fails.
  */

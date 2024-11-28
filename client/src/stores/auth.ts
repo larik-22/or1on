@@ -9,6 +9,7 @@ interface ExtendedJwtPayload extends JwtPayload {
 
 const isUserAdmin = derived(authToken, ($token) => {
 	if ($token) {
+		//TODO decode in try and catch block;
 		const decoded = jwtDecode<ExtendedJwtPayload>($token);
 		return decoded.isAdmin;
 	}
