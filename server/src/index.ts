@@ -3,11 +3,22 @@ import { Hono } from 'hono';
 import auth from './routes/auth.js';
 import test from './routes/test.js';
 import logger from './utils/logger.js';
+import { cors } from 'hono/cors';
 
 const host = process.env.HOST || "127.0.0.1";
 const port = process.env.PORT || 3000;
 
 export const app = new Hono();
+console.log(process.env.CLIENT_URL)
+/**
+ * Set up cors for the client requests
+ */
+app.use('*', cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    allowHeaders: ['Origin', 'Content-Type', 'Authorization'],
+    allowMethods: ['GET', 'OPTIONS', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+}));
 
 /**
  * Registers the routes for authentication and testing.

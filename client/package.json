@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
+    "test": "vitest"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
@@ -23,6 +24,8 @@
     "vite": "^6.0.0"
   },
   "dependencies": {
-    "page": "^1.11.6"
+    "jwt-decode": "^4.0.0",
+    "page": "^1.11.6",
+    "zod": "^3.23.8"
   }
 }
