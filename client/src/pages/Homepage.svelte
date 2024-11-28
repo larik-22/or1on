@@ -4,10 +4,9 @@
 	import ChangeUsername from './userDashboard/ChangeUsername.svelte';
 	import LogOut from './userDashboard/LogOut.svelte';
 
-	// State to track which section of the dashboard is displayed
+	//track which section of the dashboard is displayed
 	let currentSection = writable('welcome');
 
-	// Function to update the displayed section
 	const showSection = (sectionName) => {
 		currentSection.set(sectionName);
 	};
@@ -29,7 +28,6 @@
 		</nav>
 	</aside>
 
-	<!-- Main Content Area -->
 	<main class="main-content">
 		{#if $currentSection === 'welcome'}
 			<div class="welcome-section">
@@ -55,14 +53,12 @@
 
 
 <style>
-	/* General Layout */
 	.dashboard {
 		display: flex;
 		min-height: 100vh;
 		font-family: Arial, sans-serif;
 	}
 
-	/* Sidebar Styling */
 	.sidebar {
 		width: 25%;
 		background: #f7f7f7;
@@ -116,7 +112,6 @@
 		font-weight: bold;
 	}
 
-	/* Main Content Styling */
 	.main-content {
 		width: 75%;
 		padding: 40px;

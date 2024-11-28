@@ -4,7 +4,6 @@
     const handleLogout = () => {
         //remove user token, redirect
         console.log("User logged out!");
-        //redirect to login screen OR main page that should be adjusted with actual routing once backend is finished
         window.location.href = '/login';
     };
 

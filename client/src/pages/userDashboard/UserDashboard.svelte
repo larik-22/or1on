@@ -30,14 +30,14 @@
         padding: 40px;
     }
     .sidebar {
-        border-right: 1px solid #d3d3d3; /* Light gray border */
+        border-right: 1px solid #d3d3d3;
     }
     .nav-link {
         padding: 10px;
         border-radius: 5px;
     }
     .nav-link:hover {
-        background-color: #e0e0e0; /* Slightly darker gray */
+        background-color: #e0e0e0;
         font-weight: bold;
     }
 </style>
