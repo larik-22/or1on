@@ -1,0 +1,13 @@
+stages:
+  - lint_and_test
+
+lint_and_test:
+  stage: lint_and_test
+  script:
+    - cd server
+    - npm install
+    - npm run lint
+    - npm run test
+  only:
+    - develop
+    - main
