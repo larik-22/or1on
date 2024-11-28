@@ -11,10 +11,10 @@
 	import isNotLoggedIn from "./middleware/notLoggedIn";
 	import isAdmin from "./middleware/isAdmin.js";
 	import isLoggedIn from "./middleware/loggedIn";
-    import UserDashboard from "./pages/userDashboard/UserDashboard.svelte";
-    import ChangePassword from "./pages/userDashboard/ChangePassword.svelte";
-    import ChangeUsername from "./pages/userDashboard/ChangeUsername.svelte";
-    import LogOut from "./pages/userDashboard/LogOut.svelte";
+    import UserDashboard from "./pages/UserDashboard.svelte";
+    import ChangePassword from "./components/userDashboard/ChangePassword.svelte";
+    import ChangeUsername from "./components/userDashboard/ChangeUsername.svelte";
+    import LogOut from "./components/userDashboard/LogOut.svelte";
 
 
     let page: any;
@@ -26,6 +26,7 @@
 		currentRoute = ctx.pathname;
 		params = ctx;
 	});
+
 	router('/admin', (ctx)=> {
 		page = ModeratorDashboard;
 		currentRoute = ctx.pathname;
