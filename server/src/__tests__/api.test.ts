@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { app } from '../index.js';
 import { generateToken } from '../utils/jwt.js';
-import { createUser } from '../controllers/userController.js';
+import { createUser, getUserByEmail } from '../controllers/userController.js';
 
 const mockEnv = {
     ALLOWED_HOST: '*',
@@ -105,6 +105,21 @@ describe('POST /auth', () => {
         expect(responseBody.error.code).toBe(401);
         expect(responseBody.error.message).toBe('Invalid password');
     });
+
+
+    it('should return 400 if missing required fields', async () => {
+        const missingFieldsData = { email: 'user@example.com' };
+
+        const response = await app.request('/auth', {
+            method: 'POST',
+            body: JSON.stringify(missingFieldsData),
+        }, mockEnv);
+
+        expect(response.status).toBe(400);
+        const responseBody = await response.json();
+        expect(responseBody.error.code).toBe(400);
+        expect(responseBody.error.message).toBe('Invalid registration data');
+    });
 });
 
 describe('GET /test/protected', () => {
@@ -134,6 +149,18 @@ describe('GET /test/protected', () => {
     it('should return 401 for unauthenticated users', async () => {
         const response = await app.request('/test/protected', {
             method: 'GET',
+        }, mockEnv);
+
+        expect(response.status).toBe(401);
+        const responseBody = await response.json();
+        expect(responseBody.error.code).toBe(401);
+        expect(responseBody.error.message).toBe('Unauthorized');
+    });
+
+    it('should return 401 for invalid token', async () => {
+        const response = await app.request('/test/protected', {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer invalid_token' },
         }, mockEnv);
 
         expect(response.status).toBe(401);
@@ -189,5 +216,82 @@ describe('GET /test/adminprotected', () => {
         const responseBody = await response.json();
         expect(responseBody.error.code).toBe(403);
         expect(responseBody.error.message).toBe('Forbidden: Admins only');
+    });
+
+    it('should return 401 for unauthenticated users', async () => {
+        const response = await app.request('/test/adminprotected', {
+            method: 'GET',
+        }, mockEnv);
+
+        expect(response.status).toBe(401);
+        const responseBody = await response.json();
+        expect(responseBody.error.code).toBe(401);
+        expect(responseBody.error.message).toBe('Unauthorized');
+    });
+});
+
+describe('createUser function', () => {
+    it('should create a user and return correct fields', async () => {
+        const userData = {
+            email: 'test@example.com',
+            password: 'password123',
+            isAdmin: false,
+        };
+
+        const createdUser = await createUser(userData);
+
+        expect(createdUser).toHaveProperty('id');
+        expect(createdUser).toHaveProperty('email', userData.email);
+        expect(createdUser).toHaveProperty('isAdmin', userData.isAdmin);
+        expect(createdUser).not.toHaveProperty('password');
+    });
+});
+
+describe('User Controller: getUserByEmail', () => {
+    it('should fetch a user by email', async () => {
+        const user = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+        };
+
+        const createdUser = await createUser(user);
+        const fetchedUser = await getUserByEmail(createdUser.email);
+
+        expect(fetchedUser).toBeDefined();
+        expect(fetchedUser?.email).toBe(user.email);
+    });
+
+    it('should return undefined for non-existent user', async () => {
+        const fetchedUser = await getUserByEmail('nonexistent@example.com');
+
+        expect(fetchedUser).toBeUndefined();
+    });
+
+    describe('Middleware: isLoggedIn', () => {
+        it('should return 401 for empty token', async () => {
+            const response = await app.request('/test/protected', {
+                method: 'GET',
+                headers: { 'Authorization': '' },
+            }, mockEnv);
+
+            expect(response.status).toBe(401);
+            const responseBody = await response.json();
+            expect(responseBody.error.code).toBe(401);
+            expect(responseBody.error.message).toBe('Unauthorized');
+        });
+
+        it('should return 401 for expired token', async () => {
+            const expiredToken = 'expired_token_example';
+            const response = await app.request('/test/protected', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${expiredToken}` },
+            }, mockEnv);
+
+            expect(response.status).toBe(401);
+            const responseBody = await response.json();
+            expect(responseBody.error.code).toBe(401);
+            expect(responseBody.error.message).toBe('Unauthorized');
+        });
     });
 });

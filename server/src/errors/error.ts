@@ -13,7 +13,7 @@ interface ErrorResponse {
  *
  * @param code - The HTTP status code representing the error.
  * @param message - A message describing the error.
- * @returns An object conforming to the ErrorResponse interface.
+ * @returns {ErrorResponse} An object conforming to the ErrorResponse interface.
  */
 export const createErrorResponse = (code: number, message: string): ErrorResponse => ({
     error: {
