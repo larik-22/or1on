@@ -41,8 +41,6 @@ process.on('unhandledRejection', (reason) => {
     logger.error(`Unhandled promise rejection: ${reason}`);
 });
 
-logger.info(`Server is starting at http://${host}:${port}`);
-
 try {
     serve({
         fetch: app.fetch,
@@ -50,5 +48,8 @@ try {
     });
     logger.info(`Server is running at http://${host}:${port}`);
 } catch (err) {
-    logger.error(`Failed to start server: ${(err as Error).message}`, { stack: (err as Error).stack });
+    logger.error(
+        `Failed to start server: ${(err as Error).message}`,
+        { stack: (err as Error).stack }
+    );
 }

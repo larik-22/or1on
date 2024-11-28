@@ -17,7 +17,7 @@ if (!JWT_SECRET) {
  *
  * @param ctx - The Hono context object.
  * @param next - The next middleware function in the stack.
- * @returns A promise that resolves after middleware execution.
+ * @returns {Promise<void>} A promise that resolves after middleware execution.
  */
 export const isLoggedIn: MiddlewareHandler = async (ctx, next) => {
     try {

@@ -17,11 +17,11 @@ if (!JWT_SECRET) {
  *
  * @param user - The user object for which the token is generated.
  *               The user's password is excluded from the token payload.
- * @returns A promise that resolves to the generated JWT as a string.
+ * @returns {Promise<string>} A promise that resolves to the generated JWT as a string.
  * @throws An error if the token generation process fails.
  */
 export const generateToken = async (user: User): Promise<string> => {
-    const { password, ...payload } = user;
+    const { ...payload } = user;
     try {
         logger.info(`Generating token for user with id: ${payload.id}`);
         return await sign(payload, JWT_SECRET, 'HS256');
@@ -30,3 +30,4 @@ export const generateToken = async (user: User): Promise<string> => {
         throw new Error('Failed to generate JWT token');
     }
 };
+
