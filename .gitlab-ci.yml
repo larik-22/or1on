@@ -1,6 +1,3 @@
-stages:
-  - lint_and_test
-
 lint_and_test:
   stage: lint_and_test
   image: node:20
