@@ -24,7 +24,7 @@ users.push({
  * Fetches a user by their email.
  *
  * @param email - The email of the user to find.
- * @returns A promise resolving to the user object if found, otherwise `undefined`.
+ * @returns {Promise<User | undefined>} A promise resolving to the user object if found.
  */
 export const getUserByEmail = async (email: string): Promise<User | undefined> => {
     return users.find((user) => user.email === email);
@@ -34,7 +34,7 @@ export const getUserByEmail = async (email: string): Promise<User | undefined> =
  * Creates a new user and stores them in the system.
  *
  * @param data - The user data excluding the `id` field.
- * @returns A promise resolving to the created user object excluding the `password` field.
+ * @returns {Promise<Omit<User, 'password'>>} Promise resolving to the created user object.
  */
 export const createUser = async (data: Omit<User, 'id'>): Promise<Omit<User, 'password'>> => {
     const { email, password, isAdmin } = data;
@@ -49,6 +49,5 @@ export const createUser = async (data: Omit<User, 'id'>): Promise<Omit<User, 'pa
 
     users.push(newUser);
 
-    const { password: _, ...userData } = newUser;
-    return userData;
+    return { id: newUser.id, email: newUser.email, isAdmin: newUser.isAdmin };
 };
