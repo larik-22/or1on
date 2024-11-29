@@ -1,6 +1,7 @@
 <script lang="ts">
 	import router  from 'page';
 	import Homepage from "./pages/Homepage.svelte";
+	import ModeratorDashboard from "./pages/ModeratorDashboard.svelte";
 	import Register from "./pages/Register.svelte";
 	import Navigation from "./lib/Navigation.svelte";
 	import Login from "./pages/Login.svelte";
@@ -20,6 +21,12 @@
 		currentRoute = ctx.pathname;
 		params = ctx;
 	});
+	router('/admin', (ctx)=> {
+		page = ModeratorDashboard;
+		currentRoute = ctx.pathname;
+		params = ctx;
+	});
+
 
 	router('/register', isNotLoggedIn, (ctx: Context) => {
 		page = Register;
