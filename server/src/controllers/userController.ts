@@ -4,6 +4,22 @@ import { randomUUID } from 'crypto';
 
 const users: User[] = [];
 
+// test admin and regular user
+users.push({
+    id: randomUUID(),
+    email: 'test@user.com',
+    password: bcrypt.hashSync('password', 10),
+    isAdmin: false,
+});
+
+users.push({
+    id: randomUUID(),
+    email: 'test@admin.com',
+    password: bcrypt.hashSync('password', 10),
+    isAdmin: true,
+});
+
+
 /**
  * Fetches a user by their email.
  *
