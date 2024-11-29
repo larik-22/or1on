@@ -34,6 +34,10 @@ export const getFeedbackByUserId = (id: string) => {
     return users.find(user => user.id === id)?.feedback;
 };
 
+export const getFeedbackByUserId = (id: string) => {
+    return users.find(user => user.id === id)?.feedback;
+};
+
 /**
  * Creates a new user and stores them in the database.
  *
