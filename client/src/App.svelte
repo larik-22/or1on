@@ -27,6 +27,7 @@
 		params = ctx;
 	});
 
+
 	router('/register', isNotLoggedIn, (ctx: Context) => {
 		page = Register;
 		currentRoute = ctx.pathname;
