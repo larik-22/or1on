@@ -11,8 +11,13 @@
 	import isNotLoggedIn from "./middleware/notLoggedIn";
 	import isAdmin from "./middleware/isAdmin.js";
 	import isLoggedIn from "./middleware/loggedIn";
+    import UserDashboard from "./pages/userDashboard/UserDashboard.svelte";
+    import ChangePassword from "./pages/userDashboard/ChangePassword.svelte";
+    import ChangeUsername from "./pages/userDashboard/ChangeUsername.svelte";
+    import LogOut from "./pages/userDashboard/LogOut.svelte";
 
-	let page: any;
+
+    let page: any;
 	let params: Context;
 	let currentRoute: string;
 
@@ -51,6 +56,32 @@
 		currentRoute = ctx.pathname;
 		params = ctx;
 	});
+
+    router('/user-dashboard', (ctx) => {
+        page = UserDashboard;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
+    router('/change-password', (ctx) => {
+        page = ChangePassword;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
+    router('/change-username', (ctx) => {
+        page = ChangeUsername;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
+    router('/logout', (ctx) => {
+        page = LogOut;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
+
 
 	router.start();
 </script>
