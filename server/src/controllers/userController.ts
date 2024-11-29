@@ -2,7 +2,17 @@ import { EntityManager } from '@mikro-orm/core';
 import { User } from '../models/user.js';
 import bcrypt from 'bcryptjs';
 import logger from '../utils/logger.js';
-import {randomUUID} from "crypto";
+import { randomUUID } from 'crypto';
+
+let users: User[] = [];
+
+export const getAllUsers = () => {
+    return users;
+}
+
+export const getUserById = (id: string) => {
+    return users.find(user => user.id === id)
+}
 
 /**
  * Fetches a user by their email from the database.
@@ -18,6 +28,10 @@ export const getUserByEmail = async (em: EntityManager, email: string): Promise<
         logger.error('Failed to fetch user by email:' + email + ' error: ' + error);
         throw error;
     }
+};
+
+export const getFeedbackByUserId = (id: string) => {
+    return users.find(user => user.id === id)?.feedback;
 };
 
 /**
@@ -56,3 +70,13 @@ export const createUser = async (
         throw error;
     }
 };
+
+export const deleteUser = (id: string) => {
+    const deletedUser = users.find(user => user.id === id);
+    users = users.filter(user => user.id !== deletedUser?.id);
+}
+
+export const deleteFeedbackFromUserBy = (userId: string, feedbackId) => {
+    let user = users.find(user => user.id === userId);
+    user?.feedback.filter();
+}
