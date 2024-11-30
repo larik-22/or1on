@@ -8,10 +8,14 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.13.7",
+    "@mikro-orm/postgresql": "^6.4.0",
+    "@mikro-orm/reflection": "^6.4.0",
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
     "hono": "^4.6.12",
+    "mikro-orm": "^6.4.0",
+    "uuid": "^11.0.3",
     "winston": "^3.17.0",
     "zod": "^3.23.8"
   },
