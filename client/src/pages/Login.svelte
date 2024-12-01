@@ -2,7 +2,6 @@
 	import page from "page";
 	import {loginSchema} from "../schema/loginSchema";
 	import {authToken} from "../stores/auth";
-	import {handleAuthResponse} from "../utils/authHandler.svelte";
 
 	let formData = $state({
 		email: "",
@@ -41,13 +40,19 @@
 				body: JSON.stringify(result.data),
 			});
 
-			try {
-				await handleAuthResponse(response);
-				page.redirect("/");
-			} catch (err) {
-				errors = (err as Error).message ? { message: [(err as Error).message] } : { message: ["An error occurred."] };
+			if (!response.ok) {
+				const errorData = await response.json();
+				errors = errorData.error || { message: ["An error occurred."] };
 				return;
+			} else {
+				// save token to local storage
+				const data = await response.json();
+				localStorage.setItem("token", data.token);
+				authToken.set(data.token);
 			}
+
+			// redirect to main page
+			page.redirect("/");
 		} catch (err) {
 			errors = { message: ["An unexpected error occurred. Please try again."] };
 		} finally {
