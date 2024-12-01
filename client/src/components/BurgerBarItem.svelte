@@ -1,6 +1,6 @@
 <script lang="ts">
     let {
-        BarItem = ["", []] // Default to an empty string and an empty array
+        BarItem = ["", []]
     }: {
         BarItem: [string, { label: string; action: () => void }[]];
     } = $props();
