@@ -35,7 +35,7 @@ auth.post('/', async (ctx) => {
             return ctx.json(createErrorResponse(400, 'Invalid registration data'), 400);
         }
 
-        const { email, isAdmin } = result.data;
+        const { email, password, isAdmin } = result.data;
         const existingUser = await getUserByEmail(em, email);
         if (existingUser) {
             logger.warn(`Registration failed: User with email ${email} already exists`);
@@ -43,8 +43,11 @@ auth.post('/', async (ctx) => {
         }
 
         const newUser = await createUser(em, { ...result.data, isAdmin });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const token = await generateToken({ ...newUser, password: hashedPassword });
         logger.info('User registered successfully', { userId: newUser.id, email: newUser.email });
-        return ctx.json({ message: 'User registered successfully', user: newUser }, 201);
+        return ctx.json({ message: 'User registered successfully', token }, 201);
     } catch (err) {
         logger.error('Error during user registration', { error: err });
         return ctx.json(createErrorResponse(500, 'Internal server error'), 500);
