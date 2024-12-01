@@ -1,44 +1,57 @@
 import { serve } from '@hono/node-server';
-import { Hono } from 'hono';
-import auth from './routes/auth.js';
-import test from './routes/test.js';
 import logger from './utils/logger.js';
-import { cors } from 'hono/cors';
+import { getDBConnector, updateDBSchema } from './utils/db.js';
+import { createApp } from './app.js';
 
 const host = process.env.HOST || "127.0.0.1";
 const port = process.env.PORT || 3000;
 
-export const app = new Hono();
-
 /**
- * Set up cors for the client requests
- */
-app.use('*', cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    allowHeaders: ['Origin', 'Content-Type', 'Authorization'],
-    allowMethods: ['GET', 'OPTIONS', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-}));
-
-/**
- * Registers the routes for authentication and testing.
- */
-app.route('/auth', auth);
-app.route('/test', test);
-
-/**
- * Handles the root GET request.
+ * Main entry point for the application.
  *
- * @param c - The Hono context object.
- * @returns A text response with a welcome message.
+ * Initializes the database, updates the schema, and starts the HTTP server.
  */
-app.get('/', (c) => {
-    logger.info('Received GET request on /');
-    return c.text('Hello Hono!');
-});
+(async () => {
+    try {
+        /**
+         * Initialize the database connector.
+         */
+        const dbConnector = await getDBConnector();
+
+        /**
+         * Create a scoped EntityManager for the application.
+         */
+        const em = dbConnector.em.fork();
+
+        /**
+         * Update the database schema to match the application models.
+         */
+        await updateDBSchema(dbConnector);
+
+        /**
+         * Create and configure the Hono app instance.
+         */
+        const app = createApp(em);
+
+        /**
+         * Start the HTTP server using the Hono app.
+         */
+        serve({
+            fetch: app.fetch,
+            port: Number(port),
+        });
+
+        logger.info(`Server is running at http://${host}:${port}`);
+    } catch (err) {
+        logger.error(
+            `Failed to start server: ${err as Error}: ${(err as Error).message}`,
+            { stack: (err as Error).stack }
+        );
+    }
+})();
 
 /**
- * Listens for uncaught exceptions and logs them before exiting.
+ * Handles uncaught exceptions to log the error and exit the process.
  */
 process.on('uncaughtException', (err) => {
     logger.error(`Uncaught exception: ${err.message}`, { stack: err.stack });
@@ -46,21 +59,8 @@ process.on('uncaughtException', (err) => {
 });
 
 /**
- * Listens for unhandled promise rejections and logs them.
+ * Handles unhandled promise rejections to log the error.
  */
 process.on('unhandledRejection', (reason) => {
     logger.error(`Unhandled promise rejection: ${reason}`);
 });
-
-try {
-    serve({
-        fetch: app.fetch,
-        port: Number(port),
-    });
-    logger.info(`Server is running at http://${host}:${port}`);
-} catch (err) {
-    logger.error(
-        `Failed to start server: ${(err as Error).message}`,
-        { stack: (err as Error).stack }
-    );
-}

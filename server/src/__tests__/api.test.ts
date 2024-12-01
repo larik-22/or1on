@@ -1,12 +1,51 @@
-import { describe, it, expect } from 'vitest';
-import { app } from '../index.js';
+import {describe, it, expect, vi, beforeEach} from 'vitest';
 import { generateToken } from '../utils/jwt.js';
 import { createUser, getUserByEmail } from '../controllers/userController.js';
+import {type EntityManager, MikroORM} from "@mikro-orm/core";
+import { randomUUID } from "crypto";
+import { createApp } from "../app.js";
+import type { Hono } from 'hono';
+import type { BlankEnv, BlankSchema } from 'hono/types';
+import bcrypt from "bcryptjs";
+import {getDBConnector, updateDBSchema} from "../utils/db.js";
+import mikroConfig from '../../mikro-orm.config.js';
+import logger from "../utils/logger.js";
 
 const mockEnv = {
     ALLOWED_HOST: '*',
     ENV: 'test',
 };
+
+let em: EntityManager;
+let app: Hono<BlankEnv, BlankSchema, "/">;
+
+beforeEach(() => {
+    em = {
+        findOne: vi.fn(async (_entity, condition) => {
+            if (condition.email === 'user@example.com') {
+                return {
+                    id: randomUUID(),
+                    email: 'user@example.com',
+                    password: await bcrypt.hash('password123', 10),
+                    isAdmin: false,
+                };
+            } else if (condition.email === 'admin@example.com') {
+                return {
+                    id: randomUUID(),
+                    email: 'admin@example.com',
+                    password: await bcrypt.hash('password123', 10),
+                    isAdmin: true,
+                };
+            }
+            return undefined;
+        }),
+        persistAndFlush: vi.fn(),
+        create: vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() })),
+        fork: vi.fn().mockReturnValue(em),
+    } as unknown as EntityManager;
+
+    app = createApp(em);
+});
 
 describe('POST /auth', () => {
     it('should successfully register a user', async () => {
@@ -15,6 +54,9 @@ describe('POST /auth', () => {
             password: 'password123',
             isAdmin: false,
         };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        em.findOne = vi.fn(async () => null);
 
         const response = await app.request('/auth', {
             method: 'POST',
@@ -25,6 +67,28 @@ describe('POST /auth', () => {
         const responseBody = await response.json();
         expect(responseBody.message).toBe('User registered successfully');
         expect(responseBody.user.email).toBe(userData.email);
+    });
+
+    it('should successfully register an admin', async () => {
+        const adminData = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+        };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        em.findOne = vi.fn(async () => null);
+
+        const response = await app.request('/auth', {
+            method: 'POST',
+            body: JSON.stringify(adminData),
+        }, mockEnv);
+
+        expect(response.status).toBe(201);
+        const responseBody = await response.json();
+        expect(responseBody.message).toBe('User registered successfully');
+        expect(responseBody.user.email).toBe(adminData.email);
+        expect(responseBody.user.isAdmin).toBe(true);
     });
 
     it('should return 400 for invalid registration data', async () => {
@@ -48,11 +112,6 @@ describe('POST /auth', () => {
             isAdmin: false,
         };
 
-        await app.request('/auth', {
-            method: 'POST',
-            body: JSON.stringify(existingUser),
-        }, mockEnv);
-
         const response = await app.request('/auth', {
             method: 'POST',
             body: JSON.stringify(existingUser),
@@ -64,6 +123,22 @@ describe('POST /auth', () => {
         expect(responseBody.error.message).toBe('User already exists');
     });
 
+    it('should return 400 if missing required fields', async () => {
+        const missingFieldsData = { email: 'user@example.com' };
+
+        const response = await app.request('/auth', {
+            method: 'POST',
+            body: JSON.stringify(missingFieldsData),
+        }, mockEnv);
+
+        expect(response.status).toBe(400);
+        const responseBody = await response.json();
+        expect(responseBody.error.code).toBe(400);
+        expect(responseBody.error.message).toBe('Invalid registration data');
+    });
+});
+
+describe('POST /auth/tokens', () => {
     it('should successfully login with valid credentials', async () => {
         const user = {
             email: 'user@example.com',
@@ -71,10 +146,37 @@ describe('POST /auth', () => {
             isAdmin: false,
         };
 
-        await createUser(user);
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        await createUser(em, user);
 
         const loginData = {
             email: 'user@example.com',
+            password: 'password123',
+        };
+
+        const response = await app.request('/auth/tokens', {
+            method: 'POST',
+            body: JSON.stringify(loginData),
+        }, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.message).toBe('Login successful');
+        expect(responseBody.token).toBeDefined();
+    });
+
+    it('should successfully login as admin with valid credentials', async () => {
+        const admin = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+        };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        await createUser(em, admin);
+
+        const loginData = {
+            email: 'admin@example.com',
             password: 'password123',
         };
 
@@ -106,11 +208,10 @@ describe('POST /auth', () => {
         expect(responseBody.error.message).toBe('Invalid password');
     });
 
-
     it('should return 400 if missing required fields', async () => {
         const missingFieldsData = { email: 'user@example.com' };
 
-        const response = await app.request('/auth', {
+        const response = await app.request('/auth/tokens', {
             method: 'POST',
             body: JSON.stringify(missingFieldsData),
         }, mockEnv);
@@ -118,7 +219,7 @@ describe('POST /auth', () => {
         expect(response.status).toBe(400);
         const responseBody = await response.json();
         expect(responseBody.error.code).toBe(400);
-        expect(responseBody.error.message).toBe('Invalid registration data');
+        expect(responseBody.error.message).toBe('Invalid login data');
     });
 });
 
@@ -130,7 +231,8 @@ describe('GET /test/protected', () => {
             isAdmin: false,
         };
 
-        const createdUser = await createUser(user);
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdUser = await createUser(em, user);
         const token = await generateToken({
             ...createdUser,
             password: user.password
@@ -143,7 +245,31 @@ describe('GET /test/protected', () => {
 
         expect(response.status).toBe(200);
         const responseBody = await response.json();
-        expect(responseBody.message).toBe('Hello, user@example.com! This is a protected route.');
+        expect(responseBody.message).toBe(`Hello, ${user.email}! This is a protected route.`);
+    });
+
+    it('should be accessible to admin users with valid token', async () => {
+        const admin = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+        };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, admin);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: admin.password
+        });
+
+        const response = await app.request('/test/protected', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` },
+        }, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.message).toBe(`Hello, ${admin.email}! This is a protected route.`);
     });
 
     it('should return 401 for unauthenticated users', async () => {
@@ -177,8 +303,8 @@ describe('GET /test/adminprotected', () => {
             password: 'password123',
             isAdmin: true,
         };
-
-        const createdAdmin = await createUser(adminUser);
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
         const token = await generateToken({
             ...createdAdmin,
             password: adminUser.password
@@ -201,7 +327,8 @@ describe('GET /test/adminprotected', () => {
             isAdmin: false,
         };
 
-        const createdUser = await createUser(user);
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdUser = await createUser(em, user);
         const token = await generateToken({
             ...createdUser,
             password: user.password
@@ -238,7 +365,8 @@ describe('createUser function', () => {
             isAdmin: false,
         };
 
-        const createdUser = await createUser(userData);
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdUser = await createUser(em, userData);
 
         expect(createdUser).toHaveProperty('id');
         expect(createdUser).toHaveProperty('email', userData.email);
@@ -255,15 +383,23 @@ describe('User Controller: getUserByEmail', () => {
             isAdmin: false,
         };
 
-        const createdUser = await createUser(user);
-        const fetchedUser = await getUserByEmail(createdUser.email);
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.email === createdUser.email) {
+                return createdUser;
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+        const createdUser = await createUser(em, user);
+
+        const fetchedUser = await getUserByEmail(em, createdUser.email);
 
         expect(fetchedUser).toBeDefined();
         expect(fetchedUser?.email).toBe(user.email);
     });
 
     it('should return undefined for non-existent user', async () => {
-        const fetchedUser = await getUserByEmail('nonexistent@example.com');
+        const fetchedUser = await getUserByEmail(em, 'nonexistent@example.com');
 
         expect(fetchedUser).toBeUndefined();
     });
@@ -293,5 +429,38 @@ describe('User Controller: getUserByEmail', () => {
             expect(responseBody.error.code).toBe(401);
             expect(responseBody.error.message).toBe('Unauthorized');
         });
+    });
+});
+
+describe('Database Utilities', () => {
+    it('getDBConnector should initialize MikroORM', async () => {
+        const initMock = vi.spyOn(MikroORM, 'init').mockResolvedValue({} as MikroORM);
+
+        const orm = await getDBConnector();
+
+        expect(MikroORM.init).toHaveBeenCalledWith(mikroConfig);
+        expect(orm).toBeDefined();
+
+        initMock.mockRestore();
+    });
+
+    it('updateDBSchema should update the schema without errors', async () => {
+        const schemaGeneratorMock = {
+            updateSchema: vi.fn().mockResolvedValue(undefined),
+        };
+        const ormMock = {
+            getSchemaGenerator: vi.fn().mockReturnValue(schemaGeneratorMock),
+        } as unknown as MikroORM;
+
+        const loggerInfoMock = vi.spyOn(logger, 'info').mockImplementation(vi.fn());
+
+
+        await updateDBSchema(ormMock);
+
+        expect(ormMock.getSchemaGenerator).toHaveBeenCalled();
+        expect(schemaGeneratorMock.updateSchema).toHaveBeenCalled();
+        expect(logger.info).toHaveBeenCalledWith('Schema updated successfully');
+
+        loggerInfoMock.mockRestore();
     });
 });

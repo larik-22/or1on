@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import dotenv from 'dotenv';
 import logger from '../utils/logger.js';
+import {EntityManager} from "@mikro-orm/core";
 
 dotenv.config();
 
@@ -22,14 +23,9 @@ const loginSchema = z.object({
     password: z.string().min(6),
 });
 
-/**
- * Handles user registration.
- *
- * @param ctx - The Hono context object.
- * @returns A response with a success message and the created user object, or an error message.
- */
 auth.post('/', async (ctx) => {
     try {
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const body = await ctx.req.json();
         logger.info('Registration request received', { body });
 
@@ -40,13 +36,13 @@ auth.post('/', async (ctx) => {
         }
 
         const { email, isAdmin } = result.data;
-        const existingUser = await getUserByEmail(email);
+        const existingUser = await getUserByEmail(em, email);
         if (existingUser) {
             logger.warn(`Registration failed: User with email ${email} already exists`);
             return ctx.json(createErrorResponse(409, 'User already exists'), 409);
         }
 
-        const newUser = await createUser({ ...result.data, isAdmin });
+        const newUser = await createUser(em, { ...result.data, isAdmin });
         logger.info('User registered successfully', { userId: newUser.id, email: newUser.email });
         return ctx.json({ message: 'User registered successfully', user: newUser }, 201);
     } catch (err) {
@@ -63,6 +59,7 @@ auth.post('/', async (ctx) => {
  */
 auth.post('/tokens', async (ctx) => {
     try {
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const body = await ctx.req.json();
         logger.info('Login request received', { body });
 
@@ -73,7 +70,7 @@ auth.post('/tokens', async (ctx) => {
         }
 
         const { email, password } = result.data;
-        const user = await getUserByEmail(email);
+        const user = await getUserByEmail(em, email);
 
         if (!user) {
             logger.warn(`Login failed: User with email ${email} not found`);
