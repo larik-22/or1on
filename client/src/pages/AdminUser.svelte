@@ -1,9 +1,9 @@
 <script lang="ts">
-	import {fetchWithAuthSvelte} from "../utils/fetchWithAuth.svelte";
+	import {fetchWithAuth} from "../utils/fetchWithAuth";
 
 	const testFetch = async () => {
 		try {
-			const response = await fetchWithAuthSvelte(`${import.meta.env.VITE_BACKEND_URL}/test/adminprotected`,)
+			const response = await fetchWithAuth(`${import.meta.env.VITE_BACKEND_URL}/test/adminprotected`,)
 		} catch (e) {
 			console.error(e);
 		}

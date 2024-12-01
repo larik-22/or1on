@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { registerSchema } from "../schema/registerSchema";
 	import page from "page";
-	import {handleAuthError, handleAuthResponse} from "../utils/authHandler.svelte";
 
 	let formData = $state({
 		email: "",
@@ -44,12 +43,12 @@
 				body: JSON.stringify(data),
 			});
 
-			try {
-				await handleAuthResponse(response);
-				page.redirect("/");
-			} catch (err) {
-				errors = (err as Error).message ? { message: [(err as Error).message] } : { message: ["An error occurred."] };
+			if (!response.ok) {
+				const errorData = await response.json();
+				errors = errorData.error || { message: ["An error occurred."] };
 				return;
+			} else {
+				page.redirect("/login");
 			}
 
 		} catch (err) {
