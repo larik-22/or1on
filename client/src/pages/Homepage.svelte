@@ -2,6 +2,7 @@
 	//track which section of the dashboard is displayed
 	import {writable} from "svelte/store";
 
+	//track which section of the dashboard is displayed
 	let currentSection = writable('welcome');
 
 	const showSection = (sectionName: string) => {
