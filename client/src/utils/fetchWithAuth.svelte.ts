@@ -1,9 +1,4 @@
-/**
- * Fetch with authentication header attached
- * @param url – The URL to fetch
- * @param options – The fetch options
- */
-import {handleAuthError} from "./authHandler";
+import {handleAuthError} from "./authHandler.svelte";
 
 /**
  * Fetch with authentication header attached.
@@ -11,7 +6,7 @@ import {handleAuthError} from "./authHandler";
  * @param url – The URL to fetch
  * @param options – The fetch options
  */
-const fetchWithAuth = async (url: string, options: RequestInit = {}): Promise<Response> => {
+const fetchWithAuthSvelte = async (url: string, options: RequestInit = {}): Promise<Response> => {
 	const token = localStorage.getItem('token');
 	if (!token) {
 		throw new Error('No token found');
@@ -26,4 +21,4 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}): Promise<Re
 	return handleAuthError(response);
 }
 
-export { fetchWithAuth };
+export { fetchWithAuthSvelte };
