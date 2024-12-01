@@ -1,7 +1,6 @@
 <script lang="ts">
 	import page from "page";
 	import {loginSchema} from "../schema/loginSchema";
-	import {authToken} from "../stores/auth";
 	import {handleAuthResponse} from "../utils/authHandler.svelte";
 
 	let formData = $state({
@@ -45,7 +44,7 @@
 				await handleAuthResponse(response);
 				page.redirect("/");
 			} catch (err) {
-				errors = (err as Error).message ? { message: [(err as Error).message] } : { message: ["An error occurred."] };
+				errors = { message: [err instanceof Error ? err.message : "An error occurred."] };
 				return;
 			}
 		} catch (err) {
@@ -54,8 +53,6 @@
 			isSubmitting = false;
 		}
 	}
-
-
 </script>
 
 <section>

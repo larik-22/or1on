@@ -27,7 +27,7 @@ const handleAuthError = async (response: Response): Promise<Response> => {
 const handleAuthResponse = async (response: Response): Promise<Response> => {
 	if (!response.ok) {
 		const errorData = await response.json();
-		throw new Error(errorData.error || "An error occurred.");
+		throw new Error(errorData.error.message || "An error occurred.");
 	}
 
 	const data = await response.json();

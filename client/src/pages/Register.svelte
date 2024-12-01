@@ -48,7 +48,7 @@
 				await handleAuthResponse(response);
 				page.redirect("/");
 			} catch (err) {
-				errors = (err as Error).message ? { message: [(err as Error).message] } : { message: ["An error occurred."] };
+				errors = { message: [err instanceof Error ? err.message : "An error occurred."] };
 				return;
 			}
 
