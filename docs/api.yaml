@@ -1,0 +1,672 @@
+openapi: 3.0.3
+info:
+  title: OR1ON API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local server
+tags:
+  - name: GET
+  - name: POST
+  - name: PUT
+  - name: DELETE
+paths:
+  /users:
+    get:
+      tags:
+        - GET
+      summary: Get all users
+      responses:
+        '200':
+          description: A list of users
+  /users/{userID}:
+    get:
+      tags:
+        - GET
+      summary: Get an user by ID
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected user
+      responses:
+        '200':
+          description: User found
+    delete:
+      tags:
+        - DELETE
+      summary: Delete an user by ID
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected user
+      responses:
+        '204':
+          description: User deleted
+        '404':
+          description: User not found
+    put:
+      tags:
+        - PUT
+      summary: Update an user by ID
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: User name
+                  example: "User1"
+                email:
+                  type: string
+                  description: User email
+                  example: "user1@gmail.com"
+                password:
+                  type: string
+                  description: User password
+                  example: "123456"
+      responses:
+        '200':
+          description: User updated
+        '404':
+          description: User not found
+  /users/{userID}/feedbacks:
+    get:
+      tags:
+        - GET
+      summary: Get all feedbacks from the given User
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected user
+      responses:
+        '200':
+          description: A list of feedbacks
+        '404':
+          description: User not found
+  /users/{userID}/feedback/{feedbackID}:
+    delete:
+      tags:
+        - DELETE
+      summary: Delete an feedback by ID from the given User
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected user
+        - name: feedbackID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected feedback
+      responses:
+        '204':
+          description: Feedback deleted
+        '404':
+          description: User or Feedback not found
+  /users/{userID}/suggestions/{suggestionID}:
+    delete:
+      tags:
+        - DELETE
+      summary: Delete an selected suggestion by ID from the given User
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected user
+        - name: suggestionID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected suggestion
+      responses:
+        '204':
+          description: Suggestion deleted
+        '404':
+          description: User or Suggestion not found
+  /auth:
+    post:
+      tags:
+        - POST
+      summary: Register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: User name
+                  example: "User1"
+                email:
+                  type: string
+                  description: User email
+                  example: "User1@gmail.com"
+                password:
+                  type: string
+                  description: User password
+                  example: "123456"
+                birthdate:
+                  type: string
+                  description: User birthdate
+                  example: "10/10/2000"
+      responses:
+        '200':
+          description: User registered
+        '404':
+          description: Invalid email or password
+        '500':
+          description: Internal server error
+  /auth/login:
+    post:
+      tags:
+        - POST
+      summary: Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: User email
+                  example: "user1@gmail.com"
+                password:
+                  type: string
+                  description: User password
+                  example: "123456"
+      responses:
+        '200':
+          description: User logged in and token generated
+        '404':
+          description: Invalid email or password
+  /tours:
+    post:
+      tags:
+        - POST
+      summary: Create a new tour
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Tour name
+                  example: "Tour1"
+                type:
+                  type: string
+                  description: Tour type
+                  example: "Tour1 description"
+                highlights:
+                  type: array
+                  description: Tour highlights
+                  items:
+                    type: object
+                    description: Highlight ID
+                  example: [ highlight1, highlight2 ]
+      responses:
+        '200':
+          description: New tour created
+        '404':
+          description: Invalid tour name, type or description or highlights.
+        '500':
+          description: Internal server error
+  /tours/{tourID}:
+    delete:
+      tags:
+        - DELETE
+      summary: Delete a tour by ID
+      parameters:
+        - name: tourID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected tour
+      responses:
+        '204':
+          description: Tour deleted
+        '404':
+          description: Tour not found
+    put:
+      tags:
+        - PUT
+      summary: Update a tour by ID
+      parameters:
+        - name: tourID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected tour
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Tour name
+                  example: "Tour1"
+                type:
+                  type: string
+                  description: Tour type
+                  example: "Historical"
+                highlights:
+                  type: array
+                  description: Tour highlights
+                  items:
+                    type: object
+                    description: Highlight ID
+                  example: [ highlight1, highlight2 ]
+      responses:
+        '200':
+          description: Feedback updated
+        '404':
+          description: Highlight or Feedback not found
+  /tour/{tourID}/feedbacks:
+    post:
+      tags:
+        - POST
+      summary: Create a new feedback for the given tour
+      parameters:
+        - name: tourID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected tour
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rate:
+                  type: number
+                  description: Feedback rate
+                  example: 5.5
+                comment:
+                  type: string
+                  description: User comment about the tour
+                  example: "Great tour!"
+      responses:
+        '200':
+          description: New feedback created
+        '404':
+          description: Invalid rate or comment
+        '500':
+          description: Internal server error
+  /routes:
+    get:
+      tags:
+        - GET
+      summary: Get all routes
+      responses:
+        '200':
+          description: A list of routes
+  /routes/{routeID}:
+    get:
+      tags:
+        - GET
+      summary: Get a route by ID
+      parameters:
+        - name: routeID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected route
+      responses:
+        '200':
+          description: Route found
+        '404':
+          description: Route not found.
+  /routes/{routeID}/highlights:
+    get:
+      tags:
+        - GET
+      summary: Get all highlights from the given Route
+      parameters:
+        - name: routeID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected route
+      responses:
+        '200':
+          description: A list of highlights
+        '404':
+          description: Route not found
+  /routes/{routeID}/highlights/{highlightID}:
+    get:
+      tags:
+        - GET
+      summary: Get a highlight by ID from the given Route
+      parameters:
+        - name: routeID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected route
+        - name: highlightID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected highlight
+      responses:
+        '200':
+          description: Highlight information found
+        '404':
+          description: Route or Highlight not found
+    delete:
+      tags:
+        - DELETE
+      summary: Delete a highlight by ID from the given Route
+      parameters:
+        - name: routeID
+          in: path
+          required: true
+        - name: highlightID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected highlight
+      responses:
+        '200':
+          description: Highlight information deleted
+        '404':
+          description: Route or Highlight not found
+  /highlights:
+    get:
+      tags:
+        - GET
+      summary: Get all highlights
+      responses:
+        '200':
+          description: A list of highlights
+    post:
+      tags:
+        - POST
+      summary: Create a new highlight
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Highlight name
+                  example: "Saxion :("
+                type:
+                  type: string
+                  description: Highlight type
+                  example: "Building"
+                description:
+                  type: string
+                  description: Highlight description
+                  example: "The building where I study"
+                location:
+                  type: object
+                  description: Highlight location
+                  example: 52.215, 6.895
+      responses:
+        '200':
+          description: New highlight created
+        '404':
+          description: Invalid highlight name, description , type or location
+        '500':
+          description: Internal server error
+  /highlights/{highlightID}:
+    get:
+      tags:
+        - GET
+      summary: Get a highlight by ID
+      parameters:
+        - name: highlightID
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the selected highlight
+      responses:
+        '200':
+          description: Highlight found
+        '404':
+          description: Highlight not found
+    delete:
+      tags:
+        - DELETE
+      summary: Delete an highlight by ID
+      parameters:
+        - name: highlightID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected highlight
+      responses:
+        '204':
+          description: Highlight deleted
+        '404':
+          description: Highlight not found
+    put:
+      tags:
+        - PUT
+      summary: Update a highlight by ID
+      parameters:
+        - name: highlightID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected highlight
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Tour name
+                  example: "Big Ben :("
+                type:
+                  type: string
+                  description: Tour type
+                  example: historic
+                highlights:
+                  type: array
+                  description: Tour highlights
+                  items:
+                    type: object
+                    description: Highlight ID
+                  example: [ highlight1, highlight2 ]
+      responses:
+        '200':
+          description: Feedback updated
+        '400':
+          description: Invalid name or type
+        '404':
+          description: Highlight or Feedback not found
+  /highlights/{highlightID}/feedbacks/{feedbackID}:
+    put:
+      tags:
+        - PUT
+      summary: Update a feedback by ID from the given Highlight
+      parameters:
+        - name: highlightID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected highlight
+        - name: feedbackID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected feedback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Highlight name
+                  example: "Saxion :("
+                type:
+                  type: string
+                  description: Highlight type
+                  example: "Building"
+                description:
+                  type: string
+                  description: Highlight description
+                  example: "The building where I study"
+                location:
+                  type: object
+                  description: Highlight location
+                  example: 52.215, 6.895
+      responses:
+        '200':
+          description: Feedback updated
+        '404':
+          description: Highlight or Feedback not found
+  /highlights/{highlightID}/feedbacks:
+    get:
+      tags:
+        - GET
+      summary: Get all feedbacks from the given Highlight
+      parameters:
+        - name: highlightID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected highlight
+      responses:
+        '200':
+          description: A list of feedbacks
+        '404':
+          description: Highlight not found
+    post:
+      tags:
+        - POST
+      summary: Create a new feedback for the given highlight
+      parameters:
+        - name: highlightID
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: ID of the selected highlight
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rate:
+                  type: number
+                  description: Highlight rate
+                  example: 5.5
+                comment:
+                  type: string
+                  description: User comment about the highlight
+                  example: "Great highlight!"
+      responses:
+        '200':
+          description: New feedback created
+        '404':
+          description: Invalid rate or comment
+        '500':
+          description: Internal server error
+  /suggestions:
+    get:
+      tags:
+        - GET
+      summary: Get all suggestions
+      responses:
+        '200':
+          description: A list of suggestions
+    post:
+      tags:
+        - POST
+      summary: Create a new suggestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                place:
+                  type: string
+                  description: Suggestion place
+                  example: "Saxion"
+                description:
+                  type: string
+                  description: Suggestion description
+                  example: "Saxion is a great place to study"
+                location:
+                  type: string
+                  description: Suggestion location
+                  example: "52.215, 6.895"
+      responses:
+        '200':
+          description: New suggestion created
+        '404':
+          description: Invalid suggestion name, description or location
+        '500':
+          description: Internal server error
+  /suggestions/{suggestionID}:
+    get:
+      tags:
+        - GET
+      summary: Get a suggestion by ID
+      parameters:
+        - name: suggestionID
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the selected suggestion
+      responses:
+        '200':
+          description: Suggestion found
+        '404':
+          description: Suggestion not found
