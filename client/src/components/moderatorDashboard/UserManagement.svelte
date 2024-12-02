@@ -1,9 +1,7 @@
 <script lang="ts">
-import {get} from "svelte/store";
-import {enabled} from  "../../stores/popup"
 import ListItem from "../moderatorDashboard/ListItem.svelte";
 import WarningPopUp from "./WarningPopUp.svelte";
-let popup = $state(get(enabled))
+let enabled_popup: boolean = $state(false)
 let users = [
 	{
 		username: "Alex",
@@ -51,15 +49,15 @@ let users = [
 
 <main class="flex items-center content-center w-[100%] justify-center">
 	<div class="border-[1px] bg-[#f9fafb] shadow-md w-[50vw] h-fit mb-[10vh]">
-		<ListItem disableButton={true} user={{username: "Username:", role: "Role:", id: "ID:"}}></ListItem>
+		<ListItem disableButton={true} user={{username: "Username:", role: "Role:", id: "ID:"}} bind:enabled_popup={enabled_popup}></ListItem>
 		<ul class="overflow-y-scroll max-h-[600px]">
 			{#each users as user, i}
-				<ListItem user={user} disableButton={false}></ListItem>
+				<ListItem user={user} disableButton={false} bind:enabled_popup={enabled_popup}></ListItem>
 			{/each}
 		</ul>
 	</div>
 
-	{#if  $enabled}
-	<WarningPopUp></WarningPopUp>
+	{#if enabled_popup}
+	<WarningPopUp bind:enabled_popup={enabled_popup} popupText="AAA"></WarningPopUp>
 	{/if}
 </main>

@@ -33,19 +33,6 @@ let {
     </tr>
   </tbody>
 </table>
-		<!--<ul>-->
-		<!--	{#each highlights as highlight}-->
-		<!--		<li class="pt-[30px]">-->
-		<!--			<div class="flex flex-row gap-[55px]">-->
-		<!--				<p class="text-[2vh]">{highlight[0]}</p>-->
-		<!--				<p class="text-[2vh]">{highlight[1]}</p>-->
-		<!--				<p class="text-[2vh]">{highlight[2]} stars</p>-->
-		<!--				<p class="text-[2vh]">{highlight[3]}</p>-->
-		<!--				<p class="text-[2vh]">{highlight[4]}</p>-->
-		<!--			</div>-->
-		<!--		</li>-->
-		<!--	{/each}-->
-		<!--</ul>-->
 	</div>
 </main>
 
