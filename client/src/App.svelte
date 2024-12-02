@@ -13,9 +13,6 @@
     import isLoggedIn from "./middleware/loggedIn";
 
     import UserDashboard from "./pages/UserDashboard.svelte";
-    import ChangePassword from "./pages/userDashboard/ChangePassword.svelte";
-    import ChangeUsername from "./pages/userDashboard/ChangeUsername.svelte";
-    import LogOut from "./pages/userDashboard/LogOut.svelte";
 
 
     let page: any;
