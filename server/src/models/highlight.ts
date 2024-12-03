@@ -23,8 +23,9 @@ export class Highlight {
 
     @Property({ type: 'double', nullable: true })
     longitude?: number;
+
     @Property({type: 'boolean',nullable: true})
-    is_confirmed?: boolean;
+    is_approved? = false;
 
     @ManyToMany(() => 'Tour', (tour) => tour.highlights)
     tours = new Collection<Tour>(this);

@@ -1,20 +1,16 @@
-import { Entity, PrimaryKey, Property, ManyToOne, Enum } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, ManyToOne} from '@mikro-orm/core';
 import { Tour } from './tour';
 import { Highlight } from './highlight';
 import { User } from './user';
 
-export enum FeedbackType {
-    TOUR = 'tour',
-    HIGHLIGHT = 'highlight',
-}
 
+/**
+ * Represents a tour entity.
+ */
 @Entity()
 export class Feedback {
     @PrimaryKey()
     id!: number;
-
-    @Enum(() => FeedbackType)
-    type!: FeedbackType;
 
     @ManyToOne(() => 'Tour', { nullable: true })
     tour?: Tour;

@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property, ManyToMany, Collection, OneToMany } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, ManyToMany, Collection,} from '@mikro-orm/core';
 import { User } from './user';
 import { Highlight } from './highlight';
 
