@@ -7,7 +7,7 @@ import { Tour } from './tour';
 @Entity()
 export class Highlight {
     @PrimaryKey()
-    highlight_id!: number;
+    id!: number;
 
     @Property()
     name!: string;
@@ -27,6 +27,6 @@ export class Highlight {
     is_confirmed?: boolean;
 
     @ManyToMany(() => 'Tour', (tour) => tour.highlights)
-    tours = new Collection<Tour>(this); // Many-to-Many relationship with tours
+    tours = new Collection<Tour>(this);
 
 }

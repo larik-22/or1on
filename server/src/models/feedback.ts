@@ -1,17 +1,26 @@
-import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, ManyToOne, Enum } from '@mikro-orm/core';
+import { Tour } from './tour';
 import { Highlight } from './highlight';
 import { User } from './user';
 
-/**
- * Represents feedback for a highlight.
- */
+export enum FeedbackType {
+    TOUR = 'tour',
+    HIGHLIGHT = 'highlight',
+}
+
 @Entity()
 export class Feedback {
     @PrimaryKey()
-    feedback_id!: number;
+    id!: number;
 
-    @ManyToOne(() => 'Highlight')
-    highlight!: Highlight;
+    @Enum(() => FeedbackType)
+    type!: FeedbackType;
+
+    @ManyToOne(() => 'Tour', { nullable: true })
+    tour?: Tour;
+
+    @ManyToOne(() => 'Highlight', { nullable: true })
+    highlight?: Highlight;
 
     @ManyToOne(() => 'User')
     user!: User;
@@ -24,5 +33,4 @@ export class Feedback {
 
     @Property({ default: false })
     is_approved = false;
-
 }

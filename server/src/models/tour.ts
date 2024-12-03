@@ -1,7 +1,7 @@
 import { Entity, PrimaryKey, Property, ManyToMany, Collection, OneToMany } from '@mikro-orm/core';
 import { User } from './user';
 import { Highlight } from './highlight';
-import { TourFeedback } from './tour_feedback.js';
+
 
 /**
  * Represents a tour entity.
@@ -9,7 +9,7 @@ import { TourFeedback } from './tour_feedback.js';
 @Entity()
 export class Tour {
     @PrimaryKey()
-    tour_id!: number;
+    id!: number;
 
     @Property()
     name!: string;
@@ -24,11 +24,9 @@ export class Tour {
     start_hour?: string;
 
     @ManyToMany(() => 'User', (user) => user.tours, { owner: true })
-    users = new Collection<User>(this); // Many-to-Many relationship with users
+    users = new Collection<User>(this);
 
     @ManyToMany(() => 'Highlight', (highlight) => highlight.tours, { owner: true })
-    highlights = new Collection<Highlight>(this); // Many-to-Many relationship with highlights
+    highlights = new Collection<Highlight>(this);
 
-    @OneToMany(() => 'TourFeedback', (tourFeedback) => tourFeedback.tour)
-    feedback = new Collection<TourFeedback>(this); // One-to-Many with TourFeedback
 }

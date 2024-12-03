@@ -19,8 +19,8 @@ export class User {
     password!: string;
 
     @Property()
-    is_admin = false;
+    isAdmin = false;
 
     @ManyToMany(() => 'Tour', (tour) => tour.users)
-    tours = new Collection<Tour>(this); // Many-to-Many relationship with tours
+    tours = new Collection<Tour>(this);
 }

@@ -5,13 +5,12 @@ import { User } from './src/models/user.js';
 import dotenv from 'dotenv';
 import { Tour } from './src/models/tour.js';
 import {Feedback} from "./src/models/feedback.js";
-import {TourFeedback} from "./src/models/tour_feedback.js";
 import {Highlight} from "./src/models/highlight.js";
 
 dotenv.config();
 
 export default {
-    entities: [User, Tour, Highlight, Feedback, TourFeedback],
+    entities: [User, Tour, Highlight, Feedback],
     driver: PostgreSqlDriver,
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
