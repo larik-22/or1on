@@ -1,65 +1,42 @@
 <script lang="ts">
-    import {logout} from "../../lib/utils/authHandler.svelte";
-    import {authToken} from "../../lib/stores/auth";
-    import { onMount} from "svelte";
-
-    let showConfirmation = false;
+    let showConfirmation: boolean = false;
 
     const handleLogout = (): void => {
-        showConfirmation = true;
+        //remove user token -> redirect
+        console.log("User logged out!");
+        window.location.href = '/login';
     };
 
-    const confirmLogout = (): void => {
-        logout(); // using the logout function from authHandler
+    const toggleConfirmation = (): void => {
+        showConfirmation = !showConfirmation;
     };
-
-    const cancelLogout = (): void => {
-        showConfirmation = false;
-    };
-
-    onMount(() => {
-    });
 </script>
 
-<div class="flex bg-gray-100 h-screen">
-    <div
-            class="absolute bg-white p-6 border rounded-lg shadow-md w-full max-w-sm"
-            style="top: 50%; left: 55%; transform: translate(-50%, -50%);"
+<div class="log-out">
+    <button
+            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            on:click={toggleConfirmation}
     >
-        <h2 class="text-2xl font-semibold mb-4 text-center">Logout</h2>
-        <p class="mb-6 text-gray-600 text-center">
-            Click the button below to log out of your account securely.
-        </p>
+        Log Out
+    </button>
 
-        {#if showConfirmation}
-            <!-- Confirmation dialog -->
-            <div class="bg-red-50 p-4 border rounded-lg">
-                <p class="text-red-600 text-center mb-4">
-                    Are you sure you want to log out?
-                </p>
-                <div class="flex justify-between">
-                    <button
-                            class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 w-full mr-2"
-                            on:click={confirmLogout}
-                    >
-                        Confirm
-                    </button>
-                    <button
-                            class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 w-full"
-                            on:click={cancelLogout}
-                    >
-                        Cancel
-                    </button>
-                </div>
+    {#if showConfirmation}
+        <div class="flex flex-col items-center mt-4 bg-gray-100 p-4 border border-gray-300 rounded shadow">
+            <p class="text-gray-700 mb-4">Are you sure you want to log out?</p>
+            <div class="flex space-x-2">
+                <button
+                        class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                        on:click={handleLogout}
+                >
+                    Yes, log out
+                </button>
+                <button
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+                        on:click={toggleConfirmation}
+                >
+                    Cancel
+                </button>
             </div>
-        {:else}
-            <!-- Log Out button -->
-            <button
-                    class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-800 w-full"
-                    on:click={handleLogout}
-            >
-                Log Out
-            </button>
-        {/if}
-    </div>
+        </div>
+    {/if}
 </div>
