@@ -1,8 +1,9 @@
-import { Entity, PrimaryKey, Property, OneToMany } from '@mikro-orm/core';
-import { Feedback } from './feedback';
-import { TourHighlight } from './tour_highlight';
-import {Collection} from "@mikro-orm/postgresql";
+import { Entity, PrimaryKey, Property, ManyToMany, Collection } from '@mikro-orm/core';
+import { Tour } from './tour';
 
+/**
+ * Represents a highlight entity.
+ */
 @Entity()
 export class Highlight {
     @PrimaryKey()
@@ -17,15 +18,15 @@ export class Highlight {
     @Property({ nullable: true })
     category?: string;
 
-    @Property({ nullable: true })
+    @Property({ type: 'double', nullable: true })
     latitude?: number;
 
-    @Property({ nullable: true })
+    @Property({ type: 'double', nullable: true })
     longitude?: number;
+    @Property({type: 'boolean',nullable: true})
+    is_confirmed?: boolean;
 
-    @OneToMany(() => Feedback, feedback => feedback.highlight)
-    feedbacks = new Collection<Feedback>(this);
+    @ManyToMany(() => 'Tour', (tour) => tour.highlights)
+    tours = new Collection<Tour>(this); // Many-to-Many relationship with tours
 
-    @OneToMany(() => TourHighlight, tourHighlight => tourHighlight.highlight)
-    tours = new Collection<TourHighlight>(this);
 }

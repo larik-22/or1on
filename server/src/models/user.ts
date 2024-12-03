@@ -1,25 +1,26 @@
-import { Entity, PrimaryKey, Property, OneToMany } from '@mikro-orm/core';
-import { TourUser } from './tour_user';
-import {Collection} from "@mikro-orm/postgresql";  // Import TourUser to establish the relationship
+import { Entity, PrimaryKey, Property, ManyToMany, Collection } from '@mikro-orm/core';
+import { Tour } from './tour';
 
+/**
+ * Represents a user entity in the system.
+ */
 @Entity()
 export class User {
-    @PrimaryKey()
-    user_id!: number;
+    @PrimaryKey({  type: 'uuid'  })
+    id!: String;
 
-    @Property({ unique: true })
+    @Property({ unique: true, nullable: true })
     username!: string;
 
-    @Property({ unique: true })
+    @Property({ unique: true,nullable: true  })
     email!: string;
 
-    @Property()
-    password_hash!: string;
+    @Property({ nullable: true })
+    password!: string;
 
-    @Property({ default: false })
+    @Property()
     is_admin: boolean = false;
 
-    // One-to-many relationship with the TourUser entity
-    @OneToMany(() => TourUser, tourUser => tourUser.user)
-    tours = new Collection<TourUser>(this);  // A user can participate in many tours
+    @ManyToMany(() => 'Tour', (tour) => tour.users)
+    tours = new Collection<Tour>(this); // Many-to-Many relationship with tours
 }

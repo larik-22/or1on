@@ -1,23 +1,26 @@
 import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
-import { User } from './user';
 import { Highlight } from './highlight';
+import { User } from './user';
 
+/**
+ * Represents feedback for a highlight.
+ */
 @Entity()
 export class Feedback {
     @PrimaryKey()
     feedback_id!: number;
 
-    @ManyToOne(() => Highlight)
+    @ManyToOne(() => 'Highlight')
     highlight!: Highlight;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => 'User')
     user!: User;
 
     @Property()
     rating!: number;
 
-    @Property()
-    comment!: string;
+    @Property({ nullable: true })
+    comment?: string;
 
     @Property({ default: false })
     is_approved: boolean = false;
