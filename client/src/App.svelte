@@ -25,7 +25,7 @@
         params = ctx;
     });
 
-    router('/admin', (ctx) => {
+    router('/moderator-dashboard', (ctx) => {
         page = ModeratorDashboard;
         currentRoute = ctx.pathname;
         params = ctx;
@@ -43,32 +43,14 @@
         params = ctx;
     });
 
-    router('/change-password', (ctx) => {
-        page = ChangePassword;
-        currentRoute = ctx.pathname;
-        params = ctx;
-    });
-
     router('/login', isNotLoggedIn, (ctx: Context) => {
         page = Login;
         currentRoute = ctx.pathname;
         params = ctx;
     });
 
-    router('/change-username', (ctx) => {
-        page = ChangeUsername;
-        currentRoute = ctx.pathname;
-        params = ctx;
-    });
-
     router('/test-logged-in', isLoggedIn, (ctx: Context) => {
         page = LoggedInUser;
-        currentRoute = ctx.pathname;
-        params = ctx;
-    });
-
-    router('/logout', (ctx) => {
-        page = LogOut;
         currentRoute = ctx.pathname;
         params = ctx;
     });
@@ -81,24 +63,6 @@
 
     router('/user-dashboard', (ctx) => {
         page = UserDashboard;
-        currentRoute = ctx.pathname;
-        params = ctx;
-    });
-
-    router('/change-password', (ctx) => {
-        page = ChangePassword;
-        currentRoute = ctx.pathname;
-        params = ctx;
-    });
-
-    router('/change-username', (ctx) => {
-        page = ChangeUsername;
-        currentRoute = ctx.pathname;
-        params = ctx;
-    });
-
-    router('/logout', (ctx) => {
-        page = LogOut;
         currentRoute = ctx.pathname;
         params = ctx;
     });
