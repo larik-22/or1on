@@ -60,12 +60,6 @@
         params = ctx;
     });
 
-    router('/user-dashboard', (ctx) => {
-        page = UserDashboard;
-        currentRoute = ctx.pathname;
-        params = ctx;
-    });
-
     router.start();
 </script>
 
