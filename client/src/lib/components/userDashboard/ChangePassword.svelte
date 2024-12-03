@@ -1,10 +1,10 @@
-<script>
-    let currentPassword = '';
-    let newPassword = '';
-    let confirmPassword = '';
-    let error = '';
+<script lang="ts">
+    let currentPassword: string = '';
+    let newPassword: string = '';
+    let confirmPassword: string = '';
+    let error: string = '';
 
-    const handleSubmit = () => {
+    const handleSubmit = (): void => {
         if (newPassword !== confirmPassword) {
             error = "Passwords do not match!";
         } else if (newPassword.length < 5) {
@@ -19,6 +19,7 @@
         }
     };
 </script>
+
 
 <div class="bg-gray-100 p-8 border rounded-lg shadow-md max-w-xl mx-auto">
     <h2 class="text-2xl font-semibold mb-4">Change Password</h2>

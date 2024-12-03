@@ -1,24 +1,25 @@
-<script>
-    let currentUsername = 'current_user'; //this has the pre fill of the current username
-    let newUsername = '';
-    let successMessage = '';
-    let errorMessage = '';
+<script lang="ts">
+    let currentUsername: string = 'current_user'; //this has the pre fill of the current username
+    let newUsername: string = '';
+    let successMessage: string = '';
+    let errorMessage: string = '';
 
-    const handleSubmit = () => {
+    const handleSubmit = (): void => {
         if (newUsername.trim() === '') {
             errorMessage = "Please enter a new username.";
             successMessage = '';
         } else {
-            // Simulate successful username change
+            //successful username change
             console.log("Username changed to: ", newUsername);
             successMessage = "Username changed successfully!";
             errorMessage = '';
-            // Clear input after successful change
+            //clear input after successful change
             currentUsername = newUsername;
             newUsername = '';
         }
     };
 </script>
+
 
 
 <div class="bg-gray-100 p-8 border rounded-lg shadow-md max-w-xl mx-auto">
