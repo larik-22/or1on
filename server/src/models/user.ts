@@ -7,7 +7,7 @@ import { Tour } from './tour';
 @Entity()
 export class User {
     @PrimaryKey({  type: 'uuid'  })
-    id!: String;
+    id!: string;
 
     @Property({ unique: true, nullable: true })
     username!: string;
@@ -19,7 +19,7 @@ export class User {
     password!: string;
 
     @Property()
-    is_admin: boolean = false;
+    is_admin = false;
 
     @ManyToMany(() => 'Tour', (tour) => tour.users)
     tours = new Collection<Tour>(this); // Many-to-Many relationship with tours

@@ -23,6 +23,6 @@ export class Feedback {
     comment?: string;
 
     @Property({ default: false })
-    is_approved: boolean = false;
+    is_approved = false;
 
 }
