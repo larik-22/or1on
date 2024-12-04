@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { createUser, getUserByEmail } from '../controllers/userController.js';
+import { createUser, getUserByEmail, getUserByUsername } from '../controllers/userController.js';
 import { createErrorResponse } from '../errors/error.js';
 import { generateToken } from '../utils/jwt.js';
 import bcrypt from 'bcryptjs';
@@ -36,10 +36,15 @@ auth.post('/', async (ctx) => {
             return ctx.json(createErrorResponse(400, 'Invalid registration data'), 400);
         }
 
-        const { email, password, isAdmin} = result.data;
-        const existingUser = await getUserByEmail(em, email);
-        if (existingUser) {
+        const { email, password, isAdmin, username} = result.data;
+        const emailAlreadyExists = await getUserByEmail(em, email);
+        if (emailAlreadyExists) {
             logger.warn(`Registration failed: User with email ${email} already exists`);
+            return ctx.json(createErrorResponse(409, 'User already exists'), 409);
+        }
+        const usernameAlreadyExists = await getUserByUsername(em, username);
+        if (usernameAlreadyExists) {
+            logger.warn(`Registration failed: User with username ${username} already exists`);
             return ctx.json(createErrorResponse(409, 'User already exists'), 409);
         }
 

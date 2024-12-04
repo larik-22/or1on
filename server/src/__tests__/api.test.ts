@@ -535,3 +535,9 @@ describe('createHighlightsGeoJSON function', () => {
         expect(em.find).toHaveBeenCalledWith(Highlight, { is_approved: true });
     });
 });
+
+describe('POST /userDashboard/update-username', () => {
+   it('should update the user\'s username', async () => {
+
+   });
+});
