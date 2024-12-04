@@ -1,4 +1,4 @@
-import {describe, it, expect, vi, beforeEach} from 'vitest';
+import {describe, it, expect, vi, beforeEach, afterEach} from 'vitest';
 import { generateToken } from '../utils/jwt.js';
 import { createUser, getUserByEmail } from '../controllers/userController.js';
 import {type EntityManager, MikroORM} from "@mikro-orm/core";
@@ -10,6 +10,9 @@ import bcrypt from "bcryptjs";
 import {getDBConnector, updateDBSchema} from "../utils/db.js";
 import mikroConfig from '../../mikro-orm.config.js';
 import logger from "../utils/logger.js";
+import {createHighlightsGeoJSON} from "../controllers/highlightsController.js";
+import {Highlight} from "../models/highlight.js";
+
 
 const mockEnv = {
     ALLOWED_HOST: '*',
@@ -28,6 +31,7 @@ beforeEach(() => {
                     email: 'user@example.com',
                     password: await bcrypt.hash('password123', 10),
                     isAdmin: false,
+                    username: '880005553535',
                 };
             } else if (condition.email === 'admin@example.com') {
                 return {
@@ -35,6 +39,7 @@ beforeEach(() => {
                     email: 'admin@example.com',
                     password: await bcrypt.hash('password123', 10),
                     isAdmin: true,
+                    username: '880005553535',
                 };
             }
             return undefined;
@@ -47,12 +52,17 @@ beforeEach(() => {
     app = createApp(em);
 });
 
+afterEach(() => {
+    vi.resetModules();
+});
+
 describe('POST /auth', () => {
     it('should successfully register a user', async () => {
         const userData = {
             email: 'user@example.com',
             password: 'password123',
             isAdmin: false,
+            username: '880005553535',
         };
 
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
@@ -73,6 +83,7 @@ describe('POST /auth', () => {
             email: 'admin@example.com',
             password: 'password123',
             isAdmin: true,
+            username: '880005553535',
         };
 
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
@@ -107,6 +118,7 @@ describe('POST /auth', () => {
             email: 'user@example.com',
             password: 'password123',
             isAdmin: false,
+            username: '880005553535',
         };
 
         const response = await app.request('/auth', {
@@ -141,6 +153,7 @@ describe('POST /auth/tokens', () => {
             email: 'user@example.com',
             password: 'password123',
             isAdmin: false,
+            username: '880005553535',
         };
 
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
@@ -167,6 +180,7 @@ describe('POST /auth/tokens', () => {
             email: 'admin@example.com',
             password: 'password123',
             isAdmin: true,
+            username: '880005553535',
         };
 
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
@@ -226,6 +240,7 @@ describe('GET /test/protected', () => {
             email: 'user@example.com',
             password: 'password123',
             isAdmin: false,
+            username: '880005553535',
         };
 
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
@@ -250,6 +265,7 @@ describe('GET /test/protected', () => {
             email: 'admin@example.com',
             password: 'password123',
             isAdmin: true,
+            username: '880005553535',
         };
 
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
@@ -299,6 +315,7 @@ describe('GET /test/adminprotected', () => {
             email: 'admin@example.com',
             password: 'password123',
             isAdmin: true,
+            username: '880005553535',
         };
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
         const createdAdmin = await createUser(em, adminUser);
@@ -322,6 +339,7 @@ describe('GET /test/adminprotected', () => {
             email: 'user@example.com',
             password: 'password123',
             isAdmin: false,
+            username: '880005553535',
         };
 
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
@@ -360,6 +378,7 @@ describe('createUser function', () => {
             email: 'test@example.com',
             password: 'password123',
             isAdmin: false,
+            username: '880005553535',
         };
 
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
@@ -378,6 +397,7 @@ describe('User Controller: getUserByEmail', () => {
             email: 'user@example.com',
             password: 'password123',
             isAdmin: false,
+            username: '880005553535',
         };
 
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
@@ -459,5 +479,59 @@ describe('Database Utilities', () => {
         expect(logger.info).toHaveBeenCalledWith('Schema updated successfully');
 
         loggerInfoMock.mockRestore();
+    });
+});
+
+describe('createHighlightsGeoJSON function', () => {
+    it('should return GeoJSON object with approved highlights', async () => {
+        const mockHighlights = [
+            {
+                id: 1,
+                name: 'Highlight 1',
+                description: 'Description 1',
+                category: 'Category 1',
+                latitude: 10.0,
+                longitude: 20.0,
+                is_approved: true,
+            }
+        ];
+
+        em.find = vi.fn().mockResolvedValue(mockHighlights);
+
+        const geoJSON = await createHighlightsGeoJSON(em);
+
+        expect(geoJSON).toEqual({
+            type: 'FeatureCollection',
+            features: [
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [20.0, 10.0],
+                    },
+                    properties: {
+                        id: 1,
+                        name: 'Highlight 1',
+                        description: 'Description 1',
+                        category: 'Category 1',
+                    },
+                }
+            ],
+        });
+
+        expect(em.find).toHaveBeenCalledWith(Highlight, { is_approved: true });
+    });
+
+    it('should return empty GeoJSON object if no approved highlights exist', async () => {
+        em.find = vi.fn().mockResolvedValue([]);
+
+        const geoJSON = await createHighlightsGeoJSON(em);
+
+        expect(geoJSON).toEqual({
+            type: 'FeatureCollection',
+            features: [],
+        });
+
+        expect(em.find).toHaveBeenCalledWith(Highlight, { is_approved: true });
     });
 });

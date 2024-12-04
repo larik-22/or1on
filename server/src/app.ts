@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import auth from './routes/auth.js';
 import test from './routes/test.js';
+import map from './routes/map.js';
 import { cors } from 'hono/cors';
 import logger from './utils/logger.js';
 import type {EntityManager } from '@mikro-orm/core';
@@ -27,6 +28,7 @@ export const createApp = (em: EntityManager): Hono => {
 
     app.route('/auth', auth);
     app.route('/test', test);
+    app.route('/map', map);
 
     app.get('/', (c) => {
         logger.info('Received GET request on /');

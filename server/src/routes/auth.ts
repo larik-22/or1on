@@ -16,6 +16,7 @@ const registrationSchema = z.object({
     email: z.string().email(),
     password: z.string().min(6),
     isAdmin: z.boolean().optional().default(false),
+    username: z.string().min(4),
 });
 
 const loginSchema = z.object({
@@ -27,15 +28,15 @@ auth.post('/', async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const body = await ctx.req.json();
-        logger.info('Registration request received', { body });
+        logger.info('Registration request received: '+ body);
 
         const result = registrationSchema.safeParse(body);
         if (!result.success) {
-            logger.warn('Invalid registration data', { errors: result.error.errors });
+            logger.warn('Invalid registration data: ' + result.error.errors);
             return ctx.json(createErrorResponse(400, 'Invalid registration data'), 400);
         }
 
-        const { email, password, isAdmin } = result.data;
+        const { email, password, isAdmin} = result.data;
         const existingUser = await getUserByEmail(em, email);
         if (existingUser) {
             logger.warn(`Registration failed: User with email ${email} already exists`);

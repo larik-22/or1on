@@ -1,5 +1,4 @@
-import { Entity, PrimaryKey, Property, ManyToMany, Collection } from '@mikro-orm/core';
-import { Tour } from './tour';
+import { Entity, PrimaryKey, Property} from '@mikro-orm/core';
 
 /**
  * Represents a user entity in the system.
@@ -9,7 +8,7 @@ export class User {
     @PrimaryKey({  type: 'uuid'  })
     id!: string;
 
-    @Property({ unique: true, nullable: true })
+    @Property({nullable: true })
     username!: string;
 
     @Property({ unique: true,nullable: true  })
@@ -20,7 +19,4 @@ export class User {
 
     @Property()
     isAdmin = false;
-
-    @ManyToMany(() => 'Tour', (tour) => tour.users)
-    tours = new Collection<Tour>(this);
 }

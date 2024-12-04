@@ -1,7 +1,7 @@
 import { Entity, PrimaryKey, Property, ManyToOne} from '@mikro-orm/core';
-import { Tour } from './tour';
-import { Highlight } from './highlight';
-import { User } from './user';
+import { Tour } from './tour.js';
+import { Highlight } from './highlight.js';
+import { User } from './user.js';
 
 
 /**
@@ -12,13 +12,13 @@ export class Feedback {
     @PrimaryKey()
     id!: number;
 
-    @ManyToOne(() => 'Tour', { nullable: true })
+    @ManyToOne(() => Tour, { nullable: true })
     tour?: Tour;
 
-    @ManyToOne(() => 'Highlight', { nullable: true })
+    @ManyToOne(() => Highlight, { nullable: true })
     highlight?: Highlight;
 
-    @ManyToOne(() => 'User')
+    @ManyToOne(() => User)
     user!: User;
 
     @Property()

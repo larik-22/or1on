@@ -1,5 +1,5 @@
 import { Entity, PrimaryKey, Property, ManyToMany, Collection } from '@mikro-orm/core';
-import { Tour } from './tour';
+import { Tour } from './tour.js';
 
 /**
  * Represents a highlight entity.
@@ -15,8 +15,8 @@ export class Highlight {
     @Property()
     description!: string;
 
-    @Property({ nullable: true })
-    category?: string;
+    @Property()
+    category!: string;
 
     @Property({ type: 'double', nullable: true })
     latitude?: number;
@@ -24,10 +24,10 @@ export class Highlight {
     @Property({ type: 'double', nullable: true })
     longitude?: number;
 
-    @Property({type: 'boolean',nullable: true})
-    is_approved? = false;
+    @Property({ type: 'boolean', default: false })
+    is_approved!: boolean;
 
-    @ManyToMany(() => 'Tour', (tour) => tour.highlights)
+    @ManyToMany(() => Tour, (tour) => tour.highlights)
     tours = new Collection<Tour>(this);
 
 }
