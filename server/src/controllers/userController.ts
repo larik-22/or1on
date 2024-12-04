@@ -74,8 +74,6 @@ export const createUser = async (
         logger.error('Failed to create user: ' + error);
         throw error;
     }
-
-
 };
 
 /**

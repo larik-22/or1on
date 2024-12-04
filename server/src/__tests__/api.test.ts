@@ -538,6 +538,27 @@ describe('createHighlightsGeoJSON function', () => {
 
 describe('POST /userDashboard/update-username', () => {
    it('should update the user\'s username', async () => {
+       const user = {
+           email: 'user@example.com',
+           password: 'password123',
+           isAdmin: false,
+           username: '880005553535',
+       };
 
+       em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+       const createdUser = await createUser(em, user);
+       const token = await generateToken({
+           ...createdUser,
+           password: user.password
+       });
+
+       const response = await app.request('/userDashboard/update-username', {
+           method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}` },
+           body: JSON.stringify({ oldUsername: '880005553535', newUsername: 'newUsername' }),
+       }, mockEnv);
+       const responseBody = await response.json();
+       logger.warn(responseBody);
+       expect(response.status).toBe(200);
    });
 });

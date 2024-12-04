@@ -42,7 +42,8 @@ userDashboard.post('/update-password', isLoggedIn, async (c) => {
         em,
         userId,
         oldPassword,
-        newPassword);
+        newPassword
+    );
     return c.json(result, result.success ? 200 : 400);
 });
 
