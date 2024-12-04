@@ -670,3 +670,52 @@ paths:
           description: Suggestion found
         '404':
           description: Suggestion not found
+  /map/highlights:
+    get:
+      tags:
+        - GET
+      summary: Get all highlights as GeoJSON
+      responses:
+        '200':
+          description: Successfully retrieved highlights
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: FeatureCollection
+                  features:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: Feature
+                        geometry:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              example: Point
+                            coordinates:
+                              type: array
+                              items:
+                                type: number
+                              example: [ 6.895, 52.215 ]
+                        properties:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                            description:
+                              type: string
+                            category:
+                              type: string
+        '404':
+          description: No highlights found
+

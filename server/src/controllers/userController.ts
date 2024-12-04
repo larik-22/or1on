@@ -40,11 +40,17 @@ export const createUser = async (
             email: email,
             password: hashedPassword,
             isAdmin: isAdmin,
+            username: ''
         });
 
     await em.persistAndFlush(newUser);
 
-    return { id: newUser.id, email: newUser.email, isAdmin: newUser.isAdmin };
+    return {
+        id: newUser.id,
+        email: newUser.email,
+        isAdmin: newUser.isAdmin,
+        username: newUser.username
+    };
     } catch (error) {
         logger.error('Failed to create user: ' + error);
         throw error;
