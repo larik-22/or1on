@@ -4,14 +4,34 @@ import bcrypt from 'bcryptjs';
 import logger from '../utils/logger.js';
 import { randomUUID } from 'crypto';
 
-let users: User[] = [];
-
-export const getAllUsers = () => {
-    return users;
+/**
+ * Fetches all users
+ *
+ * @param em - The MikroORM EntityManager instance.
+ * @returns {Promise<User[] | null>} A promise resolving to a list of users if found, otherwise null.
+ */
+export const getAllUsers = async (em: EntityManager): Promise<User[] | null> => {
+    try {
+        return await em.find(User);
+    } catch (error) {
+        logger.error('Failed to fetch users: ' + error)
+    }
 }
 
-export const getUserById = (id: string) => {
-    return users.find(user => user.id === id)
+/**
+ * Fetches a user by their id from the database.
+ *
+ * @param em - The MikroORM EntityManager instance.
+ * @param id - The id of the user to be found.
+ * @returns {Promise<User | null>} A promise resolving to the user object if found, otherwise null.
+ */
+export const getUserById = async (em: EntityManager, id: string): Promise<User | null> => {
+    try {
+        return await em.findOne(User, { id });
+    } catch (error){
+        logger.error('Failed to fetch user by id: ' + id + ' error: ' + error);
+        throw error;
+    }
 }
 
 /**
@@ -28,14 +48,6 @@ export const getUserByEmail = async (em: EntityManager, email: string): Promise<
         logger.error('Failed to fetch user by email:' + email + ' error: ' + error);
         throw error;
     }
-};
-
-export const getFeedbackByUserId = (id: string) => {
-    return users.find(user => user.id === id)?.feedback;
-};
-
-export const getFeedbackByUserId = (id: string) => {
-    return users.find(user => user.id === id)?.feedback;
 };
 
 export const getFeedbackByUserId = (id: string) => {
@@ -78,13 +90,17 @@ export const createUser = async (
         throw error;
     }
 };
-
-export const deleteUser = (id: string) => {
-    const deletedUser = users.find(user => user.id === id);
-    users = users.filter(user => user.id !== deletedUser?.id);
-}
-
-export const deleteFeedbackFromUserBy = (userId: string, feedbackId) => {
-    let user = users.find(user => user.id === userId);
-    user?.feedback.filter();
+/**
+ * Deletes an existing user from the database.
+ * @param em - The MikroORM EntityManager instance.
+ * @param id - The id of the user to be found.
+ */
+export const deleteUser = async (em: EntityManager, id: string) => {
+    try {
+        await em.nativeDelete(User, {id: id});
+        await em.flush();
+        logger.info('User deleted successfully!')
+    } catch (error){
+        logger.error('Failed to find or delete user with id: ' + id + ' error: ' + error)
+    }
 }

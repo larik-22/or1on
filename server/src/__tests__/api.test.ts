@@ -1,6 +1,9 @@
 import {describe, it, expect, vi, beforeEach, afterEach} from 'vitest';
 import { generateToken } from '../utils/jwt.js';
-import { createUser, getUserByEmail } from '../controllers/userController.js';
+import { createUser, getUserByEmail, getAllUsers, getUserById, deleteUser } from '../controllers/userController.js';
+import { getFeedbackByUserId, getFeedbackByHighlight, approveFeedback, deleteFeedback } from '../controllers/feedbackController.js'
+import { getAllTours, getTourById, getHighlightsByTour, createTour, addUserToTour, updateTour, deleteTour } from "../controllers/tourController.js";
+import { getAllHighlights, getHighlightById, createHighlight, approveHighlightSuggestion, updateHighlight, deleteHighlight } from "../controllers/highlightController.js";
 import {type EntityManager, MikroORM} from "@mikro-orm/core";
 import { randomUUID } from "crypto";
 import { createApp } from "../app.js";
@@ -12,6 +15,10 @@ import mikroConfig from '../../mikro-orm.config.js';
 import logger from "../utils/logger.js";
 import {createHighlightsGeoJSON} from "../controllers/highlightsController.js";
 import {Highlight} from "../models/highlight.js";
+import {User} from "../models/user.js";
+import {Feedback} from "../models/feedback.js";
+import {Tour} from "../models/tour.js";
+import {throws} from "node:assert";
 
 
 const mockEnv = {
@@ -448,6 +455,691 @@ describe('User Controller: getUserByEmail', () => {
         });
     });
 });
+
+describe('GET /users', () => {
+    it('should fetch all users and only be accessible to admins', async () => {
+        const mockUsers = [
+            {id: '1', email: 'user@example.com', is_admin: false},
+            {id: '2', email: 'admin@example.com', is_admin: true}
+        ]
+
+        em.find = vi.fn( async () => mockUsers);
+
+        const response = await app.request('/users', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.users).toEqual(mockUsers);
+    });
+    it('should return 500 if there is an internal error', async () => {
+        em.find = vi.fn( async () => throw new Error('Database error'));
+
+        const response = await app.request('/users', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(500);
+        const responseBody = await response.json();
+        expect(responseBody.error.message).toEqual('Internal error');
+    });
+})
+
+describe('GET /users/:id', () => {
+    it('should fetch a user and only be accessible to admins', async () => {
+        const mockUser = {id: '1', email: 'user@example.com', is_admin: false};
+
+        em.findOne = vi.fn( async (entity, condition) => condition.id === mockUser.id ? mockUser: null);
+
+        const response = await app.request('/users/1', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.user).toEqual(mockUser);
+    });
+    it('should return 404 if user is not found', async () => {
+        em.findOne = vi.fn( async () => null);
+
+        const response = await app.request('/users/2', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(404);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('User not found');
+    });
+})
+
+describe('POST /users', () => {
+    it('should create a user successfully', async () => {
+        const data = {email: 'user@example.com', password: 'somePassword', isAdmin: false};
+
+        em.persistAndFlush = vi.fn(async () => {});
+
+        const response = await app.request('/users', {method: 'POST', body: JSON.stringify(data)}, mockEnv);
+
+        expect(response.status).toBe(201);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('User created successfully');
+        expect(em.persistAndFlush).toHaveBeenCancelled();
+    });
+    it('should return 400 if user data is invalid', async () => {
+        const invalidData = {email: 'user&invalid-hu'};
+
+        const response = await app.request('/users', {method: 'POST', body: JSON.stringify(invalidData)}, mockEnv);
+
+        expect(response.status).toBe(400);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Invalid data');
+    });
+})
+
+describe('DELETE /users/:id', () => {
+    it('should delete user successfully', async () => {
+        em.nativeDelete = vi.fn( async () => 1);
+
+        const response = await app.request('/users/1', {method: 'DELETE'}, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('User deleted successfully');
+    });
+    it('should return 500 if there is an internal error', async () => {
+        em.nativeDelete = vi.fn( async () => throw new Error('Database error'));
+
+        const response = await app.request('/users/1', {method: 'DELETE'}, mockEnv);
+
+        expect(response.status).toBe(500);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Internal error');
+    });
+})
+
+describe('GET /feedbacks/highlight/:id', () => {
+    it('should fetch all feedbacks from a highlight', async () => {
+        const feedback = [{id: '1',
+            highlight: {id: '1', name: 'something', description: 'someDescription', category: 'history', is_approved: false},
+            user: {id: '1', email: 'test@mail1.com', isAdmin: false},
+            rating: 4}];
+
+        em.find = vi.fn(async () => feedback);
+
+        const response = await app.request('/feedbacks/highlight/1', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody).toEqual(feedback);
+    });
+    it('should return 404 if no feedback is found for highlight', async () => {
+        em.find = vi.fn( async () => []);
+
+        const response = await app.request('/feedbacks/highlight/10', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(404);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('No feedback found');
+    });
+    it('should return 400 if highlight id is invalid', async () => {
+        const response = await app.request('/feedbacks/highlight/invalidHighlightId', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(400);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Invalid highlightId parameter');
+    });
+})
+
+describe('GET /feedbacks/user/:id', () => {
+    it('should fetch all feedbacks from a user', async () => {
+        const feedback = [{id: '1',
+            highlight: {id: '1', name: 'something', description: 'someDescription', category: 'history', is_approved: false},
+            user: {id: '1', email: 'test@mail1.com', isAdmin: false},
+            rating: 4}];
+
+        em.find = vi.fn(async () => feedback);
+
+        const response = await app.request('/feedbacks/user/1', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody).toEqual(feedback);
+    });
+    it('should return 404 if no feedback is found for user', async () => {
+        em.find = vi.fn( async () => []);
+
+        const response = await app.request('/feedbacks/user/10', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(404);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('No feedback found');
+    });
+    it('should return 400 if user id is invalid', async () => {
+        const response = await app.request('/feedbacks/user/invalidUserId', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(400);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Invalid userId parameter');
+    });
+})
+
+describe('PUT /feedbacks/:id/approve', () => {
+    it('should should approve a highlight suggestion', async () => {
+        em.nativeUpdate = vi.fn(async () => 1);
+
+        const response = await app.request('/feedbacks/1/approve', {method: 'PUT'}, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Feedback approved successfully');
+    });
+    it('should return 400 for invalid feedback id', async () => {
+        const response = await app.request('/feedbacks/invalidId/approve', {method: 'PUT'}, mockEnv);
+
+        expect(response.status).toBe(400);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Invalid feedbackId parameter');
+    });
+    it('should return 500 if there is an internal error', async () => {
+        em.nativeUpdate = vi.fn( async () => throw new Error('Database error'));
+
+        const response = await app.request('/feedbacks/1/approve', {method: 'PUT'}, mockEnv);
+
+        expect(response.status).toBe(500);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Internal error');
+    });
+})
+
+describe('DELETE /feedbacks/:id', () => {
+    it('should delete highlight', async () => {
+        em.nativeDelete = vi.fn(async () => 1);
+
+        const response = await app.request('feedbacks/1', {method: 'DELETE'}, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Feedback deleted successfully');
+    });
+    it('should return 400 if invalid feedback id', async () => {
+        const response = await app.request('feedbacks/invalidFeedbackId', {method: 'DELETE'}, mockEnv);
+
+        expect(response.status).toBe(400);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Invalid feedbackId parameter');
+    });
+    it('should return 500 if there is an internal error', async () => {
+        em.nativeDelete = vi.fn( async () => throw new Error('Database error'));
+
+        const response = await app.request('/feedbacks/1', {method: 'DELETE'}, mockEnv);
+
+        expect(response.status).toBe(500);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Internal error');
+    });
+})
+
+describe('getAllUsers function', () => {
+    it('should fetch a list of users', async () => {
+        const users = [
+            {id: '1', email: 'test@mail1.com', isAdmin: false},
+            {id: '2', email: 'test@mail2.com', isAdmin: false}
+        ];
+
+        em.find = vi.fn(async () => users);
+
+        const fetchedUsers = getAllUsers(em);
+
+        expect(fetchedUsers).toBeDefined();
+        expect(fetchedUsers).toHaveLength(2);
+        expect(fetchedUsers[0].id).toBe(users[0].id);
+        expect(fetchedUsers[1].id).toBe(users[1].id);
+    });
+    it('should return null if no users', async () => {
+        em.findOne = vi.fn(async () => []);
+
+        const fetchedUsers = getAllUsers(em);
+
+        expect(fetchedUsers).toEqual([]);
+    });
+})
+
+describe('getUserById function', () => {
+    it('should fetch a user by id', async () => {
+        const user = {
+            id: '1',
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+        }
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === user.id){
+                return user;
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const fetchedUser = await getUserById(em, user.id);
+
+        expect(fetchedUser).toBeDefined();
+        expect(fetchedUser?.id).toBe(user.id);
+    });
+
+    it('should return undefined for non-existent user', async () => {
+        em.findOne = vi.fn(async () => null);
+
+        const fetchedUser = await getUserById(em, 'fakeID');
+
+        expect(fetchedUser).toBeUndefined();
+    });
+});
+
+describe('deleteUser function', () => {
+    it('should delete a user', async () => {
+        const user = {
+            id: '1',
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+        }
+        em.nativeDelete = vi.fn(async () => 1);
+
+        await deleteUser(em, user.id);
+
+        expect(em.nativeDelete).toBeCalledWith(User, {id: '1'});
+    });
+})
+
+describe('getFeedbackByUserId function', () => {
+    it('should get all feedback by a user', async () => {
+        const feedback = {
+            id: '1',
+            user: {id: '1',
+                email: 'user@example.com',
+                password: 'password123',
+                isAdmin: false,},
+            rating: 4,
+            comment: 'crazy',
+            is_approved: false,
+        };
+
+        em.find = vi.fn(async (_entity, condition) => {
+            if (condition.id === feedback.user.id){
+                return feedback;
+            }
+            return null;
+        }) as unknown as typeof em.find;
+
+        const fetchedFeedback = await getFeedbackByUserId(em, feedback.user.id);
+
+        expect(fetchedFeedback).toBeDefined();
+        expect(fetchedFeedback).toHaveLength(1)
+        expect(fetchedFeedback).toBe(feedback);
+    });
+    it('should return an empty list if no feedback exists with user ID', async () => {
+        em.find = vi.fn(async () => []);
+
+        const fetchedFeedback = await getFeedbackByUserId(em, 'randomId');
+
+        expect(fetchedFeedback).toEqual([]);
+    });
+});
+
+describe('getFeedbackByHighlight function', () => {
+    it('should fetch feedback fo a highlight', async () => {
+        const feedback = {
+            id: '1',
+            highlight: {id: '1',
+                name: 'something',
+                description: 'some description',
+                category: 'history',
+                is_approved: false},
+            user: {id: '1',
+                email: 'user@example.com',
+                password: 'password123',
+                isAdmin: false,},
+            rating: 4,
+            comment: 'crazy',
+            is_approved: false,
+        };
+
+        em.find = vi.fn(async (_entity, condition) => {
+            if (condition.id === feedback.user.id){
+                return feedback;
+            }
+            return null;
+        }) as unknown as typeof em.find;
+
+        const fetchedFeedback = await getFeedbackByHighlight(em, feedback.highlight.id);
+
+        expect(fetchedFeedback).toBeDefined();
+        expect(fetchedFeedback).toHaveLength(1)
+        expect(fetchedFeedback).toBe(feedback);
+    });
+    it('should return an empty list if no feedback exists with highlight ID', async () => {
+        em.find = vi.fn(async () => []);
+
+        const fetchedFeedback = await getFeedbackByHighlight(em, '10');
+
+        expect(fetchedFeedback).toEqual([]);
+    });
+})
+
+describe('approveFeedback function', () => {
+    it('should set isApproved to true', async () => {
+        const feedback = {
+            id: '1',
+            user: {id: '1',
+                email: 'user@example.com',
+                password: 'password123',
+                isAdmin: false,},
+            rating: 4,
+            comment: 'crazy',
+            is_approved: false,
+        };
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === feedback.id){
+                return feedback;
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        em.persistAndFlush = vi.fn(async (entity) => entity);
+
+        const updatedFeedback = await approveFeedback(em, feedback.id);
+
+        expect(updatedFeedback).toBeDefined();
+    });
+    it('should return null if feedback non-existent', async () => {
+        em.findOne = vi.fn(async () => null);
+
+        const updatedFeedback = await approveFeedback(em, '20');
+
+        expect(updatedFeedback).toBeNull();
+    });
+})
+
+describe('deleteFeedback', () => {
+    it('should delete feedback with given ID', async () => {
+        const feedback = {
+            id: '1',
+            user: {id: '1',
+                email: 'user@example.com',
+                password: 'password123',
+                isAdmin: false,},
+            rating: 4,
+            comment: 'crazy',
+            is_approved: false,
+        };
+        em.nativeDelete = vi.fn(async () => 1);
+
+        await deleteFeedback(em, feedback.id);
+
+        expect(em.nativeDelete).toBeCalledWith(Feedback, {id: '1'});
+    });
+})
+
+describe('getAllTours function', () => {
+    it('should fetch all tours', async () => {
+        const tours = [
+            {id: '1', name: 'tourOne'},
+            {id: '1', name: 'tourTwo'}
+        ];
+
+        em.find = vi.fn(async () => tours);
+
+        const fetchedTours = getAllTours(em);
+
+        expect(fetchedTours).toBeDefined();
+        expect(fetchedTours).toHaveLength(2);
+        expect(fetchedTours[0].id).toBe(tours[0].id);
+        expect(fetchedTours[1].id).toBe(tours[1].id);
+    });
+    it('should return null if no tours', async () => {
+        em.findOne = vi.fn(async () => []);
+
+        const fetchedTours = getAllTours(em);
+
+        expect(fetchedTours).toEqual([]);
+    });
+})
+
+describe('getTourById function', () => {
+    it('should fetch a tour by id', async () => {
+        const tour = {
+            id: '1',
+            name: 'someName'
+        }
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === tour.id){
+                return tour;
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const fetchedTours = await getTourById(em, tour.id);
+
+        expect(fetchedTours).toBeDefined();
+        expect(fetchedTours?.id).toBe(tour.id);
+    });
+
+    it('should return undefined for non-existent tour', async () => {
+        em.findOne = vi.fn(async () => null);
+
+        const fetchedTours = await getTourById(em, 'fakeID');
+
+        expect(fetchedTours).toBeUndefined();
+    });
+});
+
+describe('getHighlightsByTour function', () => {
+    it('should fetch a list of highlights by tour ID', () => {
+        const tour = {
+            id: '1',
+            name: 'someName',
+            highlights: {id: '1',
+                name: 'something',
+                description: 'some description',
+                category: 'history',
+                is_approved: false},
+        };
+
+        em.find = vi.fn(async (_entity, condition) => {
+            if (condition.id === tour.highlights.id){
+                return tour;
+            }
+            return null;
+        }) as unknown as typeof em.find;
+
+        const fetchedHighlights = await getHighlightsByTour(em, tour.id);
+
+        expect(fetchedHighlights).toBeDefined();
+        expect(fetchedHighlights).toHaveLength(1)
+        expect(fetchedHighlights).toBe(tour.highlights);
+    });
+})
+
+describe('createTour function', () => {
+    it('should create a new tour', async () => {
+        const tourData = {
+            name: 'tourName'
+        }
+
+        em.create = vi.fn((entity, data) => ({...data, id: data.id || randomUUID()}));
+        const createdTour = await createTour(em, tourData);
+
+        expect(createdTour).toBeDefined();
+    });
+})
+
+describe('addUserToTour function', () => {
+    it('should add a user to a tour', () => {
+        const tour = {
+            id: '1',
+            name: 'someName'
+        }
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === tour.id){
+                return tour;
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const updatedTour = await addUserToTour(em, tour.id, '1');
+
+        expect(updatedTour).toBeDefined();
+    });
+})
+
+describe('updateTour function', () => {
+    it('should should update existing tour', async () => {
+        const tour = {
+            id: '1',
+            name: 'someName'
+        };
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === tour.id){
+                return tour
+            }
+            return null
+        })
+
+        const updatedTour = await updateTour(em, tour.id, {name: 'newName'});
+
+        expect(updatedTour).toBeDefined();
+    });
+})
+
+describe('deleteTour function', () => {
+    it('should delete tour with given ID', async () => {
+        const tour = {
+            id: '1',
+            name: 'someName'
+        };
+        em.nativeDelete = vi.fn(async () => 1);
+
+        await deleteTour(em, tour.id);
+
+        expect(em.nativeDelete).toBeCalledWith(Tour, {id: '1'});
+    });
+})
+
+describe('getAllHighlights function', () => {
+    it('should fetch a list of highlights', async () => {
+        const highlights = [
+            {id: '1', name: 'something', description: 'someDescription', category: 'history', is_approved: false},
+            {id: '2', name: 'somethingElse', description: 'someDescription', category: 'pubs', is_approved: false}
+        ];
+
+        em.find = vi.fn(async () => highlights);
+
+        const fetchedHighlights = getAllHighlights(em);
+
+        expect(fetchedHighlights).toBeDefined();
+        expect(fetchedHighlights).toHaveLength(2);
+        expect(fetchedHighlights[0].id).toBe(highlights[0].id);
+        expect(fetchedHighlights[1].id).toBe(highlights[1].id);
+    });
+    it('should return null if no users', async () => {
+        em.findOne = vi.fn(async () => []);
+
+        const fetchedHighlights = getAllHighlights(em);
+
+        expect(fetchedHighlights).toEqual([]);
+    });
+})
+
+describe('getHighlightById function', () => {
+    it('should fetch a highlight by id', async () => {
+        const highlight = {id: '2', name: 'somethingElse', description: 'someDescription', category: 'pubs', is_approved: false};
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === highlight.id){
+                return highlight;
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const fetchedHighlight = await getHighlightById(em, highlight.id);
+
+        expect(fetchedHighlight).toBeDefined();
+        expect(fetchedHighlight?.id).toBe(highlight.id);
+    });
+
+    it('should return undefined for non-existent highlight', async () => {
+        em.findOne = vi.fn(async () => null);
+
+        const fetchedHighlight = await getHighlightById(em, 'fakeID');
+
+        expect(fetchedHighlight).toBeUndefined();
+    });
+});
+
+describe('createHighlight function', () => {
+    it('should create highlight', async () => {
+        const highlightData = {
+            name: 'testHighlight',
+            description: 'randomText',
+            category: 'someCategory',
+            longitude: 'someNumber',
+            latitude: 'someOtherNumber'
+        };
+
+        em.create = vi.fn((entity, data) => ({...data, id: data.id || randomUUID()}));
+
+        const createdHighlight = await createHighlight(em, highlightData);
+
+        expect(createdHighlight).toHaveProperty('id');
+        expect(createdHighlight).toHaveProperty('name', highlightData.name);
+        expect(createdHighlight).toHaveProperty('description', highlightData.description);
+        expect(createdHighlight).toHaveProperty('category', highlightData.category);
+        expect(createdHighlight).toHaveProperty('longitude', highlightData.longitude);
+        expect(createdHighlight).toHaveProperty('latitude', highlightData.latitude);
+    })
+})
+
+describe('approveHighlightSuggestion function', () => {
+    it('should approve a highlight suggestion', async () => {
+        const highlight = {id: '2', name: 'somethingElse', description: 'someDescription', category: 'pubs', is_approved: false};
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === highlight.id){
+                return highlight;
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const updatedHighlight = await approveHighlightSuggestion(em, highlight.id);
+
+        expect(updatedHighlight).toBeDefined();
+    });
+})
+
+describe('updateHighlight function', () => {
+    it('should should update existing highlight', async () => {
+        const highlight = {id: '2', name: 'somethingElse', description: 'someDescription', category: 'pubs', is_approved: false};
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === highlight.id){
+                return highlight
+            }
+            return null
+        })
+
+        const updatedHighlight = await updateHighlight(em, highlight.id, {name: 'newName'});
+
+        expect(updatedHighlight).toBeDefined();
+    });
+})
+
+describe('deleteHighlight function', () => {
+    it('should delete highlight with given ID', async () => {
+        const highlight = {id: '2', name: 'somethingElse', description: 'someDescription', category: 'pubs', is_approved: false};
+        em.nativeDelete = vi.fn(async () => 1);
+
+        await deleteHighlight(em, highlight.id);
+
+        expect(em.nativeDelete).toBeCalledWith(Highlight, {id: '2'});
+    });
+})
 
 describe('Database Utilities', () => {
     it('getDBConnector should initialize MikroORM', async () => {
