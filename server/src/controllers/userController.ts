@@ -101,7 +101,7 @@ export const updateUsername = async (
         }
 
         user.username = newUsername;
-        em.flush();
+        await em.persistAndFlush(user);
 
         logger.info(`User ${oldUsername} username updated to ${newUsername}`);
         return { success: true, message: 'Username updated successfully' };

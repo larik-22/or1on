@@ -24,6 +24,7 @@ let app: Hono<BlankEnv, BlankSchema, "/">;
 
 beforeEach(() => {
     em = {
+        count: vi.fn(),
         findOne: vi.fn(async (_entity, condition) => {
             if (condition.email === 'user@example.com') {
                 return {
@@ -537,6 +538,7 @@ describe('createHighlightsGeoJSON function', () => {
 });
 
 describe('POST /userDashboard/update-username', () => {
+
    it('should update the user\'s username', async () => {
        const user = {
            email: 'user@example.com',
@@ -546,6 +548,13 @@ describe('POST /userDashboard/update-username', () => {
        };
 
        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+       em.findOne = vi.fn(async (_entity, condition) => {
+           if (condition.username === createdUser.username) {
+               return createdUser;
+           }
+           return null;
+       }) as unknown as typeof em.findOne;
+       em.count = vi.fn(() => Promise.resolve(0));
        const createdUser = await createUser(em, user);
        const token = await generateToken({
            ...createdUser,
