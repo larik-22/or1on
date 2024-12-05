@@ -5,6 +5,7 @@ import map from './routes/map.js';
 import { cors } from 'hono/cors';
 import logger from './utils/logger.js';
 import type {EntityManager } from '@mikro-orm/core';
+import userDashboard from "./routes/userDashboard.js";
 
 /**
  * Creates and configures a Hono application with the provided EntityManager.
@@ -29,6 +30,7 @@ export const createApp = (em: EntityManager): Hono => {
     app.route('/auth', auth);
     app.route('/test', test);
     app.route('/map', map);
+    app.route('/userDashboard', userDashboard);
 
     app.get('/', (c) => {
         logger.info('Received GET request on /');

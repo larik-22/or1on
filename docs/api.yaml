@@ -718,4 +718,67 @@ paths:
                               type: string
         '404':
           description: No highlights found
+  /userDashboard/update-username:
+    post:
+      tags:
+        - POST
+      summary: update username
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldUsername:
+                  type: string
+                  description: Old username
+                  example: "User1"
+                newUsername:
+                  type: string
+                  description: New Username
+                  example: "User2"
+      responses:
+        '200':
+          description: Username updated
+        '404':
+          description: Username not found
+        '400':
+            description: Missing required fields
+        '500':
+          description: Internal server error
+  /userDashboard/update-password:
+    post:
+      tags:
+        - POST
+      summary: update password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: User ID
+                  example: "6859782e-87a8-482e-92bb-54206c7b95dd"
+                oldPassword:
+                  type: string
+                  description: Old Password
+                  example: "password123"
+                newPassword:
+                  type: string
+                  description: New Password
+                  example: "newPassword123"
+      responses:
+        '200':
+          description: Password updated
+        '404':
+          description: User not found
+        '400':
+          description: Missing required fields
+        '401':
+            description: Incorrect current password
+        '500':
+          description: Internal server error
+
 

@@ -24,6 +24,7 @@ let app: Hono<BlankEnv, BlankSchema, "/">;
 
 beforeEach(() => {
     em = {
+        count: vi.fn(),
         findOne: vi.fn(async (_entity, condition) => {
             if (condition.email === 'user@example.com') {
                 return {
@@ -533,5 +534,145 @@ describe('createHighlightsGeoJSON function', () => {
         });
 
         expect(em.find).toHaveBeenCalledWith(Highlight, { is_approved: true });
+    });
+});
+
+describe('POST /userDashboard/update-username', () => {
+
+   it('should update the user\'s username', async () => {
+       const user = {
+           email: 'user@example.com',
+           password: 'password123',
+           isAdmin: false,
+           username: '880005553535',
+       };
+
+       em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+       em.findOne = vi.fn(async (_entity, condition) => {
+           if (condition.username === createdUser.username) {
+               return createdUser;
+           }
+           return null;
+       }) as unknown as typeof em.findOne;
+       em.count = vi.fn(() => Promise.resolve(0));
+       const createdUser = await createUser(em, user);
+       const token = await generateToken({
+           ...createdUser,
+           password: user.password
+       });
+
+       const response = await app.request('/userDashboard/update-username', {
+           method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}` },
+           body: JSON.stringify({ oldUsername: '880005553535', newUsername: 'newUsername' }),
+       }, mockEnv);
+       const responseBody = await response.json();
+       logger.warn(responseBody);
+       expect(response.status).toBe(200);
+   });
+    it('should return 400 missing fields', async () => {
+        const user = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+        };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.username === createdUser.username) {
+                return createdUser;
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+        em.count = vi.fn(() => Promise.resolve(0));
+        const createdUser = await createUser(em, user);
+        const token = await generateToken({
+            ...createdUser,
+            password: user.password
+        });
+
+        const response = await app.request('/userDashboard/update-username', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ newUsername: 'newUsername' }),
+        }, mockEnv);
+        const responseBody = await response.json();
+        logger.warn(responseBody);
+        expect(response.status).toBe(400);
+    });
+});
+
+describe('POST /userDashboard/update-password', () => {
+    it('should update the user\'s password successfully', async () => {
+        const user = {
+            id: "6859782e-87a8-482e-92bb-54206c7b95dd",
+            email: 'user@example.com',
+            password: await bcrypt.hash('password123', 10),
+            isAdmin: false,
+            username: '880005553535',
+        };
+
+        em.count = vi.fn(() => Promise.resolve(0));
+        const token = await generateToken({
+            ...user,
+            password: user.password
+        });
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === user.id) {
+                return user;
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/userDashboard/update-password', {
+            method: 'POST',
+            body: JSON.stringify({
+                userId: user.id,
+                oldPassword: 'password123',
+                newPassword: 'newPassword123' }),
+            headers: { 'Authorization': `Bearer ${token}` },
+        }, mockEnv);
+
+        const responseBody = await response.json();
+        logger.warn(responseBody);
+        expect(response.status).toBe(200);
+    });
+    it('should return 400 missing fields', async () => {
+        const user = {
+            id: "6859782e-87a8-482e-92bb-54206c7b95dd",
+            email: 'user@example.com',
+            password: await bcrypt.hash('password123', 10),
+            isAdmin: false,
+            username: '880005553535',
+        };
+
+        em.count = vi.fn(() => Promise.resolve(0));
+        const token = await generateToken({
+            ...user,
+            password: user.password
+        });
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === user.id) {
+                return user;
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/userDashboard/update-password', {
+            method: 'POST',
+            body: JSON.stringify({
+                userId: user.id,
+                newPassword: 'newPassword123' }),
+            headers: { 'Authorization': `Bearer ${token}` },
+        }, mockEnv);
+
+        const responseBody = await response.json();
+        logger.warn(responseBody);
+        expect(response.status).toBe(400);
     });
 });
