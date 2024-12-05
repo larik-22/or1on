@@ -3,17 +3,15 @@
     import Homepage from "./pages/Homepage.svelte";
     import ModeratorDashboard from "./pages/ModeratorDashboard.svelte";
     import Register from "./pages/Register.svelte";
-    import Navigation from "./lib/Navigation.svelte";
     import Login from "./pages/Login.svelte";
     import AdminUser from "./pages/AdminUser.svelte";
     import LoggedInUser from "./pages/LoggedInUser.svelte";
     import type {Context} from 'page';
-    import isNotLoggedIn from "./middleware/notLoggedIn";
-    import isAdmin from "./middleware/isAdmin.js";
-    import isLoggedIn from "./middleware/loggedIn";
-
+    import isNotLoggedIn from "./lib/middleware/notLoggedIn";
+    import isAdmin from "./lib/middleware/isAdmin.js";
+    import isLoggedIn from "./lib/middleware/loggedIn";
     import UserDashboard from "./pages/UserDashboard.svelte";
-
+    import { Modals } from 'svelte-modals'
 
     let page: any;
     let params: Context;
@@ -72,8 +70,26 @@
 
 
 <main>
-    <Navigation active={currentRoute}/>
     <svelte:component this={page} {params}/>
+
+    <Modals>
+        {#snippet backdrop({ close })}
+            <div
+                    class=""
+                    onclick={() => close()}
+            />
+        {/snippet}
+    </Modals>
 </main>
 
+<style>
+    .backdrop {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        z-index: 999;
+    }
+</style>
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { registerSchema } from "../schema/registerSchema";
+	import { registerSchema } from "../lib/schema/registerSchema";
 	import page from "page";
-	import { handleAuthResponse} from "../utils/authHandler.svelte";
+	import { handleAuthResponse} from "../lib/utils/authHandler.svelte";
 
 	let formData = $state({
 		email: "",
