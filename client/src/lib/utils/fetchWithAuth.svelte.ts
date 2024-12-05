@@ -1,4 +1,4 @@
-import {handleAuthError} from "./authHandler.svelte";
+import {handleAuthError} from "./authHandler.svelte.js";
 
 /**
  * Fetch with authentication header attached.

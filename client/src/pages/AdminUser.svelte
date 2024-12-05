@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {fetchWithAuthSvelte} from "../utils/fetchWithAuth.svelte";
+	import {fetchWithAuthSvelte} from "../lib/utils/fetchWithAuth.svelte";
 
 	const testFetch = async () => {
 		try {
