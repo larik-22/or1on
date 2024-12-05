@@ -1,18 +1,16 @@
-export enum HighlightType {
-  CATEGORY_A = "Category A",
-  CATEGORY_B = "Category B",
-  CATEGORY_C = "Category C",
-  CATEGORY_D = "Category D",
-}
+import {HighlightType} from "../models/models";
 
 /**
  * Maps highlight types to colors
  */
 const highlightTypeToColor: Record<HighlightType, string> = {
-    [HighlightType.CATEGORY_A]: "#FF0000",
-    [HighlightType.CATEGORY_B]: "#00FF00",
-    [HighlightType.CATEGORY_C]: "#0000FF",
-    [HighlightType.CATEGORY_D]: "#FFFF00",
+	[HighlightType.CATEGORY_A]: "#fda762",
+	[HighlightType.CATEGORY_B]: "#00FF00",
+	[HighlightType.CATEGORY_C]: "#0000FF",
+	[HighlightType.CATEGORY_D]: "#FFFF00",
+	[HighlightType.CATEGORY_G]: "#6f7eca",
+	[HighlightType.Default]: "#FFFFFF"
+
 }
 
 /**
@@ -21,5 +19,5 @@ const highlightTypeToColor: Record<HighlightType, string> = {
  * @returns The color associated with the highlight type
  */
 export const getHighlightColor = (highlightType: HighlightType): string => {
-    return highlightTypeToColor[highlightType];
+	return highlightTypeToColor[highlightType] || highlightTypeToColor[HighlightType.Default];
 }
