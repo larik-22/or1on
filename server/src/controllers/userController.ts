@@ -140,7 +140,7 @@ export const updateUserPassword = async (
 
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedNewPassword;
-        await em.flush();
+        await em.persistAndFlush(user);
 
         logger.info(`User ${userId} password updated successfully`);
         return { success: true, message: 'Password updated successfully' };
