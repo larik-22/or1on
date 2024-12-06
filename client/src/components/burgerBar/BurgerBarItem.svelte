@@ -1,37 +1,46 @@
 <script lang="ts">
+    import type {BarItem} from "./BurgerBar.svelte";
+
     let {
-        BarItem = ["", []],
+        Item = {
+            label: "Placeholder",
+        },
         sectionNumber,
-        lastClicked
+        lastClicked = $bindable(""),
+        paddingTop = "pt-[20px]"
     }: {
-        BarItem: [string, { label: string; action: (actionType: string) => void }[]];
-        sectionNumber: number
-        lastClicked: string
+        Item: BarItem;
+        sectionNumber?: number
+        lastClicked?: string
+        paddingTop?: string
     } = $props();
 
     let hiddenSubElements: boolean = $state(true)
 </script>
 
-<main class="pt-[20px] flex flex-col items-center">
+<main class="flex flex-col items-center {paddingTop}">
     <button
             type="button"
             class="h-fit w-[90%] rounded-[2px] text-[17px]  pt-[10px] pb-[10px] content-center
             hover:bg-[#f2f2f2] font-[500] active:bg-[#ececec] border-b-[1px] border-[#cacaca]"
-           onclick={() => {
-      hiddenSubElements = !hiddenSubElements;
-    }}
-    >
-        <p class="text-center">{BarItem[0]}</p>
+            onclick={() =>
+            {
+                if (Item.overrideFunction !== undefined && Item.overrideClick){
+                    Item.overrideFunction();
+                }else{
+                    hiddenSubElements = !hiddenSubElements;
+                }
+            }}>
+        <p class="text-center">{Item.label}</p>
     </button>
 
-    {#if hiddenSubElements === false}
+    {#if Item.subitems !== undefined && hiddenSubElements === false}
         <div class="h-fit w-[100%]">
             <ul class="h-fit">
-                {#each BarItem[1] as item, i}
+                {#each Item.subitems as item, i}
                     <li class="content-center text-center pt-[8px]">
                         <button onclick={()=>{
-                            item.action(item.label);
-
+                            item.action();
                             lastClicked = ""
                             lastClicked = "tab" + (i+1) + "" + sectionNumber;
 
