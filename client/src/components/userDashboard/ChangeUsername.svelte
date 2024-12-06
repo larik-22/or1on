@@ -1,21 +1,50 @@
 <script lang="ts">
+    import {authToken} from "../../lib/stores/auth";
+    import {get} from "svelte/store";
+
     let currentUsername: string = 'current_user'; //this has the pre fill of the current username
     let newUsername: string = '';
     let successMessage: string = '';
     let errorMessage: string = '';
 
-    const handleSubmit = (): void => {
+    const handleSubmit = async (): Promise<void> => {
         if (newUsername.trim() === '') {
             errorMessage = "Please enter a new username.";
-            successMessage = '';
-        } else {
-            //successful username change
-            console.log("Username changed to: ", newUsername);
-            successMessage = "Username changed successfully!";
-            errorMessage = '';
-            //clear input after successful change
-            currentUsername = newUsername;
-            newUsername = '';
+            return;
+        }
+
+        const token = get(authToken);
+
+        if (!token) {
+            errorMessage = "Unauthorized. Please log in.";
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:5173/userDashboard/update-username', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    oldUsername: currentUsername,
+                    newUsername: newUsername
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                successMessage = "Username changed successfully!";
+                currentUsername = newUsername;
+                newUsername = '';
+                errorMessage = '';
+            } else {
+                errorMessage = result.message || "Failed to update username:((";
+            }
+        } catch (e) {
+            errorMessage = "Network error! Please try again later.";
         }
     };
 </script>

@@ -1,9 +1,10 @@
 <script lang="ts">
+    import {authToken} from "../../lib/stores/auth";
+
     let showConfirmation: boolean = false;
 
     const handleLogout = (): void => {
-        //remove user token -> redirect
-        console.log("User logged out!");
+        authToken.set(null);
         window.location.href = '/login';
     };
 
@@ -40,3 +41,5 @@
         </div>
     {/if}
 </div>
+
+
