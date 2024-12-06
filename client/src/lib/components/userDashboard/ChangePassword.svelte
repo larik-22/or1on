@@ -1,23 +1,63 @@
 <script lang="ts">
+    import {get} from "svelte/store";
+    import {authToken} from "../../lib/stores/auth";
+
     let currentPassword: string = '';
     let newPassword: string = '';
     let confirmPassword: string = '';
     let error: string = '';
+    let successMessage: string = '';
 
-    const handleSubmit = (): void => {
+    const handleSubmit = async (): Promise<void> => {
         if (newPassword !== confirmPassword) {
             error = "Passwords do not match!";
-        } else if (newPassword.length < 5) {
-            error = "Password must be at least 5 characters long!";
-        } else {
-            // Call to backend (for now just log)
-            console.log("Password changed successfully!");
-            currentPassword = '';
-            newPassword = '';
-            confirmPassword = '';
-            error = '';
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            error = "Password must be at least 6 characters long!";
+            return;
+        }
+
+        //to fetch the jwt from store
+        const token = get(authToken);
+
+        if (!token) {
+            error = "Unauthorized, PLEASE LOG IN!!!!!!!!!!!!!";
+            return;
+        }
+
+        try {
+           //backend api
+            const response = await fetch('http://localhost:5173/userDashboard/update-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    userId: 'user-id',
+                    oldPassword: currentPassword,
+                    newPassword: newPassword
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                successMessage = "Password changed successfully!^^";
+                currentPassword = '';
+                newPassword = '';
+                confirmPassword = '';
+                error = '';
+            } else {
+                error = result.message || "Failed to update password.";
+            }
+        } catch (e) {
+            error = "Network error! Please try again later!";
         }
     };
+
 </script>
 
 
@@ -47,7 +87,9 @@
         {#if error}
             <p class="text-red-600 mb-4">{error}</p>
         {/if}
-
+        {#if successMessage}
+            <p class="text-green-600 mt-4">{successMessage}</p>
+        {/if}
         <button type="submit" class="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600">Submit</button>
     </form>
 </div>
