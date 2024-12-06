@@ -21,19 +21,20 @@
 </script>
 
 
-
 <div class="bg-gray-100 p-8 border rounded-lg shadow-md max-w-xl mx-auto">
     <h2 class="text-2xl font-semibold mb-4">Change Username</h2>
     <p class="mb-6 text-gray-600">Update your username to something recognizable for your account.</p>
     <form on:submit|preventDefault={handleSubmit}>
         <div class="mb-4">
             <label for="currentUsername" class="block mb-2 font-semibold">Current Username</label>
-            <input type="text" id="currentUsername" value={currentUsername} class="w-full p-2 mb-4 border rounded bg-gray-200" disabled />
+            <input type="text" id="currentUsername" value={currentUsername}
+                   class="w-full p-2 mb-4 border rounded bg-gray-200" disabled/>
         </div>
 
         <div class="mb-4">
             <label for="newUsername" class="block mb-2 font-semibold">New Username</label>
-            <input type="text" id="newUsername" bind:value={newUsername} class="w-full p-2 mb-4 border rounded" required />
+            <input type="text" id="newUsername" bind:value={newUsername} class="w-full p-2 mb-4 border rounded"
+                   required/>
         </div>
 
         {#if errorMessage}

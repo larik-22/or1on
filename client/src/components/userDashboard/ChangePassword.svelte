@@ -23,21 +23,25 @@
 
 <div class="bg-gray-100 p-8 border rounded-lg shadow-md max-w-xl mx-auto">
     <h2 class="text-2xl font-semibold mb-4">Change Password</h2>
-    <p class="mb-6 text-gray-600">Ensure your new password is strong and unique. Make sure to follow the security guidelines.</p>
+    <p class="mb-6 text-gray-600">Ensure your new password is strong and unique. Make sure to follow the security
+        guidelines.</p>
     <form on:submit|preventDefault={handleSubmit}>
         <div class="mb-4">
             <label for="currentPassword" class="block mb-2 font-semibold">Current Password</label>
-            <input type="password" id="currentPassword" bind:value={currentPassword} class="w-full p-2 mb-4 border rounded" required />
+            <input type="password" id="currentPassword" bind:value={currentPassword}
+                   class="w-full p-2 mb-4 border rounded" required/>
         </div>
 
         <div class="mb-4">
             <label for="newPassword" class="block mb-2 font-semibold">New Password</label>
-            <input type="password" id="newPassword" bind:value={newPassword} class="w-full p-2 mb-4 border rounded" required />
+            <input type="password" id="newPassword" bind:value={newPassword} class="w-full p-2 mb-4 border rounded"
+                   required/>
         </div>
 
         <div class="mb-4">
             <label for="confirmPassword" class="block mb-2 font-semibold">Confirm New Password</label>
-            <input type="password" id="confirmPassword" bind:value={confirmPassword} class="w-full p-2 mb-4 border rounded" required />
+            <input type="password" id="confirmPassword" bind:value={confirmPassword}
+                   class="w-full p-2 mb-4 border rounded" required/>
         </div>
 
         {#if error}
