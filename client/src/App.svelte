@@ -12,6 +12,7 @@
     import isLoggedIn from "./lib/middleware/loggedIn";
     import UserDashboard from "./pages/UserDashboard.svelte";
     import { Modals } from 'svelte-modals'
+    import Navigation from "./components/Navigation.svelte";
 
     let page: any;
     let params: Context;
@@ -70,14 +71,17 @@
 
 
 <main>
-    <svelte:component this={page} {params}/>
+
+    <div class="flex">
+        <Navigation currentRoute="{currentRoute}" bind:currentPage={page} ></Navigation>
+        <svelte:component this={page} {params}/>
+    </div>
 
     <Modals>
         {#snippet backdrop({ close })}
-            <div
-                    class="fixed inset-0 z-[999]"
-                    onclick={() => close()}
-            />
+            <div class="fixed inset-0 z-[999]" onclick={() => close()}>
+
+            </div>
         {/snippet}
     </Modals>
 </main>
