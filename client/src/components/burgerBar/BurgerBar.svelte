@@ -52,6 +52,6 @@
             {/each}
 
         </ul>
-        <BurgerBarItem Item={homeButton} paddingTop="pt-[55vh]"/>
+        <BurgerBarItem Item={homeButton} paddingTop="pt-[10vh]"/>
     </div>
 </main>

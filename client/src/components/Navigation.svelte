@@ -165,10 +165,18 @@ $effect(()=>{
     else{
         BarItems = [
             {
-                label : "Login / Sign up",
+                label : "Login",
                 overrideClick: true,
                 overrideFunction: () => {
                     page.redirect("/login")
+                }
+
+            },
+            {
+                label : "Sign Up",
+                overrideClick: true,
+                overrideFunction: () => {
+                    page.redirect("/register")
                 }
 
             }
