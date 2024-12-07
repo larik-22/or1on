@@ -6,12 +6,10 @@
     import {writable} from "svelte/store";
 
     let currentSection = writable('');
-
 </script>
 
 <main class="flex h-screen">
     <!-- Sidebar -->
-
 
     <!-- Main Content Area -->
     <div class="flex-grow p-8">

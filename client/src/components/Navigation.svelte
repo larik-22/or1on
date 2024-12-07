@@ -126,7 +126,7 @@ $effect(()=>{
                 break;
 
             case "/user-dashboard":
-                if (!$isUserAdmin){
+                if (!$isUserAdmin) {
                     BarItems = [
                         {
                             label : "Change Password",
@@ -178,7 +178,6 @@ $effect(()=>{
                 overrideFunction: () => {
                     page.redirect("/register")
                 }
-
             }
         ]
     }
