@@ -8,6 +8,7 @@ import { getAllTours, getTourById} from "../controllers/tourController.js";
 import {EntityManager} from "@mikro-orm/core";
 import { isAdmin } from "../middleware/isAdmin.js";
 import logger from "../utils/logger.js";
+import {isLoggedIn} from "../middleware/isLoggedIn.js";
 
 dotenv.config();
 
@@ -92,7 +93,7 @@ tours.get(':id/highlights', async (ctx) => {
  * @param isAdmin - Middleware so only admin users can use.
  * @returns A response with a success or error message.
  */
-tours.post('/', isAdmin, async (ctx) => {
+tours.post('/', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const body = await ctx.req.json();
@@ -149,7 +150,7 @@ tours.put('/:id', async (ctx) => {
  * @param isAdmin - Middleware so only admins can use.
  * @returns A response with a success or error message.
  */
-tours.delete('/:id', isAdmin, async (ctx) => {
+tours.delete('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const { id } = ctx.req.param();

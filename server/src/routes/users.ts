@@ -5,6 +5,7 @@ import {EntityManager} from "@mikro-orm/core";
 import {getAllUsers, getUserById, deleteUser} from "../controllers/userController.js";
 import { isAdmin } from "../middleware/isAdmin.js";
 import logger from "../utils/logger.js";
+import {isLoggedIn} from "../middleware/isLoggedIn.js";
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ const users = new Hono();
  * @param ctx - The Hono context object.
  * @returns A response the list of users or an error message
  */
-users.get('/', isAdmin, async (ctx) => {
+users.get('/', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const users = getAllUsers(em);
@@ -36,7 +37,7 @@ users.get('/', isAdmin, async (ctx) => {
  * @param ctx - The Hono context object.
  * @returns A response with the user or an error message.
  */
-users.get('/:id', isAdmin, async (ctx) => {
+users.get('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const { id } = ctx.req.param();
@@ -59,7 +60,7 @@ users.get('/:id', isAdmin, async (ctx) => {
  * @param ctx - The Hono context object.
  * @returns A response with a success or error message.
  */
-users.delete('/:id', isAdmin, async (ctx) => {
+users.delete('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const { id } = ctx.req.param();

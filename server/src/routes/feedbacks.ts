@@ -7,6 +7,7 @@ import {approveFeedback, deleteFeedback} from "../controllers/feedbackController
 import {getFeedbackByUserId, getFeedbackByHighlight} from "../controllers/feedbackController.js";
 import { isAdmin } from "../middleware/isAdmin.js";
 import logger from "../utils/logger.js";
+import {isLoggedIn} from "../middleware/isLoggedIn.js";
 
 dotenv.config();
 
@@ -32,9 +33,10 @@ feedbacks.get('/highlight/:id', async (ctx) => {
         }
 
         const {id} = params.data;
+
         const feedback = getFeedbackByHighlight(em, id);
 
-        if(!feedback){
+        if(feedback === null){
             return ctx.json({message: 'No feedback found'}, 404);
         }
 
@@ -52,7 +54,7 @@ feedbacks.get('/highlight/:id', async (ctx) => {
  * @param isAdmin - Middleware so only admins can use.
  * @returns A response the list of feedbacks or an error message.
  */
-feedbacks.get('/user/:id', isAdmin, async (ctx) => {
+feedbacks.get('/user/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const params = userIdSchema.safeParse(ctx.req.param());
@@ -82,7 +84,7 @@ feedbacks.get('/user/:id', isAdmin, async (ctx) => {
  * @param isAdmin - Middleware so only admins can use.
  * @returns A response with a success or error message.
  */
-feedbacks.put('/:id/approve', isAdmin, async (ctx) => {
+feedbacks.put('/:id/approve', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const params = numberIdSchema.safeParse(ctx.req.param());
@@ -109,7 +111,7 @@ feedbacks.put('/:id/approve', isAdmin, async (ctx) => {
  * @param isAdmin - Middleware so only admins can use.
  * @returns A response with a success or error message.
  */
-feedbacks.delete('/:id', isAdmin, async (ctx) => {
+feedbacks.delete('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const params = numberIdSchema.safeParse(ctx.req.param());

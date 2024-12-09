@@ -71,7 +71,7 @@ highlights.get('/:id', async (ctx) => {
  * @param isLoggedIn - Middleware so only logged-in users can use.
  * @returns A response with a success or error message.
  */
-highlights.post('/', isLoggedIn, async (ctx) => {
+highlights.post('/', isLoggedIn, isLoggedIn, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const body = await ctx.req.json();
@@ -97,7 +97,7 @@ highlights.post('/', isLoggedIn, async (ctx) => {
  * @param isAdmin - Middleware so only admins can use.
  * @returns A response with a success or error message.
  */
-highlights.put('/:id/approve', isAdmin, async (ctx) => {
+highlights.put('/:id/approve', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const {id} = ctx.req.param();
@@ -151,7 +151,7 @@ highlights.put('/:id', async (ctx) => {
  * @param isAdmin - Middleware so only admins can use.
  * @returns A response with a success or error message.
  */
-highlights.delete('/:id', isAdmin, async (ctx) => {
+highlights.delete('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const {id} = ctx.req.param();
