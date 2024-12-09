@@ -3,14 +3,18 @@ import { createErrorResponse } from "../errors/error.js";
 import { z } from 'zod';
 import dotenv from "dotenv";
 import {EntityManager} from "@mikro-orm/core";
-import {getFeedbackByUserId, getFeedbackByHighlight, approveFeedback, deleteFeedback} from "../controllers/feedbackController.js";
+import {approveFeedback, deleteFeedback} from "../controllers/feedbackController.js";
+import {getFeedbackByUserId, getFeedbackByHighlight} from "../controllers/feedbackController.js";
 import { isAdmin } from "../middleware/isAdmin.js";
+import logger from "../utils/logger.js";
 
 dotenv.config();
 
 const feedbacks = new Hono();
 
-const idSchema = z.object({highlightId: z.string().uuid()});
+const userIdSchema = z.object({id: z.string().uuid()});
+
+const numberIdSchema = z.object({id: z.preprocess((val) => Number(val), z.number())});
 
 /**
  * Fetches all feedback by highlight id.
@@ -21,14 +25,14 @@ const idSchema = z.object({highlightId: z.string().uuid()});
 feedbacks.get('/highlight/:id', async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
-        const params = idSchema.safeParse(ctx.req.param());
+        const params = numberIdSchema.safeParse(ctx.req.param());
 
         if (!params.success){
             return ctx.json(createErrorResponse(400, 'Invalid highlightId parameter'), 400)
         }
 
-        const {highlightId} = params.data;
-        const feedback = getFeedbackByHighlight(em, highlightId);
+        const {id} = params.data;
+        const feedback = getFeedbackByHighlight(em, id);
 
         if(!feedback){
             return ctx.json({message: 'No feedback found'}, 404);
@@ -36,6 +40,7 @@ feedbacks.get('/highlight/:id', async (ctx) => {
 
         return ctx.json(feedback, 200);
     }catch (error){
+        logger.error('Error while fetching feedbacks', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
@@ -50,14 +55,14 @@ feedbacks.get('/highlight/:id', async (ctx) => {
 feedbacks.get('/user/:id', isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
-        const params = idSchema.safeParse(ctx.req.param());
+        const params = userIdSchema.safeParse(ctx.req.param());
 
         if (!params.success){
             return ctx.json(createErrorResponse(400, 'Invalid userId parameter'), 400)
         }
 
-        const {userId} = params.data;
-        const feedback = getFeedbackByUserId(em, userId);
+        const {id} = params.data;
+        const feedback = getFeedbackByUserId(em, id);
 
         if(!feedback){
             return ctx.json({message: 'No feedback found'}, 404);
@@ -65,6 +70,7 @@ feedbacks.get('/user/:id', isAdmin, async (ctx) => {
 
         return ctx.json(feedback, 200);
     }catch (error){
+        logger.error('Error while fetching feedbacks', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
@@ -79,18 +85,19 @@ feedbacks.get('/user/:id', isAdmin, async (ctx) => {
 feedbacks.put('/:id/approve', isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
-        const params = idSchema.safeParse(ctx.req.param());
+        const params = numberIdSchema.safeParse(ctx.req.param());
 
         if (!params.success){
             return ctx.json(createErrorResponse(400, 'Invalid feedbackId parameter'), 400)
         }
 
-        const {feedbackId} = params.data;
+        const {id} = params.data;
 
-        await approveFeedback(em, feedbackId);
+        await approveFeedback(em, id);
 
         return ctx.json({message: 'Feedback approved successfully'}, 200);
     }catch (error){
+        logger.error('Error while approving highlight', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
@@ -105,17 +112,18 @@ feedbacks.put('/:id/approve', isAdmin, async (ctx) => {
 feedbacks.delete('/:id', isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
-        const params = idSchema.safeParse(ctx.req.param());
+        const params = numberIdSchema.safeParse(ctx.req.param());
 
         if (!params.success){
             return ctx.json(createErrorResponse(400, 'Invalid feedbackId parameter'), 400)
         }
 
-        const {feedbackId} = params.data;
-        await deleteFeedback(em, feedbackId);
+        const {id} = params.data;
+        await deleteFeedback(em, id);
 
         return ctx.json({message: 'Feedback deleted successfully'}, 200);
     }catch (error){
+        logger.error('Error while deleting feedback', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })

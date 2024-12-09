@@ -2,10 +2,12 @@ import {Hono} from "hono";
 import { createErrorResponse } from "../errors/error.js";
 import { z } from 'zod';
 import dotenv from "dotenv";
-import { getAllTours, getTourById, getHighlightsByTour, createTour, addUserToTour, updateTour, deleteTour} from "../controllers/tourController.js";
+import { updateTour, deleteTour} from "../controllers/tourController.js";
+import { getHighlightsByTour, createTour} from "../controllers/tourController.js";
+import { getAllTours, getTourById} from "../controllers/tourController.js";
 import {EntityManager} from "@mikro-orm/core";
-import { isLoggedIn } from "../middleware/isLoggedIn.js";
 import { isAdmin } from "../middleware/isAdmin.js";
+import logger from "../utils/logger.js";
 
 dotenv.config();
 
@@ -13,13 +15,10 @@ const tours = new Hono();
 
 const tourSchema = z.object({
     name: z.string(),
-    description: z.string(),
-    duration_time: z.string(),
-    start_hour: z.string()
-})
-
-const userSchema = z.object({
-    id: z.string()
+    description: z.string().optional().nullable(),
+    duration_time: z.string().optional().nullable(),
+    start_hour: z.string().optional().nullable(),
+    highlights: z.array(z.any()).optional()
 })
 
 /**
@@ -35,6 +34,7 @@ tours.get('/', async (ctx) => {
 
         return ctx.json({tours}, 200);
     }catch (error){
+        logger.error('Error while fetching tours', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
@@ -49,7 +49,7 @@ tours.get('/:id', async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const { id } = ctx.req.param();
-        const tour = getTourById(em, id);
+        const tour = getTourById(em, parseInt(id));
 
         if (!tour){
             return ctx.json({message: 'Tour not found'}, 404)
@@ -57,6 +57,7 @@ tours.get('/:id', async (ctx) => {
 
         return ctx.json({tour}, 200)
     }catch (error){
+        logger.error('Error while fetching tour', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
@@ -71,7 +72,7 @@ tours.get(':id/highlights', async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const { id } = ctx.req.param();
-        const highlights = getHighlightsByTour(em, id);
+        const highlights = getHighlightsByTour(em, parseInt(id));
 
         if (!highlights){
             return ctx.json({message: 'No highlights found'}, 404);
@@ -79,6 +80,7 @@ tours.get(':id/highlights', async (ctx) => {
 
         return ctx.json({highlights}, 200)
     }catch (error){
+        logger.error('Error while fetching tour highlights', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
@@ -104,6 +106,7 @@ tours.post('/', isAdmin, async (ctx) => {
 
         return ctx.json({message: 'Tour created successfully'}, 201)
     }catch (error){
+        logger.error('Error while creating tour', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
@@ -115,20 +118,26 @@ tours.post('/', isAdmin, async (ctx) => {
  * @param isAdmin - Middleware so only admins can use.
  * @returns A response with a success or error message.
  */
-tours.put('/:id', isAdmin, async (ctx) => {
+tours.put('/:id', async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const { id } = ctx.req.param();
-        const body = await ctx.req.json();
 
-        const tour = tourSchema.safeParse(body);
-        if (!tour.success){
-            return ctx.json({message: 'Invalid date'}, 400);
+        const tour = await getTourById(em, parseInt(id));
+        if (!tour){
+            return ctx.json({message: 'Tour not found'}, 404);
         }
 
-        await updateTour(em, id, tour.data);
+        const body = await ctx.req.json();
+        const tourData = tourSchema.safeParse(body);
+        if (!tourData.success){
+            return ctx.json({message: 'Invalid data'}, 400);
+        }
+
+        await updateTour(em, parseInt(id), tourData.data);
         return ctx.json({message: 'Tour updated successfully'}, 200);
     }catch (error){
+        logger.error('Error while updating tour', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
@@ -145,9 +154,10 @@ tours.delete('/:id', isAdmin, async (ctx) => {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const { id } = ctx.req.param();
 
-        await deleteTour(em, id);
+        await deleteTour(em, parseInt(id));
         return ctx.json({message: 'Tour deleted successfully'}, 200)
     }catch (error){
+        logger.error('Error while deleting tour', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })

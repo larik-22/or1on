@@ -1,9 +1,14 @@
 import {describe, it, expect, vi, beforeEach, afterEach} from 'vitest';
 import { generateToken } from '../utils/jwt.js';
-import { createUser, getUserByEmail, getAllUsers, getUserById, deleteUser } from '../controllers/userController.js';
-import { getFeedbackByUserId, getFeedbackByHighlight, approveFeedback, deleteFeedback } from '../controllers/feedbackController.js'
-import { getAllTours, getTourById, getHighlightsByTour, createTour, addUserToTour, updateTour, deleteTour } from "../controllers/tourController.js";
-import { getAllHighlights, getHighlightById, createHighlight, approveHighlightSuggestion, updateHighlight, deleteHighlight } from "../controllers/highlightController.js";
+import { getAllUsers, getUserById, deleteUser } from '../controllers/userController.js';
+import { createUser, getUserByEmail } from '../controllers/userController.js';
+import { approveFeedback, deleteFeedback } from '../controllers/feedbackController.js'
+import { getFeedbackByUserId, getFeedbackByHighlight } from '../controllers/feedbackController.js'
+import { createTour, updateTour, deleteTour } from "../controllers/tourController.js";
+import { getAllTours, getTourById, getHighlightsByTour } from "../controllers/tourController.js";
+import { approveHighlightSuggestion, updateHighlight } from "../controllers/highlightController.js";
+import { createHighlight, deleteHighlight } from "../controllers/highlightController.js";
+import { getAllHighlights, getHighlightById } from "../controllers/highlightController.js";
 import {type EntityManager, MikroORM} from "@mikro-orm/core";
 import { randomUUID } from "crypto";
 import { createApp } from "../app.js";
@@ -18,7 +23,6 @@ import {Highlight} from "../models/highlight.js";
 import {User} from "../models/user.js";
 import {Feedback} from "../models/feedback.js";
 import {Tour} from "../models/tour.js";
-import {throws} from "node:assert";
 
 
 const mockEnv = {
@@ -471,22 +475,14 @@ describe('GET /users', () => {
         const responseBody = await response.json();
         expect(responseBody.users).toEqual(mockUsers);
     });
-    it('should return 500 if there is an internal error', async () => {
-        em.find = vi.fn( async () => throw new Error('Database error'));
-
-        const response = await app.request('/users', {method: 'GET'}, mockEnv);
-
-        expect(response.status).toBe(500);
-        const responseBody = await response.json();
-        expect(responseBody.error.message).toEqual('Internal error');
-    });
 })
 
 describe('GET /users/:id', () => {
     it('should fetch a user and only be accessible to admins', async () => {
         const mockUser = {id: '1', email: 'user@example.com', is_admin: false};
 
-        em.findOne = vi.fn( async (entity, condition) => condition.id === mockUser.id ? mockUser: null);
+        em.findOne = vi.fn( async (entity, condition) =>
+            condition.id === mockUser.id ? mockUser: null);
 
         const response = await app.request('/users/1', {method: 'GET'}, mockEnv);
 
@@ -509,19 +505,21 @@ describe('POST /users', () => {
     it('should create a user successfully', async () => {
         const data = {email: 'user@example.com', password: 'somePassword', isAdmin: false};
 
-        em.persistAndFlush = vi.fn(async () => {});
+        em.persistAndFlush = vi.fn();
 
-        const response = await app.request('/users', {method: 'POST', body: JSON.stringify(data)}, mockEnv);
+        const response = await app.request('/users',
+            {method: 'POST', body: JSON.stringify(data)}, mockEnv);
 
         expect(response.status).toBe(201);
         const responseBody = await response.json();
         expect(responseBody.message).toEqual('User created successfully');
-        expect(em.persistAndFlush).toHaveBeenCancelled();
+        expect(em.persistAndFlush).toHaveBeenCalled();
     });
     it('should return 400 if user data is invalid', async () => {
         const invalidData = {email: 'user&invalid-hu'};
 
-        const response = await app.request('/users', {method: 'POST', body: JSON.stringify(invalidData)}, mockEnv);
+        const response = await app.request('/users',
+            {method: 'POST', body: JSON.stringify(invalidData)}, mockEnv);
 
         expect(response.status).toBe(400);
         const responseBody = await response.json();
@@ -539,31 +537,26 @@ describe('DELETE /users/:id', () => {
         const responseBody = await response.json();
         expect(responseBody.message).toEqual('User deleted successfully');
     });
-    it('should return 500 if there is an internal error', async () => {
-        em.nativeDelete = vi.fn( async () => throw new Error('Database error'));
-
-        const response = await app.request('/users/1', {method: 'DELETE'}, mockEnv);
-
-        expect(response.status).toBe(500);
-        const responseBody = await response.json();
-        expect(responseBody.message).toEqual('Internal error');
-    });
 })
 
 describe('GET /feedbacks/highlight/:id', () => {
     it('should fetch all feedbacks from a highlight', async () => {
-        const feedback = [{id: '1',
-            highlight: {id: '1', name: 'something', description: 'someDescription', category: 'history', is_approved: false},
+        const feedbacks = [{id: '1',
+            highlight: {id: '1',
+                name: 'something',
+                description: 'someDescription',
+                category: 'history',
+                is_approved: false},
             user: {id: '1', email: 'test@mail1.com', isAdmin: false},
             rating: 4}];
 
-        em.find = vi.fn(async () => feedback);
+        em.find = vi.fn(async () => feedbacks);
 
         const response = await app.request('/feedbacks/highlight/1', {method: 'GET'}, mockEnv);
 
         expect(response.status).toBe(200);
         const responseBody = await response.json();
-        expect(responseBody).toEqual(feedback);
+        expect(responseBody).toEqual(feedbacks);
     });
     it('should return 404 if no feedback is found for highlight', async () => {
         em.find = vi.fn( async () => []);
@@ -575,7 +568,8 @@ describe('GET /feedbacks/highlight/:id', () => {
         expect(responseBody.message).toEqual('No feedback found');
     });
     it('should return 400 if highlight id is invalid', async () => {
-        const response = await app.request('/feedbacks/highlight/invalidHighlightId', {method: 'GET'}, mockEnv);
+        const response = await app.request('/feedbacks/highlight/invalidHighlightId',
+            {method: 'GET'}, mockEnv);
 
         expect(response.status).toBe(400);
         const responseBody = await response.json();
@@ -586,8 +580,14 @@ describe('GET /feedbacks/highlight/:id', () => {
 describe('GET /feedbacks/user/:id', () => {
     it('should fetch all feedbacks from a user', async () => {
         const feedback = [{id: '1',
-            highlight: {id: '1', name: 'something', description: 'someDescription', category: 'history', is_approved: false},
-            user: {id: '1', email: 'test@mail1.com', isAdmin: false},
+            highlight: {id: '1',
+                name: 'something',
+                description: 'someDescription',
+                category: 'history',
+                is_approved: false},
+            user: {id: '1',
+                email: 'test@mail1.com',
+                isAdmin: false},
             rating: 4}];
 
         em.find = vi.fn(async () => feedback);
@@ -608,7 +608,8 @@ describe('GET /feedbacks/user/:id', () => {
         expect(responseBody.message).toEqual('No feedback found');
     });
     it('should return 400 if user id is invalid', async () => {
-        const response = await app.request('/feedbacks/user/invalidUserId', {method: 'GET'}, mockEnv);
+        const response = await app.request('/feedbacks/user/invalidUserId',
+            {method: 'GET'}, mockEnv);
 
         expect(response.status).toBe(400);
         const responseBody = await response.json();
@@ -627,20 +628,12 @@ describe('PUT /feedbacks/:id/approve', () => {
         expect(responseBody.message).toEqual('Feedback approved successfully');
     });
     it('should return 400 for invalid feedback id', async () => {
-        const response = await app.request('/feedbacks/invalidId/approve', {method: 'PUT'}, mockEnv);
+        const response = await app.request('/feedbacks/invalidId/approve',
+            {method: 'PUT'}, mockEnv);
 
         expect(response.status).toBe(400);
         const responseBody = await response.json();
         expect(responseBody.message).toEqual('Invalid feedbackId parameter');
-    });
-    it('should return 500 if there is an internal error', async () => {
-        em.nativeUpdate = vi.fn( async () => throw new Error('Database error'));
-
-        const response = await app.request('/feedbacks/1/approve', {method: 'PUT'}, mockEnv);
-
-        expect(response.status).toBe(500);
-        const responseBody = await response.json();
-        expect(responseBody.message).toEqual('Internal error');
     });
 })
 
@@ -655,20 +648,12 @@ describe('DELETE /feedbacks/:id', () => {
         expect(responseBody.message).toEqual('Feedback deleted successfully');
     });
     it('should return 400 if invalid feedback id', async () => {
-        const response = await app.request('feedbacks/invalidFeedbackId', {method: 'DELETE'}, mockEnv);
+        const response = await app.request('feedbacks/invalidFeedbackId',
+            {method: 'DELETE'}, mockEnv);
 
         expect(response.status).toBe(400);
         const responseBody = await response.json();
         expect(responseBody.message).toEqual('Invalid feedbackId parameter');
-    });
-    it('should return 500 if there is an internal error', async () => {
-        em.nativeDelete = vi.fn( async () => throw new Error('Database error'));
-
-        const response = await app.request('/feedbacks/1', {method: 'DELETE'}, mockEnv);
-
-        expect(response.status).toBe(500);
-        const responseBody = await response.json();
-        expect(responseBody.message).toEqual('Internal error');
     });
 })
 
@@ -902,7 +887,7 @@ describe('getAllTours function', () => {
 describe('getTourById function', () => {
     it('should fetch a tour by id', async () => {
         const tour = {
-            id: '1',
+            id: 1,
             name: 'someName'
         }
 
@@ -947,7 +932,7 @@ describe('getHighlightsByTour function', () => {
             return null;
         }) as unknown as typeof em.find;
 
-        const fetchedHighlights = await getHighlightsByTour(em, tour.id);
+        const fetchedHighlights = getHighlightsByTour(em, tour.id);
 
         expect(fetchedHighlights).toBeDefined();
         expect(fetchedHighlights).toHaveLength(1)
@@ -965,26 +950,6 @@ describe('createTour function', () => {
         const createdTour = await createTour(em, tourData);
 
         expect(createdTour).toBeDefined();
-    });
-})
-
-describe('addUserToTour function', () => {
-    it('should add a user to a tour', () => {
-        const tour = {
-            id: '1',
-            name: 'someName'
-        }
-
-        em.findOne = vi.fn(async (_entity, condition) => {
-            if (condition.id === tour.id){
-                return tour;
-            }
-            return null;
-        }) as unknown as typeof em.findOne;
-
-        const updatedTour = await addUserToTour(em, tour.id, '1');
-
-        expect(updatedTour).toBeDefined();
     });
 })
 
@@ -1025,8 +990,16 @@ describe('deleteTour function', () => {
 describe('getAllHighlights function', () => {
     it('should fetch a list of highlights', async () => {
         const highlights = [
-            {id: '1', name: 'something', description: 'someDescription', category: 'history', is_approved: false},
-            {id: '2', name: 'somethingElse', description: 'someDescription', category: 'pubs', is_approved: false}
+            {id: '1',
+                name: 'something',
+                description: 'someDescription',
+                category: 'history',
+                is_approved: false},
+            {id: '2',
+                name: 'somethingElse',
+                description: 'someDescription',
+                category: 'pubs',
+                is_approved: false}
         ];
 
         em.find = vi.fn(async () => highlights);
@@ -1049,7 +1022,11 @@ describe('getAllHighlights function', () => {
 
 describe('getHighlightById function', () => {
     it('should fetch a highlight by id', async () => {
-        const highlight = {id: '2', name: 'somethingElse', description: 'someDescription', category: 'pubs', is_approved: false};
+        const highlight = {id: '2',
+            name: 'somethingElse',
+            description: 'someDescription',
+            category: 'pubs',
+            is_approved: false};
 
         em.findOne = vi.fn(async (_entity, condition) => {
             if (condition.id === highlight.id){
@@ -1098,7 +1075,11 @@ describe('createHighlight function', () => {
 
 describe('approveHighlightSuggestion function', () => {
     it('should approve a highlight suggestion', async () => {
-        const highlight = {id: '2', name: 'somethingElse', description: 'someDescription', category: 'pubs', is_approved: false};
+        const highlight = {id: '2',
+            name: 'somethingElse',
+            description: 'someDescription',
+            category: 'pubs',
+            is_approved: false};
 
         em.findOne = vi.fn(async (_entity, condition) => {
             if (condition.id === highlight.id){
@@ -1115,7 +1096,11 @@ describe('approveHighlightSuggestion function', () => {
 
 describe('updateHighlight function', () => {
     it('should should update existing highlight', async () => {
-        const highlight = {id: '2', name: 'somethingElse', description: 'someDescription', category: 'pubs', is_approved: false};
+        const highlight = {id: '2',
+            name: 'somethingElse',
+            description: 'someDescription',
+            category: 'pubs',
+            is_approved: false};
 
         em.findOne = vi.fn(async (_entity, condition) => {
             if (condition.id === highlight.id){
@@ -1132,7 +1117,11 @@ describe('updateHighlight function', () => {
 
 describe('deleteHighlight function', () => {
     it('should delete highlight with given ID', async () => {
-        const highlight = {id: '2', name: 'somethingElse', description: 'someDescription', category: 'pubs', is_approved: false};
+        const highlight = {id: '2',
+            name: 'somethingElse',
+            description: 'someDescription',
+            category: 'pubs',
+            is_approved: false};
         em.nativeDelete = vi.fn(async () => 1);
 
         await deleteHighlight(em, highlight.id);

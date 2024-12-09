@@ -1,5 +1,4 @@
-import type {Feedback} from "../models/feedback.js";
-import type { Highlight } from "../models/highlight.js";
+import {Feedback} from "../models/feedback.js";
 import {EntityManager} from "@mikro-orm/core";
 import logger from "../utils/logger.js";
 
@@ -8,9 +7,11 @@ import logger from "../utils/logger.js";
  *
  * @param em - The MikroORM EntityManager instance.
  * @param userId - The id of the user whose feedback is to be found.
- * @returns {Promise<Feedback[] | null>} A promise resolving to a list of feedbacks if found, otherwise null.
+ * @returns {Promise<Feedback[] | null>} A promise resolving to a list of feedbacks if found,
+ * otherwise null.
  */
-export const getFeedbackByUserId = async (em: EntityManager, userId: string): Promise<Feedback[] | null> => {
+export const getFeedbackByUserId = async (em: EntityManager, userId: string):
+    Promise<Feedback[] | null> => {
     try {
         return await em.find(Feedback, {user: {id: userId}});
     } catch (error){
@@ -23,11 +24,13 @@ export const getFeedbackByUserId = async (em: EntityManager, userId: string): Pr
  *
  * @param em - The MikroORM EntityManager instance.
  * @param id - The id of the highlight.
- * @returns {Promise<Feedback[]>} A promise resolving to a list of feedbacks if found, otherwise null.
+ * @returns {Promise<Feedback[]>} A promise resolving to a list of feedbacks if found,
+ * otherwise null.
  */
-export const getFeedbackByHighlight = async (em: EntityManager, id: string): Promise<Feedback[]> => {
+export const getFeedbackByHighlight = async (em: EntityManager, id: number):
+    Promise<Feedback[]> => {
     try {
-        return await em.find(Feedback, {Highlight: {id: id}});
+        return await em.find(Feedback, {highlight: {id: id}});
     } catch (error) {
         logger.error('Failed to fetch feedback from highlight with id: ' + id + ' error: ' + error);
     }
@@ -40,7 +43,7 @@ export const getFeedbackByHighlight = async (em: EntityManager, id: string): Pro
  * @param id - The id of the feedback to be updated.
  * @returns {Promise<void>}
  */
-export const approveFeedback = async (em: EntityManager, id: string): Promise<void> => {
+export const approveFeedback = async (em: EntityManager, id: number): Promise<void> => {
     try {
         await em.nativeUpdate(Feedback, { id: id }, { is_approved: true});
         await em.flush();
@@ -57,7 +60,7 @@ export const approveFeedback = async (em: EntityManager, id: string): Promise<vo
  * @param id - The id of the feedback to be deleted.
  * @returns {Promise<void>}
  */
-export const deleteFeedback = async (em: EntityManager, id: string): Promise<void> => {
+export const deleteFeedback = async (em: EntityManager, id: number): Promise<void> => {
     try {
         await em.nativeDelete(Feedback, {id: id});
         await em.flush();

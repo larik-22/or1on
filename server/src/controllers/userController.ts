@@ -8,7 +8,7 @@ import { randomUUID } from 'crypto';
  * Fetches all users
  *
  * @param em - The MikroORM EntityManager instance.
- * @returns {Promise<User[] | null>} A promise resolving to a list of users if found, otherwise null.
+ * @returns {Promise<User[] | null>} A promise resolving to a list of users if found, otherwise null
  */
 export const getAllUsers = async (em: EntityManager): Promise<User[] | null> => {
     try {
@@ -48,10 +48,6 @@ export const getUserByEmail = async (em: EntityManager, email: string): Promise<
         logger.error('Failed to fetch user by email:' + email + ' error: ' + error);
         throw error;
     }
-};
-
-export const getFeedbackByUserId = (id: string) => {
-    return users.find(user => user.id === id)?.feedback;
 };
 
 /**
@@ -95,7 +91,7 @@ export const createUser = async (
  * @param em - The MikroORM EntityManager instance.
  * @param id - The id of the user to be found.
  */
-export const deleteUser = async (em: EntityManager, id: string) => {
+export const deleteUser = async (em: EntityManager, id: string): Promise<void> => {
     try {
         await em.nativeDelete(User, {id: id});
         await em.flush();

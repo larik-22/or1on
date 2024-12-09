@@ -1,15 +1,13 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Tour } from "../models/tour.js";
 import logger from '../utils/logger.js';
-import { randomUUID } from 'crypto';
-import type {User} from "../models/user.js";
 import type { Highlight } from "../models/highlight.js";
 
 /**
  * Fetches all tours
  *
  * @param em - The MikroORM EntityManager instance.
- * @returns {Promise<Tour[] | null>} A promise resolving to a list of tours if found, otherwise null.
+ * @returns {Promise<Tour[] | null>} A promise resolving to a list of tours if found, otherwise null
  */
 export const getAllTours = async (em: EntityManager): Promise<Tour[] | null> => {
     try {
@@ -26,7 +24,7 @@ export const getAllTours = async (em: EntityManager): Promise<Tour[] | null> => 
  * @param id - The id of the user to find.
  * @returns {Promise<Tour | null>} A promise resolving to the tour object if found, otherwise null.
  */
-export const getTourById = async (em: EntityManager, id: string): Promise<Tour | null> => {
+export const getTourById = async (em: EntityManager, id: number): Promise<Tour | null> => {
     try {
         return await em.findOne(Tour, { id });
     } catch (error) {
@@ -39,16 +37,19 @@ export const getTourById = async (em: EntityManager, id: string): Promise<Tour |
  *
  * @param em - The MikroORM EntityManager instance.
  * @param tourId - The id of the tour to find.
- * @returns {Promise<Highlight[] | null>} A promise resolving to a list of highlights if found, otherwise null.
+ * @returns {Promise<Highlight[] | null>} A promise resolving to
+ * a list of highlights if found, otherwise null.
  */
-export const getHighlightsByTour = async (em: EntityManager, tourId: string): Promise<Highlight[] | null> => {
+export const getHighlightsByTour = async (em: EntityManager, tourId: number):
+    Promise<Highlight[] | null> => {
     try {
         const tour = await em.findOne(Tour, { id: tourId}, {populate: ['highlights']});
         if (tour){
             return tour.highlights.getItems();
         }
     } catch (error) {
-        logger.error('Failed to find tour or fetch highlights from tour with id: ' + tourId + ' error: ' + error);
+        logger.error('Failed to find tour or fetch highlights from tour with id: ' + tourId
+            + ' error: ' + error);
     }
 }
 
@@ -63,12 +64,10 @@ export const createTour = async (em: EntityManager, data: Omit<Tour, 'id'>): Pro
     try {
         const { name, description, duration_time, start_hour } = data;
         const newTour = em.create(Tour, {
-            id: randomUUID(),
             name: name,
             description: description,
             duration_time: duration_time,
             start_hour: start_hour,
-            users: [],
             highlights: []
         });
 
@@ -86,18 +85,17 @@ export const createTour = async (em: EntityManager, data: Omit<Tour, 'id'>): Pro
  * @param updatedData - The changed data of the updated attributes.
  * @returns {Promise<void>}
  */
-export const updateTour = async (em: EntityManager, id: string, updatedData: Partial<Tour>): Promise<void> =>{
+export const updateTour = async (em: EntityManager, id: number, updatedData: Partial<Tour>):
+    Promise<void> =>{
+    const tour = await em.findOne(Tour, {id: id});
+    if(!tour){
+        throw new Error('Tour with id ${id} not found');
+    }
     try {
-        let tour = await em.findOne(Tour, {id: id});
-
-        if (updatedData.name !== undefined) tour?.name = updatedData.name;
-        if (updatedData.description !== undefined) tour?.description = updatedData.description;
-        if (updatedData.duration_time !== undefined) tour?.duration_time = updatedData.duration_time;
-        if (updatedData.start_hour !== undefined) tour?.start_hour = updatedData.start_hour;
-
-        await em.flush();
-    } catch (error){
-        logger.error('Failed to update tour with id: ' + id + ' error: ' + error);
+        em.assign(tour, updatedData)
+        await em.persistAndFlush(tour);
+    }catch (error){
+        logger.error('Failed to update tour with id: ' + id + ' error: ' + error)
     }
 }
 
@@ -108,7 +106,7 @@ export const updateTour = async (em: EntityManager, id: string, updatedData: Par
  * @param id - The id of the tour to be deleted.
  * @returns {Promise<void>}
  */
-export const deleteTour = async (em: EntityManager, id: string): Promise<void> => {
+export const deleteTour = async (em: EntityManager, id: number): Promise<void> => {
     try {
         await em.nativeDelete(Tour, {id: id});
         await em.flush();

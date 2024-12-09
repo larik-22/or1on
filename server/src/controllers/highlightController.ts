@@ -1,14 +1,13 @@
 import { EntityManager } from '@mikro-orm/core';
-import type { Highlight } from "../models/highlight.js";
-import { randomUUID } from 'crypto';
-import type {Feedback} from "../models/feedback.js";
+import { Highlight } from "../models/highlight.js";
 import logger from "../utils/logger.js";
 
 /**
  * Fetches all highlights from the database.
  *
  * @param em - The MikroORM EntityManager instance.
- * @returns {Promise<Highlight[] | null>} A promise resolving to a list of highlights if found, otherwise null.
+ * @returns {Promise<Highlight[] | null>} A promise resolving to a list of highlights if found,
+ * otherwise null.
  */
 export const getAllHighlights = async (em: EntityManager): Promise<Highlight[] | null> => {
     try {
@@ -23,9 +22,11 @@ export const getAllHighlights = async (em: EntityManager): Promise<Highlight[] |
  *
  * @param em - The MikroORM EntityManager instance.
  * @param id - The id of the highlight to be found.
- * @returns {Promise<Highlight | null>} A promise resolving to the highlight object if found, otherwise null.
+ * @returns {Promise<Highlight | null>} A promise resolving to the highlight object if found,
+ * otherwise null.
  */
-export const getHighlightById = async (em: EntityManager, id: string): Promise<Highlight | null> => {
+export const getHighlightById = async (em: EntityManager, id: number):
+    Promise<Highlight | null> => {
     try {
         return await em.findOne(Highlight, {id: id});
     } catch (error) {
@@ -40,18 +41,24 @@ export const getHighlightById = async (em: EntityManager, id: string): Promise<H
  * @param data -  - The highlight data excluding the `id` field.
  * @returns {Promise<void>}
  */
-export const createHighlight = async (em: EntityManager, data: Omit<Highlight, 'id'>): Promise<void> => {
-    const {name, description, category, latitude, longitude} = data;
-    const newHighlight = em.create(Highlight, {
-        id: randomUUID(),
-        name,
-        description,
-        category: category ?? null,
-        latitude: latitude  ?? null,
-        longitude: longitude ?? null,
-        is_approved: false,
-        tours: []
-    })
+export const createHighlight = async (em: EntityManager, data: Omit<Highlight, 'id'>):
+    Promise<void> => {
+    try{
+        const {name, description, category, latitude, longitude} = data;
+        const newHighlight = em.create(Highlight, {
+            name,
+            description,
+            category: category ?? null,
+            latitude: latitude  ?? null,
+            longitude: longitude ?? null,
+            is_approved: false,
+            tours: []
+        })
+
+        await em.persistAndFlush(newHighlight)
+    }catch (error){
+        logger.error('Failed to create highlight: ' + error);
+    }
 }
 
 /**
@@ -61,10 +68,10 @@ export const createHighlight = async (em: EntityManager, data: Omit<Highlight, '
  * @param id - The id of the highlight to be approved.
  * @returns {Promise<void>}
  */
-export const approveHighlightSuggestion = async (em: EntityManager, id: string): Promise<void> => {
+export const approveHighlightSuggestion = async (em: EntityManager, id: number): Promise<void> => {
     try {
         await em.nativeUpdate(Highlight, {id: id}, {is_approved: true});
-        em.flush();
+        await em.flush();
     } catch (error){
         logger.error('Failed to approve highlight with id: ' + id + ' error: ' + error);
     }
@@ -78,17 +85,15 @@ export const approveHighlightSuggestion = async (em: EntityManager, id: string):
  * @param updatedData - The changed data of the updated attributes.
  * @returns {Promise<void>}
  */
-export const updateHighlight = async (em: EntityManager, id: string, updatedData: Partial<Highlight>): Promise<void> =>{
+export const updateHighlight =
+    async (em: EntityManager, id: number, updatedData: Partial<Highlight>): Promise<void> =>{
+    const highlight = await em.findOne(Highlight, {id: id});
+    if(!highlight){
+        throw new Error('Highlight with id ${id} not found');
+    }
     try {
-        let highlight = await em.findOne(Highlight, {id: id});
-
-        if (updatedData.name !== undefined) highlight?.name = updatedData.name;
-        if (updatedData.description !== undefined) highlight?.description = updatedData.description;
-        if (updatedData.category !== undefined) highlight?.category = updatedData.category;
-        if (updatedData.latitude !== undefined) highlight?.latitude = updatedData.latitude;
-        if (updatedData.longitude !== undefined) highlight?.longitude = updatedData.longitude;
-
-        em.flush();
+        em.assign(highlight, updatedData)
+        await em.persistAndFlush(highlight);
     }catch (error){
         logger.error('Failed to update highlight with id: ' + id + ' error: ' + error)
     }
@@ -101,11 +106,11 @@ export const updateHighlight = async (em: EntityManager, id: string, updatedData
  * @param id - The id of the highlight to be deleted.
  * @returns {Promise<void>}
  */
-export const deleteHighlight = async (em: EntityManager, id: string): Promise<void> => {
+export const deleteHighlight = async (em: EntityManager, id: number): Promise<void> => {
     try {
         await em.nativeDelete(Highlight, {id: id});
         em.flush();
     }catch (error){
-        logger.error('Failed to delete highlight with id: ' + id);
+        logger.error('Failed to delete highlight with id: ' + id + ' error: ' + error);
     }
 }
