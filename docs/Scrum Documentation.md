@@ -71,3 +71,65 @@ Absentees: None;
   - The team will try to burn 80 hours in the next sprint as per the assignment requirements.
   - The team will try to assign each member at least 2 issues in the next sprint.
 
+## Sprint 1 - Botond Vendler
+Create a functional backend and the base for the frontend already with some functionality.
+
+### 1st Meeting (27/11/2024)
+Meeting notes:
+- Team members picked up issues to work on.
+  Attendees: Rafael, Ilarion, Ignat, Jan, Petko, Sarina, Botond, Robert;
+  Absentees: None;
+
+---
+
+### 2nd Meeting (29/11/2024)
+Meeting notes:
+- Ignat, Ilarion, Petko and Rafael finished their tasks.
+- Others had either too big of a task to finish, or had to do some little fixes
+  Attendees: Rafael, Ilarion, Ignat, Jan, Petko, Sarina, Botond, Robert;
+  Absentees: None;
+
+---
+
+### 3rd Meeting (02/12/2024)
+Meeting notes:
+- Jan, Rafael, Ignat and Ilarion finished their tasks
+- The others continued working on theirs
+- Robert and Botond's tasks(backend) needed continuance for modifications because of the database
+  Attendees: Rafael, Ilarion, Ignat, Jan, Petko, Sarina, Botond, Robert;
+  Absentees: None;
+
+---
+
+### 4th Meeting (04/12/2024)
+Meeting notes:
+- The database was finalised, Robert and Botond can start their task to adapt their previous task
+- Ignat and Ilarion finished their task, and got assigned new ones
+- Others continued their tasks
+  Attendees: Rafael, Ilarion, Ignat, Jan, Sarina, Botond, Robert, Petko;
+  Absentees: None;
+
+---
+
+### 5th Meeting (06/12/2024)
+Meeting notes:
+- Botond made progress with his task, but hasn't finished it
+- Petko's task was thought to be blocked by Botond, but it isn't he will work on it
+- Jan made progress on his task, but hasn't finished yet
+- The others finished their tasks
+- The team started planning Sprint 2
+  Attendees: Rafael, Ilarion, Ignat, Jan, Sarina, Botond, Robert, Petko;
+  Absentees: None;
+
+---
+
+## Sprint End Backlog:
+![backlog](img/sprint1_end_backlog.png)
+
+## Sprint-1 Retrospective
+- What went well:
+  - The team was able to complete majority the tasks assigned to them.
+  - Adapting to technicalities we haven't used before (ORM, etc.)
+- What could have gone better:
+  - There could have been more communication between corresponding tasks.
+  - Breaking down large issues into smaller ones if possible
