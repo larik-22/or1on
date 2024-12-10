@@ -4,15 +4,13 @@
     import ModeratorDashboard from "./pages/ModeratorDashboard.svelte";
     import Register from "./pages/Register.svelte";
     import Login from "./pages/Login.svelte";
-    import AdminUser from "./pages/AdminUser.svelte";
-    import LoggedInUser from "./pages/LoggedInUser.svelte";
     import type {Context} from 'page';
     import isNotLoggedIn from "./lib/middleware/notLoggedIn";
     import isAdmin from "./lib/middleware/isAdmin.js";
     import isLoggedIn from "./lib/middleware/loggedIn";
     import UserDashboard from "./pages/UserDashboard.svelte";
     import { Modals } from 'svelte-modals'
-    import Navigation from "./components/Navigation.svelte";
+    import Navigation from "./lib/components/Navigation.svelte";
 
     let page: any;
     let params: Context;
@@ -44,18 +42,6 @@
 
     router('/login', isNotLoggedIn, (ctx: Context) => {
         page = Login;
-        currentRoute = ctx.pathname;
-        params = ctx;
-    });
-
-    router('/test-logged-in', isLoggedIn, (ctx: Context) => {
-        page = LoggedInUser;
-        currentRoute = ctx.pathname;
-        params = ctx;
-    });
-
-    router('/test-admin', isAdmin, (ctx: Context) => {
-        page = AdminUser;
         currentRoute = ctx.pathname;
         params = ctx;
     });

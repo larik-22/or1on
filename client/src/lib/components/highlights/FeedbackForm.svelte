@@ -1,6 +1,6 @@
 <script lang="ts">
-	import {feedbackSchema} from "../../lib/schema/feedbackSchema";
-	import {authToken, decodeToken, isUserAdmin, isUserLoggedIn} from "../../lib/stores/auth";
+	import {feedbackSchema} from "../../schema/feedbackSchema";
+	import {authToken, decodeToken, isUserAdmin, isUserLoggedIn} from "../../stores/auth";
 	import {modals} from "svelte-modals";
 	import page from "page";
 

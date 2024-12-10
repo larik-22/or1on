@@ -1,5 +1,5 @@
 <script lang="ts">
-import ListItem from "../moderatorDashboard/ListItem.svelte";
+import ListItem from "./ListItem.svelte";
 import WarningPopUp from "./WarningPopUp.svelte";
 let enabled_popup: boolean = $state(false)
 let users = [

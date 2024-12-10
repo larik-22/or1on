@@ -4,9 +4,9 @@ import BurgerBar from "./burgerBar/BurgerBar.svelte";
 let actionT = $state("none")
 import page from "page";
 import type {BarItem} from "./burgerBar/BurgerBar.svelte";
-import {isUserLoggedIn, isUserAdmin} from "../lib/stores/auth";
+import {isUserLoggedIn, isUserAdmin} from "../stores/auth";
 import UserManagement from "./moderatorDashboard/UserManagement.svelte";
-import Homepage from "../pages/Homepage.svelte";
+import Homepage from "../../pages/Homepage.svelte";
 import UserIndicator from "./userDashboard/UserIndicator.svelte";
 import ChangePassword from "./userDashboard/ChangePassword.svelte";
 import ChangeUsername from "./userDashboard/ChangeUsername.svelte";
