@@ -15,6 +15,7 @@ export const getAllUsers = async (em: EntityManager): Promise<User[] | null> => 
         return await em.find(User);
     } catch (error) {
         logger.error('Failed to fetch users: ' + error)
+        return null;
     }
 }
 
@@ -30,7 +31,7 @@ export const getUserById = async (em: EntityManager, id: string): Promise<User |
         return await em.findOne(User, { id });
     } catch (error){
         logger.error('Failed to fetch user by id: ' + id + ' error: ' + error);
-        throw error;
+        return null;
     }
 }
 

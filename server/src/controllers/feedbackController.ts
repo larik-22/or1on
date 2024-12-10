@@ -28,11 +28,16 @@ export const getFeedbackByUserId = async (em: EntityManager, userId: string):
  * otherwise null.
  */
 export const getFeedbackByHighlight = async (em: EntityManager, id: number):
-    Promise<Feedback[]> => {
+    Promise<Feedback[] | null> => {
     try {
-        return await em.find(Feedback, {highlight: {id: id}});
+        const feedbacks = await em.find(Feedback, {highlight: {id: id}});
+        if (feedbacks.length === 0){
+            return null
+        }
+        return feedbacks
     } catch (error) {
         logger.error('Failed to fetch feedback from highlight with id: ' + id + ' error: ' + error);
+        return null;
     }
 };
 

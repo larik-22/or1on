@@ -16,8 +16,8 @@ const highlights = new Hono();
 
 const highlightSchema = z.object({
     name: z.string(),
-    description: z.string().optional(),
-    category: z.string().optional(),
+    description: z.string(),
+    category: z.string(),
     latitude:z.number().nullable(),
     longitude:z.number().nullable(),
     is_approved: z.boolean().default(false)
@@ -32,7 +32,7 @@ const highlightSchema = z.object({
 highlights.get('/', async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
-        const highlights = getAllHighlights(em);
+        const highlights = await getAllHighlights(em);
 
         return ctx.json({highlights}, 200)
     }catch (error){
@@ -51,9 +51,9 @@ highlights.get('/:id', async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const { id } = ctx.req.param();
-        const highlight = getHighlightById(em, parseInt(id));
+        const highlight = await getHighlightById(em, parseInt(id));
 
-        if (!highlight){
+        if (highlight === null){
             return ctx.json({message: 'Highlight not found'}, 404);
         }
 
@@ -71,7 +71,7 @@ highlights.get('/:id', async (ctx) => {
  * @param isLoggedIn - Middleware so only logged-in users can use.
  * @returns A response with a success or error message.
  */
-highlights.post('/', isLoggedIn, isLoggedIn, async (ctx) => {
+highlights.post('/', isLoggedIn, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const body = await ctx.req.json();
@@ -102,6 +102,10 @@ highlights.put('/:id/approve', isLoggedIn, isAdmin, async (ctx) => {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const {id} = ctx.req.param();
 
+        if (id === null){
+            return ctx.json(createErrorResponse(400, 'Invalid highlightId parameter'), 400)
+        }
+
         await approveHighlightSuggestion(em, parseInt(id));
 
         return ctx.json({message: `Highlight with ID ${id} approved`}, 200)
@@ -118,7 +122,7 @@ highlights.put('/:id/approve', isLoggedIn, isAdmin, async (ctx) => {
  * @param isAdmin - Middleware so only admins can use.
  * @returns A response with a success or error message.
  */
-highlights.put('/:id', async (ctx) => {
+highlights.put('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const id = parseInt(ctx.req.param('id'))

@@ -11,9 +11,14 @@ import type { Highlight } from "../models/highlight.js";
  */
 export const getAllTours = async (em: EntityManager): Promise<Tour[] | null> => {
     try {
-        return await em.find(Tour);
+        const tours = await em.find(Tour, {});
+        if (tours.length === 0){
+            return null
+        }
+        return tours;
     } catch (error){
         logger.error('Failed to fetch tours: ' + error)
+        return null;
     }
 }
 

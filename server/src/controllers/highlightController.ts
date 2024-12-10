@@ -11,9 +11,14 @@ import logger from "../utils/logger.js";
  */
 export const getAllHighlights = async (em: EntityManager): Promise<Highlight[] | null> => {
     try {
-        return await em.find(Highlight);
+        const highlights = await em.find(Highlight);
+        if (highlights.length === 0){
+            return null;
+        }
+        return highlights
     } catch (error){
         logger.error('Failed to fetch highlights: ' + error);
+        return null;
     }
 }
 

@@ -21,7 +21,7 @@ const users = new Hono();
 users.get('/', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
-        const users = getAllUsers(em);
+        const users = await getAllUsers(em);
 
         return ctx.json({users}, 200);
     }catch (error){

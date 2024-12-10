@@ -569,8 +569,8 @@ describe('DELETE /users/:id', () => {
 
 describe('GET /feedbacks/highlight/:id', () => {
     it('should fetch all feedbacks from a highlight', async () => {
-        const feedbacks = [{id: '1',
-            highlight: {id: '1',
+        const feedbacks = [{id: 1,
+            highlight: {id: 1,
                 name: 'something',
                 description: 'someDescription',
                 category: 'history',
@@ -597,7 +597,7 @@ describe('GET /feedbacks/highlight/:id', () => {
 describe('GET /feedbacks/user/:id', () => {
     it('should fetch all feedbacks from a user', async () => {
         const feedback = [{id: '1',
-            user: {id: '1',
+            user: {id: '550e8400-e29b-41d4-a716-446655440020',
                 email: 'test@mail1.com',
                 isAdmin: false},
             rating: 4}];
@@ -616,7 +616,8 @@ describe('GET /feedbacks/user/:id', () => {
 
         em.find = vi.fn(async () => feedback);
 
-        const response = await app.request('/feedbacks/user/1', {method: 'GET',
+        const response = await app.request('/feedbacks/user/550e8400-e29b-41d4-a716-446655440020',
+            {method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
 
         expect(response.status).toBe(200);
@@ -638,7 +639,8 @@ describe('GET /feedbacks/user/:id', () => {
         });
         em.find = vi.fn( async () => []);
 
-        const response = await app.request('/feedbacks/user/10', {method: 'GET',
+        const response = await app.request('/feedbacks/user/550e8400-e29b-41d4-a716-446655440020',
+            {method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
 
         expect(response.status).toBe(404);
@@ -711,6 +713,340 @@ describe('PUT /feedbacks/:id/approve', () => {
 })
 
 describe('DELETE /feedbacks/:id', () => {
+    it('should delete feedback', async () => {
+        const user = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+        };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdUser = await createUser(em, user);
+        const token = await generateToken({
+            ...createdUser,
+            password: user.password
+        });
+        em.nativeDelete = vi.fn(async () => 1);
+
+        const response = await app.request('feedbacks/1', {method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Feedback deleted successfully');
+    });
+    it('should return 400 if invalid feedback id', async () => {
+        const user = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+        };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdUser = await createUser(em, user);
+        const token = await generateToken({
+            ...createdUser,
+            password: user.password
+        });
+        const response = await app.request('feedbacks/invalidFeedbackId',
+            {method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(400);
+    });
+})
+
+describe('GET /highlights', () => {
+    it('should fetch all highlights', async () => {
+        const mockHighlights = [
+            {
+                id: 1,
+                name: "something",
+                description: "some description",
+                category: "history",
+                latitude: 40.7128,
+                longitude: -74.0060,
+                is_approved: false
+            },
+            {
+                id: 2,
+                name: "something",
+                description: "some description",
+                category: "history",
+                latitude: 40.7128,
+                longitude: -74.0060,
+                is_approved: false
+            }
+        ]
+
+        em.find = vi.fn( async () => mockHighlights);
+
+        const response = await app.request('/highlights', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.highlights).toEqual(mockHighlights);
+    });
+})
+
+describe('GET /highlights/:id', () => {
+    it('should fetch a user and only be accessible to admins', async () => {
+        const mockHighlight = {
+            id: 1,
+            name: "something",
+            description: "some description",
+            category: "history",
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        };
+
+        em.findOne = vi.fn( async (entity, condition) =>
+            condition.id === mockHighlight.id ? mockHighlight: null);
+
+        const response = await app.request('/highlights/1', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.highlight).toEqual(mockHighlight);
+    });
+    it('should return 404 if user is not found', async () => {
+        em.findOne = vi.fn( async () => null);
+
+        const response = await app.request('/highlights/2', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(404);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Highlight not found');
+    });
+})
+
+describe('POST /highlights', () => {
+    it('should create a new highlight', async () => {
+        const user = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+        };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdUser = await createUser(em, user);
+        const token = await generateToken({
+            ...createdUser,
+            password: user.password
+        });
+
+        const highlightData = {
+            name: "something",
+            description: "some description",
+            category: "history",
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        }
+        const response = await app.request('/highlights', {
+            method: 'POST',
+            body: JSON.stringify(highlightData),
+            headers: { 'Authorization': `Bearer ${token}`}
+        }, mockEnv);
+
+        expect(response.status).toBe(201);
+    });
+    it('should return 400 if invalid parameters', async () => {
+        const user = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+        };
+        const highlightData = {
+            name: 1,
+            description: "some description",
+            category: "history",
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        }
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdUser = await createUser(em, user);
+        const token = await generateToken({
+            ...createdUser,
+            password: user.password
+        });
+        const response = await app.request('/highlights', {
+            method: 'POST',
+            body: JSON.stringify(highlightData),
+            headers: { 'Authorization': `Bearer ${token}`}
+        }, mockEnv);
+
+        expect(response.status).toBe(400);
+    });
+})
+
+describe('PUT /highlights/:id/approve', () => {
+    it('should should approve a highlight suggestion', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.nativeUpdate = vi.fn(async () => 1);
+
+        const response = await app.request('/highlights/1/approve', {method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual(`Highlight with ID 1 approved`);
+    });
+    it('should return 400 for invalid highlight id', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        const response = await app.request('/feedbacks/invalidId/approve',
+            {method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(400);
+    });
+})
+
+describe('PUT /highlights/:id', () => {
+    it('should should approve a highlight suggestion', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.nativeUpdate = vi.fn(async () => 1);
+
+        const highlight = {
+            id: 1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        }
+        const newData = {
+            name: 'newName',
+            description: 'some other description',
+            category: 'pub',
+            is_approved: true
+        }
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === highlight.id) {
+                return highlight;
+            }
+            return null;
+        })
+
+        const response = await app.request('/highlights/1', {method: 'PUT',
+            body: JSON.stringify(newData),
+            headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual(`Highlight with ID 1 updated`);
+    });
+    it('should return 400 for invalid highlight id', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+
+        em.nativeUpdate = vi.fn(async () => 1);
+        const highlight = {
+            id: 1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        }
+        const newData = {
+            name: 1,
+            description: "some other description",
+            category: "pub",
+            is_approved: true
+        }
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === highlight.id) {
+                return highlight;
+            }
+            return null;
+        })
+        const response = await app.request('/highlights/1',
+            {method: 'PUT',
+                body: JSON.stringify(newData),
+                headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(400);
+    });
+    it('should return 404 if highlight not found', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        const newData = {
+            name: 'newName'
+        }
+        const response = await app.request('/highlights/1',
+            {method: 'PUT',
+                body: JSON.stringify(newData),
+                headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(404);
+    });
+})
+
+describe('DELETE /highlights/:id', () => {
     it('should delete highlight', async () => {
         const adminUser = {
             email: 'admin@example.com',
@@ -726,31 +1062,12 @@ describe('DELETE /feedbacks/:id', () => {
         });
         em.nativeDelete = vi.fn(async () => 1);
 
-        const response = await app.request('feedbacks/1', {method: 'DELETE',
+        const response = await app.request('highlights/1', {method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
 
         expect(response.status).toBe(200);
         const responseBody = await response.json();
-        expect(responseBody.message).toEqual('Feedback deleted successfully');
-    });
-    it('should return 400 if invalid feedback id', async () => {
-        const adminUser = {
-            email: 'admin@example.com',
-            password: 'password123',
-            isAdmin: true,
-            username: '880005553535',
-        };
-        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
-        const createdAdmin = await createUser(em, adminUser);
-        const token = await generateToken({
-            ...createdAdmin,
-            password: adminUser.password
-        });
-        const response = await app.request('feedbacks/invalidFeedbackId',
-            {method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
-
-        expect(response.status).toBe(400);
+        expect(responseBody.message).toEqual('Highlight with ID 1 deleted');
     });
 })
 
@@ -763,7 +1080,7 @@ describe('getAllUsers function', () => {
 
         em.find = vi.fn(async () => users);
 
-        const fetchedUsers = getAllUsers(em);
+        const fetchedUsers = await getAllUsers(em);
 
         expect(fetchedUsers).toBeDefined();
         expect(fetchedUsers).toHaveLength(2);
@@ -773,9 +1090,9 @@ describe('getAllUsers function', () => {
     it('should return null if no users', async () => {
         em.findOne = vi.fn(async () => []);
 
-        const fetchedUsers = getAllUsers(em);
+        const fetchedUsers = await getAllUsers(em);
 
-        expect(fetchedUsers).toEqual([]);
+        expect(fetchedUsers).toBeNull();
     });
 })
 
@@ -828,29 +1145,50 @@ describe('deleteUser function', () => {
 
 describe('getFeedbackByUserId function', () => {
     it('should get all feedback by a user', async () => {
-        const feedback = {
-            id: '1',
-            user: {id: '1',
+        const feedbackOne = {
+            id: 1,
+            highlight: {id: 1,
+                name: 'something',
+                description: 'some description',
+                category: 'history',
+                is_approved: false},
+            user: {id: 'randomUUIDMock',
                 email: 'user@example.com',
                 password: 'password123',
                 isAdmin: false,},
             rating: 4,
             comment: 'crazy',
             is_approved: false,
-        };
+        }
+        const feedbacks = [ feedbackOne,
+            {
+                id: 2,
+                highlight: {id: 2,
+                    name: 'something',
+                    description: 'some description',
+                    category: 'history',
+                    is_approved: false},
+                user: {id: 'randomUUIDMock2',
+                    email: 'user@example.com',
+                    password: 'password123',
+                    isAdmin: false,},
+                rating: 4,
+                comment: 'amazing',
+                is_approved: false,
+            }];
 
         em.find = vi.fn(async (_entity, condition) => {
-            if (condition.id === feedback.user.id){
-                return feedback;
+            if (condition.user.id === 'randomUUIDMock'){
+                return feedbacks.filter(f => f.user.id === 'randomUUIDMock');
             }
-            return null;
+            return [];
         }) as unknown as typeof em.find;
 
-        const fetchedFeedback = await getFeedbackByUserId(em, feedback.user.id);
+        const fetchedFeedback = await getFeedbackByUserId(em, 'randomUUIDMock');
 
         expect(fetchedFeedback).toBeDefined();
-        expect(fetchedFeedback).toHaveLength(1)
-        expect(fetchedFeedback).toBe(feedback);
+        expect(fetchedFeedback).toHaveLength(1);
+        expect(fetchedFeedback).toEqual([feedbackOne])
     });
     it('should return an empty list if no feedback exists with user ID', async () => {
         em.find = vi.fn(async () => []);
@@ -863,41 +1201,57 @@ describe('getFeedbackByUserId function', () => {
 
 describe('getFeedbackByHighlight function', () => {
     it('should fetch feedback fo a highlight', async () => {
-        const feedback = {
-            id: '1',
-            highlight: {id: '1',
+        const feedbackOne = {
+            id: 1,
+            highlight: {id: 1,
                 name: 'something',
                 description: 'some description',
                 category: 'history',
                 is_approved: false},
-            user: {id: '1',
+            user: {id: 1,
                 email: 'user@example.com',
                 password: 'password123',
                 isAdmin: false,},
             rating: 4,
             comment: 'crazy',
             is_approved: false,
-        };
+        }
+        const feedbacks = [ feedbackOne,
+            {
+                id: 2,
+                highlight: {id: 2,
+                    name: 'something',
+                    description: 'some description',
+                    category: 'history',
+                    is_approved: false},
+                user: {id: 1,
+                    email: 'user@example.com',
+                    password: 'password123',
+                    isAdmin: false,},
+                rating: 4,
+                comment: 'amazing',
+                is_approved: false,
+            }];
 
         em.find = vi.fn(async (_entity, condition) => {
-            if (condition.id === feedback.user.id){
-                return feedback;
+            if (condition.highlight.id === 1){
+                return feedbacks.filter(f => f.highlight.id === 1);
             }
-            return null;
+            return [];
         }) as unknown as typeof em.find;
 
-        const fetchedFeedback = await getFeedbackByHighlight(em, feedback.highlight.id);
+        const fetchedFeedback = await getFeedbackByHighlight(em, 1);
 
         expect(fetchedFeedback).toBeDefined();
-        expect(fetchedFeedback).toHaveLength(1)
-        expect(fetchedFeedback).toBe(feedback);
+        expect(fetchedFeedback).toHaveLength(1);
+        expect(fetchedFeedback).toEqual([feedbackOne])
     });
-    it('should return an empty list if no feedback exists with highlight ID', async () => {
+    it('should return null if no feedback exists with highlight ID', async () => {
         em.find = vi.fn(async () => []);
 
-        const fetchedFeedback = await getFeedbackByHighlight(em, '10');
+        const fetchedFeedback = await getFeedbackByHighlight(em, 10);
 
-        expect(fetchedFeedback).toEqual([]);
+        expect(fetchedFeedback).toBeNull();
     });
 })
 
@@ -930,7 +1284,7 @@ describe('getAllTours function', () => {
 
         em.find = vi.fn(async () => tours);
 
-        const fetchedTours = getAllTours(em);
+        const fetchedTours = await getAllTours(em);
 
         expect(fetchedTours).toBeDefined();
         expect(fetchedTours).toHaveLength(2);
@@ -938,11 +1292,11 @@ describe('getAllTours function', () => {
         expect(fetchedTours[1].id).toBe(tours[1].id);
     });
     it('should return null if no tours', async () => {
-        em.findOne = vi.fn(async () => []);
+        em.find = vi.fn(async () => []);
 
-        const fetchedTours = getAllTours(em);
+        const fetchedTours = await getAllTours(em);
 
-        expect(fetchedTours).toEqual([]);
+        expect(fetchedTours).toBeNull();
     });
 })
 
@@ -969,49 +1323,64 @@ describe('getTourById function', () => {
     it('should return null for non-existent tour', async () => {
         em.findOne = vi.fn(async () => null);
 
-        const fetchedTours = await getTourById(em, 'fakeID');
+        const fetchedTours = await getTourById(em, 3);
 
-        expect(fetchedTours).toBeNull;
+        expect(fetchedTours).toBeNull();
     });
 });
 
 describe('getHighlightsByTour function', () => {
-    it('should fetch a list of highlights by tour ID', () => {
+    it('should fetch a list of highlights by tour ID', async () => {
+        const highlights= [{id: 1,
+            name: 'something',
+            description: 'some description',
+            category: 'history',
+            is_approved: false}]
         const tour = {
-            id: '1',
+            id: 1,
             name: 'someName',
-            highlights: {id: '1',
-                name: 'something',
-                description: 'some description',
-                category: 'history',
-                is_approved: false},
+            highlights: {getItems: () => highlights}
         };
 
-        em.find = vi.fn(async (_entity, condition) => {
-            if (condition.id === tour.highlights.id){
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === tour.id){
                 return tour;
             }
             return null;
-        }) as unknown as typeof em.find;
+        }) as unknown as typeof em.findOne;
 
-        const fetchedHighlights = getHighlightsByTour(em, tour.id);
+        const fetchedHighlights = await getHighlightsByTour(em, tour.id);
 
         expect(fetchedHighlights).toBeDefined();
         expect(fetchedHighlights).toHaveLength(1)
-        expect(fetchedHighlights).toBe(tour.highlights);
+        expect(fetchedHighlights).toEqual(tour.highlights.getItems());
     });
 })
 
 describe('createTour function', () => {
     it('should create a new tour', async () => {
         const tourData = {
-            name: 'tourName'
+            name: 'Historical Tour',
+            description: 'A tour of historical sites.',
+            duration_time: '2 hours',
+            start_hour: '09:00:00'
         }
 
-        em.create = vi.fn((entity, data) => ({...data, id: data.id || randomUUID()}));
+        em.create = vi.fn((entity, data) => ({...data, id: 1}));
+        em.persistAndFlush = vi.fn;
+
+        em.findOne = vi.fn(async (entity, condition) => {
+            if (condition.id === 1){
+                return {
+                    id: 1,
+                    ...tourData
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
 
         await createTour(em, tourData)
-        const createdTour = getTourById(em, 1);
+        const createdTour = await getTourById(em, 1);
 
         expect(createdTour).toBeDefined();
     });
@@ -1032,7 +1401,7 @@ describe('updateTour function', () => {
         })
 
         await updateTour(em, tour.id, {name: 'newName'})
-        const updatedTour = getTourById(em, tour.id);
+        const updatedTour = await getTourById(em, tour.id);
 
         expect(updatedTour).toBeDefined();
     });
@@ -1069,7 +1438,7 @@ describe('getAllHighlights function', () => {
 
         em.find = vi.fn(async () => highlights);
 
-        const fetchedHighlights = getAllHighlights(em);
+        const fetchedHighlights = await getAllHighlights(em);
 
         expect(fetchedHighlights).toBeDefined();
         expect(fetchedHighlights).toHaveLength(2);
@@ -1079,7 +1448,7 @@ describe('getAllHighlights function', () => {
     it('should return null if no users', async () => {
         em.findOne = vi.fn(async () => []);
 
-        const fetchedHighlights = getAllHighlights(em);
+        const fetchedHighlights = await getAllHighlights(em);
 
         expect(fetchedHighlights).toBeNull();
     });
@@ -1126,7 +1495,18 @@ describe('createHighlight function', () => {
             is_approved: false
         };
 
-        em.create = vi.fn((entity, data) => ({...data, id: data.id || randomUUID()}));
+        em.create = vi.fn((entity, data) => ({...data, id: 1}));
+        em.persistAndFlush = vi.fn;
+
+        em.findOne = vi.fn(async (entity, condition) => {
+            if (condition.id === 1){
+                return {
+                    id: 1,
+                    ...highlightData
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
 
         await createHighlight(em, highlightData);
 

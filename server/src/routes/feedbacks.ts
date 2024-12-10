@@ -34,7 +34,7 @@ feedbacks.get('/highlight/:id', async (ctx) => {
 
         const {id} = params.data;
 
-        const feedback = getFeedbackByHighlight(em, id);
+        const feedback = await getFeedbackByHighlight(em, id);
 
         if(feedback === null){
             return ctx.json({message: 'No feedback found'}, 404);
@@ -64,9 +64,9 @@ feedbacks.get('/user/:id', isLoggedIn, isAdmin, async (ctx) => {
         }
 
         const {id} = params.data;
-        const feedback = getFeedbackByUserId(em, id);
+        const feedback = await getFeedbackByUserId(em, id);
 
-        if(!feedback){
+        if(feedback?.length === 0){
             return ctx.json({message: 'No feedback found'}, 404);
         }
 
@@ -111,7 +111,7 @@ feedbacks.put('/:id/approve', isLoggedIn, isAdmin, async (ctx) => {
  * @param isAdmin - Middleware so only admins can use.
  * @returns A response with a success or error message.
  */
-feedbacks.delete('/:id', isLoggedIn, isAdmin, async (ctx) => {
+feedbacks.delete('/:id', isLoggedIn, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const params = numberIdSchema.safeParse(ctx.req.param());
