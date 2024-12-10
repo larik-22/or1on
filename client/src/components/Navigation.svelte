@@ -31,10 +31,10 @@ let BarItems : BarItem[] = $state([
 ]);
 
 $effect(()=>{
-    if ($isUserLoggedIn){
+    if (!$isUserLoggedIn){
         switch (currentRoute) {
             case "/":
-                if (!$isUserAdmin){
+                if ($isUserAdmin){
                     BarItems = [
                         {
                             label: "My highlights"
@@ -68,7 +68,7 @@ $effect(()=>{
 
                 break;
             case "/moderator-dashboard":
-                if ($isUserAdmin){
+                if (!$isUserAdmin){
                     BarItems = [
                         {
                             label : "Users",
