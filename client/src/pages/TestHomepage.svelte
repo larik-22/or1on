@@ -1,16 +1,17 @@
 <script lang="ts">
-    import {GeoJSON, Map, TileLayer} from 'sveaflet';
-    import L, {LatLng, Layer} from 'leaflet';
+    import { GeoJSON, Map, TileLayer } from 'sveaflet';
+    import L, { LatLng, Layer } from 'leaflet';
+    import "leaflet-routing-machine";
+    import { onMount } from 'svelte';
+    import type { Feature, GeoJsonObject } from "geojson";
     import HighlightModal from "../components/highlights/HighlightModal.svelte";
-    import {modals} from 'svelte-modals'
-    import {fetchWithAuthSvelte} from "../lib/utils/fetchWithAuth.svelte";
-    import type {Feature, GeoJsonObject} from "geojson";
-    import type {HighlightFeature} from "../lib/models/models";
-    import {getHighlightColor} from "../lib/utils/highlightTypes";
+    import { modals } from 'svelte-modals';
+    import type { HighlightFeature } from "../lib/models/models";
+    import { getHighlightColor } from "../lib/utils/highlightTypes";
 
-
-    let geoJSONData: GeoJsonObject | null = $state(null);
-
+    let geoJSONData: GeoJsonObject | null = null;
+    let map: L.Map | null = null; // Reference to the Leaflet map instance
+    let userLocation: LatLng | null = null;
 
     /**
      * Fetches the GeoJSON data from the backend
@@ -18,7 +19,44 @@
     const fetchGeoJSON = async () => {
         const data = await fetch(`${import.meta.env.VITE_BACKEND_URL}/map/highlights`);
         geoJSONData = await data.json() as GeoJsonObject;
-    }
+        plotRouteToPoints();
+    };
+
+    /**
+     * Get user location (mocked for now)
+     * Replace this with Geolocation API for real user locations
+     */
+    const getUserLocation = () => {
+        userLocation = new LatLng(52.250, 6.168); // Mocked user location
+    };
+
+    const plotRouteToPoints = () => {
+        if (!map || !userLocation || !geoJSONData) return;
+
+        const features = (geoJSONData as any).features as Feature[];
+
+        // Convert GeoJSON coordinates to LatLng points
+        const waypoints = features.map((feature) => {
+            const [longitude, latitude] = feature.geometry.coordinates;
+            return new LatLng(latitude, longitude);
+        });
+
+        // Include the user's location as the starting point
+        const allWaypoints = [userLocation, ...waypoints];
+
+        // Create a routing control with the walking profile
+        L.Routing.control({
+            waypoints: allWaypoints,
+            routeWhileDragging: true,
+            show: true, // Show route control UI
+            addWaypoints: false, // Prevent adding/moving waypoints dynamically
+            router: new L.Routing.OSRMv1({
+                serviceUrl: 'https://router.project-osrm.org/route/v1', // OSRM public instance
+                profile: 'foot' // Specify the walking profile
+            })
+        }).addTo(map);
+    };
+
 
     /**
      * Handles popup opening when clicking on each highlight
@@ -26,10 +64,10 @@
      * @param layer
      */
     const handleEachFeature = (feature: HighlightFeature, layer: Layer) => {
-        layer.on('click', (e) => {
-            openModal(feature)
+        layer.on('click', () => {
+            openModal(feature);
         });
-    }
+    };
 
     /**
      * Handles the point to layer conversion
@@ -47,7 +85,7 @@
             opacity: 1,
             fillOpacity: 0.5
         });
-    }
+    };
 
     /**
      * Opens the modal with the highlight information
@@ -58,29 +96,26 @@
             name: feature.properties.name,
             description: feature.properties.description,
             id: feature.properties.id
-        })
-    }
+        });
+    };
 
-    fetchGeoJSON();
-
-
+    onMount(() => {
+        getUserLocation();
+        fetchGeoJSON();
+    });
 </script>
 
 <div class="w-full" style="height: 100svh">
-    <Map options={{ center: [52.254298, 6.168155], zoom: 13, closePopupOnClick: true }}>
-        <TileLayer url={'https://tile.openstreetmap.org/{z}/{x}/{y}.png'}/>
+    <Map options={{ center: [52.254298, 6.168155], zoom: 13, closePopupOnClick: true }} bind:instance={map}>
+        <TileLayer url={'https://tile.openstreetmap.org/{z}/{x}/{y}.png'} />
         {#if geoJSONData}
             <GeoJSON
                     json={geoJSONData}
-                    options={
-					{
-						onEachFeature: handleEachFeature,
-						pointToLayer: handlePointToLayer,
-						// filter: handleHighlightFilter
-					}
-				}
-            >
-            </GeoJSON>
+                    options={{
+                    onEachFeature: handleEachFeature,
+                    pointToLayer: handlePointToLayer
+                }}
+            />
         {/if}
     </Map>
 </div>
