@@ -97,6 +97,8 @@
 				<button type="submit" class=" mt-6 bg-blue-500 text-white rounded-md p-2 disabled:bg-gray-500 disabled:cursor-not-allowed" disabled={isSubmitting}>
 					{isSubmitting ? "Submitting..." : "Login"}
 				</button>
+				<!-- alr have an account? -->
+				<p class="text-center text-gray-500 text-sm">Don't have an account? <a href="/register" class="text-blue-500">Register</a></p>
 			</form>
 
 			{#if errors.message}
