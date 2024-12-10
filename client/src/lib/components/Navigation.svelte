@@ -49,6 +49,13 @@ $effect(()=>{
                                 page.redirect("/user-dashboard")
                             }
                         },
+                        {
+                            label: "Test Path",
+                            overrideClick: true,
+                            overrideFunction: () => {
+                                page.redirect("/test")
+                            }
+                        },
                     ]
                     AdditionalComponent = UserIndicator
                     CurrentLocation = "Home"
@@ -66,6 +73,13 @@ $effect(()=>{
                     CurrentLocation = "Home"
                 }
 
+                break;
+
+            case "/test":
+                    BarItems = [
+
+                        ]
+                CurrentLocation = "Test Page PLS WORK MAN"
                 break;
             case "/moderator-dashboard":
                 if ($isUserAdmin){
