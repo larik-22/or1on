@@ -1,31 +1,26 @@
 <script lang="ts">
 	import {GeoJSON, Map, TileLayer} from 'sveaflet';
 	import L, {LatLng, Layer} from 'leaflet';
-	import HighlightModal from "../components/highlights/HighlightModal.svelte";
 	import {modals} from 'svelte-modals'
-	import {fetchWithAuthSvelte} from "../lib/utils/fetchWithAuth.svelte";
-	import type {Feature, GeoJsonObject} from "geojson";
-	import type {HighlightFeature} from "../lib/models/models";
-	import {getHighlightColor} from "../lib/utils/highlightTypes";
+	import type {FeatureCollection} from "geojson";
+	import {type HighlightFeature, type HighlightProperties, HighlightType} from "../lib/models/models";
+	import {getHighlightColor} from "../lib/utils/highlightTypeColor";
+	import type SMap from "sveaflet/dist/SMap.svelte";
+	import type SGeoJson from "sveaflet/dist/SGeoJSON.svelte";
+	import HighlightModal from "../lib/components/highlights/HighlightModal.svelte";
 
-	let geoJSONData: GeoJsonObject | null = $state(null);
 
-	// TODO: Finish filtering
-	//let currentHighlightFilter: HighlightType[] = $state([HighlightType.CATEGORY_G, HighlightType.CATEGORY_A]);
-	// const handleHighlightFilter = (feature: HighlightFeature) => {
-	// 	if (currentHighlightFilter.includes(feature.properties.category)) {
-	// 		return true;
-	// 	}
-	//
-	// 	return false;
-	// }
+	let geoJSONData: FeatureCollection | null = $state(null);
+	let geoJSONElement: SGeoJson | null = $state(null);
+	let map: SMap | null = $state(null);
+	let currentHighlightFilter: string = $state("All");
 
 	/**
 	 * Fetches the GeoJSON data from the backend
 	 */
 	const fetchGeoJSON = async () => {
 		const data = await fetch(`${import.meta.env.VITE_BACKEND_URL}/map/highlights`);
-		geoJSONData = await data.json() as GeoJsonObject;
+		geoJSONData = await data.json() as FeatureCollection;
 	}
 
 	/**
@@ -69,26 +64,87 @@
 		})
 	}
 
+	/**
+	 * Filters the GeoJSON features based on the current filter
+	 */
+	const filterFeatures = (feature: HighlightFeature) => {
+		if (feature.properties) {
+			// Only include features matching the current filter
+			return currentHighlightFilter.includes(feature.properties.category);
+		}
+		return false;
+	}
+
+	/**
+	 * Applies the current filter to the GeoJSON data
+	 */
+	const applyFilter = () => {
+		if (geoJSONData) {
+			if (currentHighlightFilter === "All") {
+				geoJSONElement.clearLayers();
+				geoJSONElement.addData(geoJSONData);
+				return;
+			}
+
+			const filteredGeoJSON: FeatureCollection = {
+				type: "FeatureCollection",
+				features: geoJSONData.features.filter((feature): feature is HighlightFeature => {
+					return (feature.properties as HighlightProperties)?.category !== undefined && filterFeatures(feature as HighlightFeature);
+				}),
+			};
+
+			geoJSONElement.clearLayers();
+			geoJSONElement.addData(filteredGeoJSON);
+		}
+	};
+
 	fetchGeoJSON();
 </script>
 
 <div class="w-full" style="height: 100svh">
-	<Map options={{ center: [52.254298, 6.168155], zoom: 13, closePopupOnClick: true }}>
+	<Map options={{ center: [52.254298, 6.168155], zoom: 13, closePopupOnClick: true }} bind:instance={map}>
 		<TileLayer url={'https://tile.openstreetmap.org/{z}/{x}/{y}.png'}/>
 		{#if geoJSONData}
 			<GeoJSON
-				json={geoJSONData}
-				options={
+					json={geoJSONData}
+					options={
 					{
 						onEachFeature: handleEachFeature,
 						pointToLayer: handlePointToLayer,
-						// filter: handleHighlightFilter
 					}
 				}
+					bind:instance={geoJSONElement}
 			>
 			</GeoJSON>
 		{/if}
 	</Map>
+
+	<div class="absolute top-4 right-4 z-[900] flex gap-2 shadow-xl">
+		{#if currentHighlightFilter !== "All"}
+			<button
+					class="bg-red-500 text-white font-medium py-2 px-4 rounded-md hover:bg-red-600 transition duration-200"
+					onclick={() => {
+        currentHighlightFilter = "All";
+        applyFilter();
+      }}
+			>
+				Clear
+			</button>
+		{/if}
+		<select
+				class="bg-gray-100 border border-gray-300 text-gray-600 py-2 px-4 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+				bind:value={currentHighlightFilter}
+				onchange={applyFilter}
+		>
+			<option value="All" class="text-gray-600" disabled selected>
+				Select a category
+			</option>
+			{#each Object.values(HighlightType) as type}
+				<option value={type}>{type}</option>
+			{/each}
+		</select>
+	</div>
 </div>
+
 
 
