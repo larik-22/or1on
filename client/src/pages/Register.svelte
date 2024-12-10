@@ -62,7 +62,7 @@
 
 </script>
 
-<section>
+<section class="w-[100%]">
 	<div class="container-base min-h-svh flex flex-col justify-center items-center">
 		<div class="w-full max-w-md mx-auto p-6 bg-gray-50 rounded-lg shadow-md">
 			<h1 class="text-xl font-medium mb-6 text-center">Register</h1>
