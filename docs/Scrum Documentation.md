@@ -133,3 +133,19 @@ Meeting notes:
 - What could have gone better:
   - There could have been more communication between corresponding tasks.
   - Breaking down large issues into smaller ones if possible
+
+## Sprint 2 - Ilarion Petriv
+
+### Sprint 2 Planning
+![backlog](img/sprint2_backlog_before.png)
+
+### 1st Meeting (9/12/2024)
+Meeting Notes:
+- Serena: Couldn't finish Sprint-1 task, however, made some progress. Needs more time to finish it. Weight has been increased and the due date has been extended as per discussion.
+- Petko: ORN-059 wasn't able to implement the feature, needs more time. Received a new task ORN-061 as per the discussion.
+- Ilarion: Assigned to ORN-067 issue
+- Jan: Assigned to ORN-063 issue. Since task is quite big, decided to set the date to the meeting after the next one.
+- Botond: Didn't finish his Sprint-1 task (ORN-052), that's why no new task was assigned to him. The due date has been extended until next meeting and Robert is going to help him with the task.
+- Robert: Assigned to ORN-052 issue to help. Also assigned to ORN-064 issue
+- Rafael: Progress on ORN-058 issue. Issue description has been updated.
+- Ignat: Helping Botond with ORN-052 issue. 
