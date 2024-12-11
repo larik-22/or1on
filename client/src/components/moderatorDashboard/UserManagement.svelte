@@ -4,6 +4,8 @@ import WarningPopUp from "./WarningPopUp.svelte";
 import type {TableType,Row} from "../table/Table.svelte";
 import {fetchWithAuthSvelte} from "../../lib/utils/fetchWithAuth.svelte";
 import type {User} from "../../pages/Feedback.svelte";
+import Table from "../table/Table.svelte";
+import type {ActionConfig} from "../table/Action.svelte";
 
 let testData = [
 	{
@@ -23,14 +25,17 @@ let testData = [
 	}
 ]
 
-let usersResp = fetchWithAuthSvelte("http://localhost:3000/users", {
+const usersUrl = `${import.meta.env.VITE_BACKEND_URL}/users}`;
+
+let usersResp = fetchWithAuthSvelte(usersUrl, {
 	method: "GET",
 });
 
 let enabled_popup: boolean = $state(false)
+let currentRow: Row;
 
-function dataToTable(data: User[]) : TableType {
-	let columns: string[] = ["Username", "Id",];
+function dataToTable(data: User[]): TableType {
+	let columns: string[] = ["Id", "Username","Email"];
 	let rows: Row[] = [];
 
 	for (let i = 0; i < data.length; i++) {
@@ -38,21 +43,37 @@ function dataToTable(data: User[]) : TableType {
 			row: [],
 			actionsVisibility: [true]
 		}
-		for (let j = 0; j < Object.entries(data[i]).length; j++) {
-			row.row.push(data[i][j]);
-		}
+		row.row.push(data[i].id);
+		row.row.push(data[i].username);
+		row.row.push(data[i].email)
+		rows.push(row);
+	}
+	return {
+		columns: columns,
+		rows: rows,
 	}
 }
 
-let newTable: TableType = dataToTable(testData);
+let newTable: TableType = $state(dataToTable(testData))
+let customCss: string = "border-transparent w-[100%] h-[100%]";
 
-
+let lockAccountActionConfig: ActionConfig = {
+	actionName : "Lock",
+	actionFunction: async (row:any)=>{
+		currentRow = row;
+		if (currentRow.actionsVisibility[0] === true){
+			console.log("Locking")
+			currentRow.actionsVisibility = [false]
+		}
+	},
+	actionClassStyle: customCss
+}
 
 </script>
 
 <main class="flex items-center content-center w-[100%] justify-center">
 	<div class="border-[1px] bg-[#f9fafb] shadow-md w-[50vw] h-fit mb-[10vh]">
-		<ListItem newTable={newTable}></ListItem>
+		<Table newTable={newTable} actionConfigs={[lockAccountActionConfig]} ></Table>
 
 	</div>
 

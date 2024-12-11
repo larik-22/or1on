@@ -2,6 +2,7 @@
     export type User = {
         id: string;
         username: string;
+        email: string;
     }
 </script>
 
@@ -11,7 +12,7 @@
             id: 1,
             highlightId: 1,
             user: {
-                id: 1,
+                id: "1",
                 username: "John Doe"
             },
             rating: 5,
@@ -22,7 +23,7 @@
             id: 2,
             highlightId: 2,
             user: {
-                id: 2,
+                id: "2",
                 username: "John Typescript"
             },
             rating: 5,
@@ -33,7 +34,7 @@
             id: 3,
             highlightId: 3,
             user: {
-                id: 2,
+                id: "2",
                 username: "John Tailwind"
             },
             rating: 5,
@@ -62,7 +63,7 @@
             let objectEntries = Object.entries(data[i]);
             let row: Row = {
                 row: [],
-                actionsVisibility: [true,true]
+                actionsVisibility: [true,true,true]
             };
             for (let j = 0; j < objectEntries.length; j++) {
                 if (objectEntries[j][0] === "user") {
@@ -80,6 +81,7 @@
             rows: rows
         };
     }
+    let table = $state(DataToTable(testData));
 
     /*
    * Function to execute when confirming the editing
@@ -89,7 +91,8 @@
     let onConfirmEdit = async (newText: string) => {
         currentRow.row[4] = newText;
 
-        // await fetchWithAuthSvelte(`http://localhost:3000/highlights/${currentRow[1]}/feedbacks/${currentRow[0]}`, {
+        const approveFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/highlights/${currentRow.row[1]}/feedbacks/${currentRow.row[0]}`;
+        // await fetchWithAuthSvelte(approveFeedbackUrl, {
         //     method: "PUT",
         //     body: JSON.stringify({
         //         comment: currentRow[4],
@@ -100,8 +103,23 @@
     let onApproveFeedback = async () => {
         currentRow.row[5] = "true";
         currentRow.actionsVisibility = [false,true];
-        // await fetchWithAuthSvelte(`http://localhost:3000/highlights/${currentRow[1]}/feedbacks/${currentRow[0]}`, {
+        const approveFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/highlights/${currentRow.row[1]}/feedbacks/${currentRow.row[0]}`;
+
+        // await fetchWithAuthSvelte(approveFeedbackUrl, {
         //     method: "PUT",
+        //     body: JSON.stringify({
+        //         comment: currentRow[4],
+        //         approvedState: currentRow[5]
+        //     }),
+        // })
+    };
+    let onRemoveFeedback = async () => {
+        let index = testData.findIndex(x=>x.id === parseInt(currentRow.row[0]))
+
+         table.rows.splice(index, 1);
+        const removeFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/highlights/${currentRow.row[1]}/feedbacks/${currentRow.row[0]}`;
+        // await fetchWithAuthSvelte(removeFeedbackUrl, {
+        //     method: "DELETE",
         //     body: JSON.stringify({
         //         comment: currentRow[4],
         //         approvedState: currentRow[5]
@@ -110,21 +128,22 @@
     };
 
 
-    const feedbacksResp = fetchWithAuthSvelte("http://localhost:3000/", {
+    const feedbacksUrl = `${import.meta.env.VITE_BACKEND_URL}/feedbacks`;
+    const feedbacksResp = fetchWithAuthSvelte(feedbacksUrl, {
         method: "GET",
-
     });
 
     let enableEditComment = $state(false);
     let enableApproveFeedback = $state(false);
+    let enableRemoveFeedback = $state(false);
 
     let commentValue = $state("");
     let currentRow: Row;
 
-    let table = $state(DataToTable(testData));
 
     let actionCssConfig: string = "border-[1px] bg-zinc-950 text-neutral-100 p-[5px] rounded-[6px] border-transparent";
     let approveText: string = "Are you sure you want to approve this feedback?";
+    let removalText: string = "Are you sure you want to remove this feedback?";
 
     let approveActionConfig: ActionConfig = {
         actionName: "Approve",
@@ -149,8 +168,18 @@
         actionClassStyle: actionCssConfig,
     };
 
+    let removeActionConfig: ActionConfig = {
+        actionName: "Remove",
+        actionFunction: (row: any) => {
+            console.log("Hi :3");
+            currentRow = row;
+            enableRemoveFeedback = true;
+        },
+        actionClassStyle: actionCssConfig,
+    };
 
-    let configs: ActionConfig[] = [approveActionConfig, editActionConfig]
+
+    let configs: ActionConfig[] = [approveActionConfig, editActionConfig, removeActionConfig];
 
 
 </script>
@@ -158,6 +187,7 @@
 <main class="w-[100%] flex justify-center">
     <div class="w-fit h-fit pt-[10vh]">
         <Table newTable={table} actionConfigs={configs}></Table>
+
     </div>
     {#if enableEditComment}
         <EditTextField bind:enabled_popup={enableEditComment} bind:commentValue={commentValue}
@@ -166,5 +196,9 @@
     {#if enableApproveFeedback}
         <WarningPopUp onConfirmFunction={onApproveFeedback} bind:enabled_popup={enableApproveFeedback}
                       popupText={approveText}></WarningPopUp>
+    {/if}
+    {#if enableRemoveFeedback}
+        <WarningPopUp onConfirmFunction={onRemoveFeedback} bind:enabled_popup={enableRemoveFeedback}
+                      popupText={removalText}></WarningPopUp>
     {/if}
 </main>

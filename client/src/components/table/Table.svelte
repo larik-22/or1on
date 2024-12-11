@@ -45,14 +45,16 @@
             {#each newTable.rows as row}
                 <tr>
                     {#each row.row as rowElement}
-                        <td class="border px-[2vw] py-2 ">{rowElement}</td>
+                        <td class="border px-[2vw] py-2 text-ellipsis overflow-hidden max-w-[200px]">{rowElement}</td>
                     {/each}
 
                     {#if actionsSlot && actionConfigs !== undefined}
-                        <td class="border px-[1.5vw] py-[1vh] flex gap-[20px] justify-center">
+                        <td class="border py-2 flex gap-[20px] justify-center w-full h-full px-[20px]">
                             {#each actionConfigs as actionConfig, i}
                                 {#if row.actionsVisibility[i]}
                                     <Action actionConfig={actionConfig} row={row}></Action>
+                                {:else}
+                                    <div class="py-3"></div>
                                 {/if}
                             {/each}
                         </td>
