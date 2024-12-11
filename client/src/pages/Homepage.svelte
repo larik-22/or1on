@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {GeoJSON, Map, TileLayer} from 'sveaflet';
+	import {CircleMarker, GeoJSON, Map, TileLayer} from 'sveaflet';
 	import L, {LatLng, Layer} from 'leaflet';
 	import {modals} from 'svelte-modals'
 	import type {FeatureCollection} from "geojson";
@@ -8,12 +8,33 @@
 	import type SMap from "sveaflet/dist/SMap.svelte";
 	import type SGeoJson from "sveaflet/dist/SGeoJSON.svelte";
 	import HighlightModal from "../lib/components/highlights/HighlightModal.svelte";
+	import {onMount} from "svelte";
 
 
 	let geoJSONData: FeatureCollection | null = $state(null);
 	let geoJSONElement: SGeoJson | null = $state(null);
 	let map: SMap | null = $state(null);
 	let currentHighlightFilter: string = $state("All");
+	let userLocation: LatLng | null = $state(null);
+
+	onMount(() => {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition((position) => {
+				userLocation = new L.LatLng(position.coords.latitude, position.coords.longitude);
+			});
+		}
+
+		// Zoom to user location
+		$effect(() => {
+			if (userLocation) {
+				map?.setView(userLocation, 13);
+
+				// Add user location marker
+				const userMarker = new L.Marker(userLocation);
+				userMarker.addTo(map);
+			}
+		})
+	});
 
 	/**
 	 * Fetches the GeoJSON data from the backend
@@ -124,10 +145,9 @@
 			<button
 					class="bg-red-500 text-white font-medium py-2 px-4 rounded-md hover:bg-red-600 transition duration-200"
 					onclick={() => {
-        currentHighlightFilter = "All";
-        applyFilter();
-      }}
-			>
+        				currentHighlightFilter = "All";
+        				applyFilter();
+      		}}>
 				Clear
 			</button>
 		{/if}
