@@ -35,25 +35,24 @@
 
         const features = (geoJSONData as any).features as Feature[];
 
-        // Convert GeoJSON coordinates to LatLng points
         const waypoints = features.map((feature) => {
             const [longitude, latitude] = feature.geometry.coordinates;
             return new LatLng(latitude, longitude);
         });
 
-        // Include the user's location as the starting point
         const allWaypoints = [userLocation, ...waypoints];
 
-        // Create a routing control with the walking profile
+        // Create a routing control
         L.Routing.control({
             waypoints: allWaypoints,
             routeWhileDragging: true,
             show: true, // Show route control UI
             addWaypoints: false, // Prevent adding/moving waypoints dynamically
             router: new L.Routing.OSRMv1({
-                serviceUrl: 'https://router.project-osrm.org/route/v1', // OSRM public instance
-                profile: 'foot' // Specify the walking profile
-            })
+                serviceUrl: 'https://router.project-osrm.org/route/v1',
+                profile: 'foot' // need to check this correctly is not working
+            }),
+            createMarker: () => null //don´t create any markers for the waypoints
         }).addTo(map);
     };
 
@@ -99,12 +98,17 @@
         });
     };
 
+    /**
+     * Fetches the GeoJSON data from the backend
+     */
     onMount(() => {
         getUserLocation();
         fetchGeoJSON();
     });
 </script>
-
+<svelte:head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+</svelte:head>
 <div class="w-full" style="height: 100svh">
     <Map options={{ center: [52.254298, 6.168155], zoom: 13, closePopupOnClick: true }} bind:instance={map}>
         <TileLayer url={'https://tile.openstreetmap.org/{z}/{x}/{y}.png'} />
