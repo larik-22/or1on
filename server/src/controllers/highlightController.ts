@@ -49,14 +49,14 @@ export const getHighlightById = async (em: EntityManager, id: number):
 export const createHighlight = async (em: EntityManager, data: Omit<Highlight, 'id'>):
     Promise<void> => {
     try{
-        const {name, description, category, latitude, longitude} = data;
+        const {name, description, category, latitude, longitude, is_approved} = data;
         const newHighlight = em.create(Highlight, {
             name,
             description,
             category: category ?? null,
             latitude: latitude  ?? null,
             longitude: longitude ?? null,
-            is_approved: false,
+            is_approved: is_approved ?? false,
             tours: []
         })
 
@@ -97,7 +97,7 @@ export const updateHighlight =
         throw new Error('Highlight with id ${id} not found');
     }
     try {
-        em.assign(highlight, updatedData)
+        await em.assign(highlight, updatedData)
         await em.persistAndFlush(highlight);
     }catch (error){
         logger.error('Failed to update highlight with id: ' + id + ' error: ' + error)

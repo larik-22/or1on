@@ -944,7 +944,7 @@ describe('PUT /highlights/:id', () => {
             ...createdAdmin,
             password: adminUser.password
         });
-        em.nativeUpdate = vi.fn(async () => 1);
+        em.assign = vi.fn(async () => 1);
 
         const highlight = {
             id: 1,
@@ -959,6 +959,8 @@ describe('PUT /highlights/:id', () => {
             name: 'newName',
             description: 'some other description',
             category: 'pub',
+            latitude: 40.7128,
+            longitude: -74.0060,
             is_approved: true
         }
 
@@ -1339,8 +1341,10 @@ describe('getHighlightsByTour function', () => {
         const tour = {
             id: 1,
             name: 'someName',
-            highlights: {getItems: () => highlights}
+            highlights: {}
         };
+
+        tour.highlights.getItems = vi.fn(() => highlights)
 
         em.findOne = vi.fn(async (_entity, condition) => {
             if (condition.id === tour.id){
