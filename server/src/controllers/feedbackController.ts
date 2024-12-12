@@ -1,0 +1,76 @@
+import {Feedback} from "../models/feedback.js";
+import {EntityManager} from "@mikro-orm/core";
+import logger from "../utils/logger.js";
+
+/**
+ * Fetches all feedback posted by a specific user.
+ *
+ * @param em - The MikroORM EntityManager instance.
+ * @param userId - The id of the user whose feedback is to be found.
+ * @returns {Promise<Feedback[] | null>} A promise resolving to a list of feedbacks if found,
+ * otherwise null.
+ */
+export const getFeedbackByUserId = async (em: EntityManager, userId: string):
+    Promise<Feedback[] | null> => {
+    try {
+        return await em.find(Feedback, {user: {id: userId}});
+    } catch (error){
+        logger.error('Failed to fetch feedback where user id: ' + userId + ' error: ' + error)
+    }
+};
+
+/**
+ * Fetches a list of feedbacks from a highlight
+ *
+ * @param em - The MikroORM EntityManager instance.
+ * @param id - The id of the highlight.
+ * @returns {Promise<Feedback[]>} A promise resolving to a list of feedbacks if found,
+ * otherwise null.
+ */
+export const getFeedbackByHighlight = async (em: EntityManager, id: number):
+    Promise<Feedback[] | null> => {
+    try {
+        const feedbacks = await em.find(Feedback, {highlight: {id: id}});
+        if (feedbacks.length === 0){
+            return null
+        }
+        return feedbacks
+    } catch (error) {
+        logger.error('Failed to fetch feedback from highlight with id: ' + id + ' error: ' + error);
+        return null;
+    }
+};
+
+/**
+ * Updates the is_approved field in a specific feedback.
+ *
+ * @param em - The MikroORM EntityManager instance.
+ * @param id - The id of the feedback to be updated.
+ * @returns {Promise<void>}
+ */
+export const approveFeedback = async (em: EntityManager, id: number): Promise<void> => {
+    try {
+        await em.nativeUpdate(Feedback, { id: id }, { is_approved: true});
+        await em.flush();
+        logger.info('Feedback updated successfully!');
+    } catch (error) {
+        logger.error('Failed to find or update feedback with id: ' + id + ' error: ' + error);
+    }
+};
+
+/**
+ * Deletes an existing user from the database.
+ *
+ * @param em - The MikroORM EntityManager instance.
+ * @param id - The id of the feedback to be deleted.
+ * @returns {Promise<void>}
+ */
+export const deleteFeedback = async (em: EntityManager, id: number): Promise<void> => {
+    try {
+        await em.nativeDelete(Feedback, {id: id});
+        await em.flush();
+        logger.info('Feedback deleted successfully!')
+    } catch (error) {
+        logger.error('Failed to find or delete feedback with id: ' + id + ' error: ' + error)
+    }
+};

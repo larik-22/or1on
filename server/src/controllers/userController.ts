@@ -2,7 +2,38 @@ import { EntityManager } from '@mikro-orm/core';
 import { User } from '../models/user.js';
 import bcrypt from 'bcryptjs';
 import logger from '../utils/logger.js';
-import {randomUUID} from "crypto";
+import { randomUUID } from 'crypto';
+
+/**
+ * Fetches all users
+ *
+ * @param em - The MikroORM EntityManager instance.
+ * @returns {Promise<User[] | null>} A promise resolving to a list of users if found, otherwise null
+ */
+export const getAllUsers = async (em: EntityManager): Promise<User[] | null> => {
+    try {
+        return await em.find(User);
+    } catch (error) {
+        logger.error('Failed to fetch users: ' + error)
+        return null;
+    }
+}
+
+/**
+ * Fetches a user by their id from the database.
+ *
+ * @param em - The MikroORM EntityManager instance.
+ * @param id - The id of the user to be found.
+ * @returns {Promise<User | null>} A promise resolving to the user object if found, otherwise null.
+ */
+export const getUserById = async (em: EntityManager, id: string): Promise<User | null> => {
+    try {
+        return await em.findOne(User, { id });
+    } catch (error){
+        logger.error('Failed to fetch user by id: ' + id + ' error: ' + error);
+        return null;
+    }
+}
 
 /**
  * Fetches a user by their email from the database.
@@ -75,6 +106,20 @@ export const createUser = async (
         throw error;
     }
 };
+/**
+ * Deletes an existing user from the database.
+ * @param em - The MikroORM EntityManager instance.
+ * @param id - The id of the user to be found.
+ */
+export const deleteUser = async (em: EntityManager, id: string): Promise<void> => {
+    try {
+        await em.nativeDelete(User, {id: id});
+        await em.flush();
+        logger.info('User deleted successfully!')
+    } catch (error){
+        logger.error('Failed to find or delete user with id: ' + id + ' error: ' + error)
+    }
+}
 
 /**
  * Updates a user's email in the database.
