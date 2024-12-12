@@ -1,27 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root {
-    --site--max-width: 90rem;
-    --site--margin: 1rem;
-    --container--main: calc(var(--site--max-width) - var(--site--margin) * 2);
-    --container--full: calc(100vw - var(--site--margin) * 2);
-    --section-space--main: 6rem;
-}
-
-.container-base {
-    position: relative;
-    width: 100%;
-    max-width: var(--container--main);
-    margin-right: auto;
-    margin-left: auto;
-}
-
-.container-full {
-    position: relative;
-    width: 100%;
-    max-width: var(--container--full);
-    margin-right: auto;
-    margin-left: auto;
-}

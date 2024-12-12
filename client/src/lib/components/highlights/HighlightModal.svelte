@@ -4,7 +4,7 @@
 	import FeedbackList from "./FeedbackList.svelte";
 	import FeedbackForm from "./FeedbackForm.svelte";
 	import type feedbackFormPayload from "./FeedbackForm.svelte";
-	import {fetchWithAuthSvelte} from "../../lib/utils/fetchWithAuth.svelte";
+	import {fetchWithAuthSvelte} from "../../utils/fetchWithAuth.svelte.js";
 	import {onMount, tick} from "svelte";
 
 	interface HighlightModalProps extends Omit<ModalProps<any>, 'id'> {
