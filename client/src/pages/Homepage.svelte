@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {CircleMarker, GeoJSON, Map, TileLayer} from 'sveaflet';
+	import {CircleMarker, Control, ControlZoom, GeoJSON, Map, TileLayer} from 'sveaflet';
 	import L, {LatLng, Layer} from 'leaflet';
 	import {modals} from 'svelte-modals'
 	import type {FeatureCollection} from "geojson";
@@ -9,12 +9,12 @@
 	import type SGeoJson from "sveaflet/dist/SGeoJSON.svelte";
 	import HighlightModal from "../lib/components/highlights/HighlightModal.svelte";
 	import {onMount} from "svelte";
-
+	import FilterDropdown from "../lib/components/highlights/FilterDropdown.svelte";
 
 	let geoJSONData: FeatureCollection | null = $state(null);
 	let geoJSONElement: SGeoJson | null = $state(null);
 	let map: SMap | null = $state(null);
-	let currentHighlightFilter: string = $state("All");
+	let currentHighlightFilter: string[] = $state([]);
 	let userLocation: LatLng | null = $state(null);
 
 	onMount(() => {
@@ -25,15 +25,15 @@
 		}
 
 		// Zoom to user location
-		$effect(() => {
-			if (userLocation) {
-				map?.setView(userLocation, 13);
-
-				// Add user location marker
-				const userMarker = new L.Marker(userLocation);
-				userMarker.addTo(map);
-			}
-		})
+		// $effect(() => {
+		// 	if (userLocation) {
+		// 		// map?.setView(userLocation, 13);
+		//
+		// 		// Add user location marker
+		// 		const userMarker = new L.Marker(userLocation);
+		// 		userMarker.addTo(map);
+		// 	}
+		// })
 	});
 
 	/**
@@ -51,7 +51,7 @@
 	 */
 	const handleEachFeature = (feature: HighlightFeature, layer: Layer) => {
 		layer.on('click', (e) => {
-			openModal(feature)
+			openHighlightModal(feature)
 		});
 	}
 
@@ -77,7 +77,7 @@
 	 * Opens the modal with the highlight information
 	 * @param feature The feature to show in the modal
 	 */
-	const openModal = async (feature: HighlightFeature) => {
+	const openHighlightModal = async (feature: HighlightFeature) => {
 		await modals.open(HighlightModal, {
 			name: feature.properties.name,
 			description: feature.properties.description,
@@ -101,7 +101,7 @@
 	 */
 	const applyFilter = () => {
 		if (geoJSONData) {
-			if (currentHighlightFilter === "All") {
+			if (currentHighlightFilter.length === 0) {
 				geoJSONElement.clearLayers();
 				geoJSONElement.addData(geoJSONData);
 				return;
@@ -123,7 +123,14 @@
 </script>
 
 <div class="w-full" style="height: 100svh">
-	<Map options={{ center: [52.254298, 6.168155], zoom: 13, closePopupOnClick: true }} bind:instance={map}>
+	<Map
+			options={{
+				center: [52.254298, 6.168155],
+				zoom: 13.5,
+				closePopupOnClick: true,
+				zoomControl: false,
+			}}
+			bind:instance={map}>
 		<TileLayer url={'https://tile.openstreetmap.org/{z}/{x}/{y}.png'}/>
 		{#if geoJSONData}
 			<GeoJSON
@@ -137,33 +144,16 @@
 					bind:instance={geoJSONElement}
 			>
 			</GeoJSON>
+			<Control options={{position:"topleft"}}>
+				<FilterDropdown
+						bind:currentFilter={currentHighlightFilter}
+						applyFilter={applyFilter}
+						filterOptions={Object.values(HighlightType)}
+				></FilterDropdown>
+			</Control>
+			<ControlZoom options={{position:"bottomleft"}}></ControlZoom>
 		{/if}
 	</Map>
-
-	<div class="absolute top-4 right-4 z-[900] flex gap-2 shadow-xl">
-		{#if currentHighlightFilter !== "All"}
-			<button
-					class="bg-red-500 text-white font-medium py-2 px-4 rounded-md hover:bg-red-600 transition duration-200"
-					onclick={() => {
-        				currentHighlightFilter = "All";
-        				applyFilter();
-      		}}>
-				Clear
-			</button>
-		{/if}
-		<select
-				class="bg-gray-100 border border-gray-300 text-gray-600 py-2 px-4 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-				bind:value={currentHighlightFilter}
-				onchange={applyFilter}
-		>
-			<option value="All" class="text-gray-600" disabled selected>
-				Select a category
-			</option>
-			{#each Object.values(HighlightType) as type}
-				<option value={type}>{type}</option>
-			{/each}
-		</select>
-	</div>
 </div>
 
 
