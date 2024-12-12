@@ -1,7 +1,5 @@
 import { MikroORM } from '@mikro-orm/core';
-import { Highlight } from '../models/highlight.js'
 import mikroConfig from '../../mikro-orm.config.js'
-import {Feedback} from "../models/feedback.js";
 import {Tour} from "../models/tour.js";
 
 (async () => {
