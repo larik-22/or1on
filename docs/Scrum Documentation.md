@@ -33,7 +33,7 @@ Meeting Notes:
 - Ilarion: Done with DoD
 - Petko: Done with the CoC
 - Ignat: Done with the git development guide
-- Jan, Sabrina, Robert: Done with the list of questions concerning the assignment
+- Jan, Sarina, Robert: Done with the list of questions concerning the assignment
 - Botond: Cannot complete his task, until meeting with the client.
 
 Attendees:  Rafael, Ilarion, Ignat, Jan, Pekto, Sarina, Botond, Robert;
@@ -47,7 +47,7 @@ Meeting Notes:
 - Rafael and Ilarion: Done with wireframes
 - Robert: Done with business goals and requirements
 - Botond, Petko: Done with system requirements
-- Sabrina, Jan: Done with user requirements
+- Sarina, Jan: Done with user requirements
 - Ignat: Done with system context and document formatting
 
 Attendees: Rafael, Ilarion, Ignat, Jan, Petko, Sarina, Botond, Robert;
@@ -141,11 +141,28 @@ Meeting notes:
 
 ### 1st Meeting (9/12/2024)
 Meeting Notes:
-- Serena: Couldn't finish Sprint-1 task, however, made some progress. Needs more time to finish it. Weight has been increased and the due date has been extended as per discussion.
+- Sarena: Couldn't finish Sprint-1 task, however, made some progress. Needs more time to finish it. Weight has been increased and the due date has been extended as per discussion.
 - Petko: ORN-059 wasn't able to implement the feature, needs more time. Received a new task ORN-061 as per the discussion.
 - Ilarion: Assigned to ORN-067 issue
 - Jan: Assigned to ORN-063 issue. Since task is quite big, decided to set the date to the meeting after the next one.
 - Botond: Didn't finish his Sprint-1 task (ORN-052), that's why no new task was assigned to him. The due date has been extended until next meeting and Robert is going to help him with the task.
 - Robert: Assigned to ORN-052 issue to help. Also assigned to ORN-064 issue
 - Rafael: Progress on ORN-058 issue. Issue description has been updated.
-- Ignat: Helping Botond with ORN-052 issue. 
+- Ignat: Helping Botond with ORN-052 issue. Assigned to ORN-065 issue
+
+Attendees: Rafael, Ilarion, Ignat, Jan, Petko, Sarina, Botond, Robert;
+Absentees: None;
+
+### 2nd Meeting (11/12/2024)
+Meeting Notes:
+- Sarina: ORN-048 made progress, has time until 13/12 to finish it. ORN-018 removed from "blocked", will finish by 13/12 as well.
+- Petko: Has done both issues (ORN-059 and ORN-061), but needs to do minor hotfixes
+- Ilarion: Finished ORN-067, assigned to ORN-060
+- Jan: Missing
+- Botond: Finished with ORN-052
+- Robert: Weren't able to start ORN-064, cause the task was blocked. Due date is extended to 13/12
+- Rafael: Made progress on path finding algorithm. Made it work, will extend it later.
+- Ignat: Started working on ORN-065, will finish by 13/12
+
+Attendees: Rafael, Ilarion, Ignat, Petko, Sarina, Botond, Robert;
+Absentees: Jan (Informed in advance);

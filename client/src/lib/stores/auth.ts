@@ -6,6 +6,7 @@ const authToken = writable(localStorage.getItem('token') || null);
 
 interface ExtendedJwtPayload extends JwtPayload {
 	isAdmin?: boolean;
+	username: string;
 	id: string;
 }
 
