@@ -27,45 +27,52 @@
      * Replace this with Geolocation API for real user locations
      */
     const getUserLocation = () => {
-        userLocation = new LatLng(52.27331873746435, 6.147190318217032); // Mocked user location
+        userLocation = new LatLng(52.257868775720844, 6.149507746684932); // Mocked user location
     };
 
+    /**
+     * Plots a route between the user location and the points of interest
+     * Uses the OSRM routing service to calculate the route
+     */
     const plotRouteToPoints = () => {
         if (!map || !userLocation || !geoJSONData) return;
 
         const features = (geoJSONData as any).features as Feature[];
 
-        // Convert GeoJSON features to LatLng objects
+        // Convert GeoJSON features to LatLng objects and pair with their names
         const waypoints = features.map((feature) => {
             const [longitude, latitude] = feature.geometry.coordinates;
             return {
-                latlng: new LatLng(latitude, longitude),
-                name: feature.properties?.name || `Point (${latitude}, ${longitude})` // Optional: Add a name property for clarity
+                latLng: new LatLng(latitude, longitude),
+                name: feature.properties.name || "Unknown"
             };
         });
 
-        // Sort waypoints by distance from user location
-        const sortedWaypoints = waypoints.sort((a, b) => {
-            const distanceToA = userLocation!.distanceTo(a.latlng);
-            const distanceToB = userLocation!.distanceTo(b.latlng);
-            return distanceToA - distanceToB;
-        });
+        // Sort waypoints by distance from the previous point
+        const sortedWaypoints = [{ latLng: userLocation, name: "User Location" }];
+        let currentLocation = userLocation;
 
-        //from user to closest point
-        //then from closest point to next closest point
-        //and so on until all points are visited
+        while (waypoints.length > 0) {
+            waypoints.sort((a, b) => currentLocation.distanceTo(a.latLng) - currentLocation.distanceTo(b.latLng));
+            const closestPoint = waypoints.shift();
+            if (closestPoint) {
+                sortedWaypoints.push(closestPoint);
+                currentLocation = closestPoint.latLng;
+            }
+        }
 
-        // Log the sorted waypoints to the console
-        console.log("Waypoint order (closest to farthest):",
-            sortedWaypoints.map((wp) => wp.name)
-        );
+        // Log the names and distances between the points in a single log
+        const logOutput = sortedWaypoints.slice(1).map((point, index) => {
+            const previousPoint = sortedWaypoints[index];
+            const distance = previousPoint.latLng.distanceTo(point.latLng);
+            return `${previousPoint.name} to ${point.name}: ${distance.toFixed(2)} meters`;
+        }).join("\n");
 
-        // Extract LatLngs for routing
-        const allWaypoints = [userLocation, ...sortedWaypoints.map(wp => wp.latlng)];
+        console.log("Points and distances:\n" + logOutput);
 
         // Create a routing control
         L.Routing.control({
-            waypoints: allWaypoints,
+            waypoints: sortedWaypoints.map((point) => point.latLng),
             routeWhileDragging: true,
             show: true, // Show route control UI
             addWaypoints: false, // Prevent adding/moving waypoints dynamically
