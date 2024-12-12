@@ -1,9 +1,17 @@
 <script lang="ts">
-	import { registerSchema } from "../schema/registerSchema";
+	import { registerSchema } from "../lib/schema/registerSchema";
 	import page from "page";
-	import { handleAuthResponse} from "../utils/authHandler.svelte";
+	import { handleAuthResponse} from "../lib/utils/authHandler.svelte";
 
-	let formData = $state({
+	type RegisterFormData = {
+		username: string;
+		email: string;
+		password: string;
+		confirmPassword: string;
+	}
+
+	let formData: RegisterFormData = $state({
+		username:"",
 		email: "",
 		password: "",
 		confirmPassword: "",
@@ -62,11 +70,28 @@
 
 </script>
 
-<section>
+<section class="w-[100%]">
 	<div class="container-base min-h-svh flex flex-col justify-center items-center">
 		<div class="w-full max-w-md mx-auto p-6 bg-gray-50 rounded-lg shadow-md">
 			<h1 class="text-xl font-medium mb-6 text-center">Register</h1>
 			<form onsubmit={(e: Event) => handleSubmit(e)} class="flex flex-col gap-4">
+				<label>
+					<span class="text-gray-500 select-none text-xs">Enter your username</span>
+					<input
+							type="text"
+							bind:value={formData.username}
+							class="w-full border border-gray-300 rounded-md p-2 mt-1 text-gray-500 text-sm"
+							placeholder="johndoe"
+							required
+							autocomplete="username"
+					>
+
+					{#if errors.username}
+						<p class="bg-red-100 border border-red-400 text-red-700 px-2 py-1 rounded relative mt-1.5 text-xs text-center ">
+							{errors.username[0]}
+						</p>
+					{/if}
+				</label>
 				<label>
 					<span class="text-gray-500 select-none text-xs">Enter your email</span>
 					<input
@@ -126,6 +151,7 @@
 				<button type="submit" class=" mt-6 bg-blue-500 text-white rounded-md p-2 disabled:bg-gray-500 disabled:cursor-not-allowed" disabled={isSubmitting}>
 					{isSubmitting ? "Submitting..." : "Register"}
 				</button>
+				<p class="text-center text-gray-500 text-sm">Already have an account? <a href="/login" class="text-blue-500">Login</a></p>
 			</form>
 		</div>
 	</div>

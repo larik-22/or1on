@@ -1,7 +1,7 @@
 <script lang="ts">
 	import page from "page";
-	import {loginSchema} from "../schema/loginSchema";
-	import {handleAuthResponse} from "../utils/authHandler.svelte";
+	import {loginSchema} from "../lib/schema/loginSchema";
+	import {handleAuthResponse} from "../lib/utils/authHandler.svelte";
 
 	let formData = $state({
 		email: "",
@@ -55,7 +55,7 @@
 	}
 </script>
 
-<section>
+<section class="w-[100%]">
 	<div class="container-base min-h-svh flex flex-col justify-center items-center">
 		<div class="w-full max-w-md mx-auto p-6 bg-gray-50 rounded-lg shadow-md">
 			<h1 class="text-xl font-medium mb-6 text-center">Login</h1>
@@ -97,6 +97,8 @@
 				<button type="submit" class=" mt-6 bg-blue-500 text-white rounded-md p-2 disabled:bg-gray-500 disabled:cursor-not-allowed" disabled={isSubmitting}>
 					{isSubmitting ? "Submitting..." : "Login"}
 				</button>
+				<!-- alr have an account? -->
+				<p class="text-center text-gray-500 text-sm">Don't have an account? <a href="/register" class="text-blue-500">Register</a></p>
 			</form>
 
 			{#if errors.message}
