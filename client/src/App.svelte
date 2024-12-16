@@ -11,6 +11,7 @@
     import UserDashboard from "./pages/UserDashboard.svelte";
     import { Modals } from 'svelte-modals'
     import Navigation from "./lib/components/Navigation.svelte";
+    import TestHomepage from "./pages/TestHomepage.svelte";
 
     let page: any;
     let params: Context;
@@ -18,6 +19,12 @@
 
     router('/', (ctx: Context) => {
         page = Homepage;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
+    router('/test', (ctx: Context) => {
+        page = TestHomepage;
         currentRoute = ctx.pathname;
         params = ctx;
     });
@@ -42,6 +49,18 @@
 
     router('/login', isNotLoggedIn, (ctx: Context) => {
         page = Login;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
+    router('/test-logged-in', isLoggedIn, (ctx: Context) => {
+        page = LoggedInUser;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
+    router('/test-admin', isAdmin, (ctx: Context) => {
+        page = AdminUser;
         currentRoute = ctx.pathname;
         params = ctx;
     });

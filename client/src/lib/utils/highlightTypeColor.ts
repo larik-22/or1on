@@ -9,6 +9,7 @@ const highlightTypeToColor: Record<HighlightType, string> = {
 	[HighlightType.CATEGORY_C]: "#0000FF",
 	[HighlightType.CATEGORY_D]: "#FFFF00",
 	[HighlightType.CATEGORY_G]: "#6f7eca",
+	[HighlightType.CATEGORY_E]: "#000000",
 	[HighlightType.OTHER]: "#FFFFFF"
 
 }
