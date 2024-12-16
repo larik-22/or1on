@@ -5,16 +5,16 @@
     import 'lrm-graphhopper';
     import { onMount } from 'svelte';
     import type { Feature, GeoJsonObject } from "geojson";
-    import HighlightModal from "../components/highlights/HighlightModal.svelte";
+    import HighlightModal from '../lib/components/highlights/HighlightModal.svelte';
     import { modals } from 'svelte-modals';
     import type { HighlightFeature } from "../lib/models/models";
     import { getHighlightColor } from "../lib/utils/highlightTypes";
 
     let geoJSONData: GeoJsonObject | null = $state(null);
     let map: L.Map | null = $state(null);
-    let userMarker: L.Marker | null = null; // Marker for user location
-    let routingControl: L.Routing.Control | null = null; // Routing control
-    let walkedPath: L.Polyline | null = null; // Polyline for walked path
+    let userMarker: L.Marker | null = $state(null); // Marker for user location
+    let routingControl: L.Routing.Control | null = $state(null); // Routing control
+    let walkedPath: L.Polyline | null = $state(null); // Polyline for walked path
 
     const testUserWalking: LatLng[] = [
         new LatLng(52.24314250202436, 6.1663437509753),

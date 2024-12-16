@@ -11,7 +11,6 @@
     import UserDashboard from "./pages/UserDashboard.svelte";
     import { Modals } from 'svelte-modals'
     import Navigation from "./lib/components/Navigation.svelte";
-    import Navigation from "./components/Navigation.svelte";
     import TestHomepage from "./pages/TestHomepage.svelte";
 
     let page: any;
