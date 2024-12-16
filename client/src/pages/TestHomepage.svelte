@@ -1,14 +1,14 @@
 <script lang="ts">
-    import { GeoJSON, Map, TileLayer } from 'sveaflet';
-    import L, { LatLng, Layer } from 'leaflet';
+    import {GeoJSON, Map, TileLayer} from 'sveaflet';
+    import L, {LatLng, Layer} from 'leaflet';
+    import HighlightModal from '../lib/components/highlights/HighlightModal.svelte';
+    import type {HighlightFeature} from "../lib/models/models";
+    import type {Feature, GeoJsonObject} from "geojson";
     import 'leaflet-routing-machine';
     import 'lrm-graphhopper';
-    import { onMount } from 'svelte';
-    import type { Feature, GeoJsonObject } from "geojson";
-    import HighlightModal from '../lib/components/highlights/HighlightModal.svelte';
-    import { modals } from 'svelte-modals';
-    import type { HighlightFeature } from "../lib/models/models";
-    import { getHighlightColor } from "../lib/utils/highlightTypes";
+    import {modals} from 'svelte-modals';
+    import {getHighlightColor} from "../lib/utils/highlightTypeColor";
+    import {onMount} from 'svelte';
 
     let geoJSONData: GeoJsonObject | null = $state(null);
     let map: L.Map | null = $state(null);
@@ -86,7 +86,7 @@
             addWaypoints: false,
             router: L.Routing.graphHopper(
                 '9e79bd3e-cfa6-47c1-869c-a7ab08b3a4ca',
-                { urlParameters: { vehicle: 'foot' } }
+                {urlParameters: {vehicle: 'foot'}}
             ),
             createMarker: () => null // Don’t create markers for waypoints
         }).addTo(map);
@@ -166,14 +166,14 @@
 </script>
 
 <svelte:head>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"/>
     <script src="leaflet-routing-machine.js"></script>
     <script src="lrm-graphhopper.js"></script>
 </svelte:head>
 
 <div class="w-full" style="height: 100svh">
     <Map options={{ center: [52.254298, 6.168155], zoom: 13, closePopupOnClick: true }} bind:instance={map}>
-        <TileLayer url={'https://tile.openstreetmap.org/{z}/{x}/{y}.png'} />
+        <TileLayer url={'https://tile.openstreetmap.org/{z}/{x}/{y}.png'}/>
         {#if geoJSONData}
             <GeoJSON
                     json={geoJSONData}
