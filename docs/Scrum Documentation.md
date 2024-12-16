@@ -153,6 +153,8 @@ Meeting Notes:
 Attendees: Rafael, Ilarion, Ignat, Jan, Petko, Sarina, Botond, Robert;
 Absentees: None;
 
+---
+
 ### 2nd Meeting (11/12/2024)
 Meeting Notes:
 - Sarina: ORN-048 made progress, has time until 13/12 to finish it. ORN-018 removed from "blocked", will finish by 13/12 as well.
@@ -166,3 +168,37 @@ Meeting Notes:
 
 Attendees: Rafael, Ilarion, Ignat, Petko, Sarina, Botond, Robert;
 Absentees: Jan (Informed in advance);
+
+---
+
+### 3rd Meeting (13/12/2024)
+Meeting Notes:
+- Ilarion: Finished ORN-060, assigned to ORN-073
+- Ignat: Will finish his task by the end of the day (ORN-065). Was helping multiple team members with their tasks.
+- Rafael: Made nice progress on ORN-058, will finish on 16/12 by cleaning up the code and refactoring.
+- Botond: Finished ORN-052, assigned to ORN-076
+- Robert: Finishing ORN-064
+- Sarina: Made the issues, will proceed with refactoring and cleaning up the code until 16/12. Due date is extended
+- Jan: Made progress, but needs more time to finish. Due date is extended until 18/12
+- Petko: ORN-069 made progress, but needs more time to finish. 
+
+Attendees: Rafael, Ilarion, Ignat, Petko, Sarina, Botond, Robert, Jan;
+Absentees: None;
+
+---
+
+### 4th Meeting (16/12/2024)
+Meeting Notes:
+- Ilarion: Not done with ORN-073, will finish by 18/12
+- Ignat: ORN-073 will be done in parallel with new task ORN-068 until 20/12
+- Rafael: ORN-058 is done. Assigned to ORN-062
+- Botond: Almost done with ORN-076, needs help with testing. Assigned to $$$...BOMBOCLAT PUT ISSUE NUMBER HERe...$$$
+- Robert: Finished ORN-064. Assigned to ORN-071.  
+- Sarina: ORN-048 is done, will be merged by 18/12. Petko will help with the issues. 
+- Jan: ORN-063 made progress, will finish by 18/12. Assigned to ORN-077
+- Petko: ORN-069 is done. Will provide help to Sarina with her issues.
+
+Attendees: Rafael, Ilarion, Ignat, Petko, Sarina, Botond, Robert, Jan;
+Absentees: None;
+
+---
