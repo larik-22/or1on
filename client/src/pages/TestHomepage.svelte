@@ -6,9 +6,10 @@
     import type {Feature, GeoJsonObject} from "geojson";
     import 'leaflet-routing-machine';
     import 'lrm-graphhopper';
-    import {modals} from 'svelte-modals';
     import {getHighlightColor} from "../lib/utils/highlightTypeColor";
     import {onMount} from 'svelte';
+    import {modals} from 'svelte-modals';
+    import.meta.env.VITE_GRASSHOPER_API_KEY
 
     let geoJSONData: GeoJsonObject | null = $state(null);
     let map: L.Map | null = $state(null);
@@ -85,7 +86,7 @@
             routeWhileDragging: false,
             addWaypoints: false,
             router: L.Routing.graphHopper(
-                '9e79bd3e-cfa6-47c1-869c-a7ab08b3a4ca',
+                `${import.meta.env.VITE_GRASSHOPER_API_KEY}`,
                 {urlParameters: {vehicle: 'foot'}}
             ),
             createMarker: () => null // Don’t create markers for waypoints
