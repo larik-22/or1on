@@ -42,10 +42,10 @@
 
 				// Check if cache is still valid (5 minutes)
 				if ((now.getTime() - cachedTime.getTime()) < 5 * 60 * 1000) {
+					console.log('Using cached data');
 					return cachedData;
 				}
 			}
-
 			// Fetch from network
 			const response = await fetch(cacheKey);
 			const data = await response.json();
@@ -105,6 +105,8 @@
 
 	// Add and clean up event listener
 	onMount(() => {
+		feedbackPromise = fetchFeedback();
+
 		window.addEventListener("keydown", handleKeydown);
 		return () => {
 			window.removeEventListener("keydown", handleKeydown);

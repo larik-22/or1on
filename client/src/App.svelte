@@ -12,6 +12,7 @@
     import { Modals } from 'svelte-modals'
     import Navigation from "./lib/components/Navigation.svelte";
     import TestHomepage from "./pages/TestHomepage.svelte";
+    import SuggestHighlight from "./pages/SuggestHighlight.svelte";
 
     let page: any;
     let params: Context;
@@ -53,20 +54,14 @@
         params = ctx;
     });
 
-    router('/test-logged-in', isLoggedIn, (ctx: Context) => {
-        page = LoggedInUser;
-        currentRoute = ctx.pathname;
-        params = ctx;
-    });
-
-    router('/test-admin', isAdmin, (ctx: Context) => {
-        page = AdminUser;
-        currentRoute = ctx.pathname;
-        params = ctx;
-    });
-
-    router('/user-dashboard', (ctx) => {
+    router('/user-dashboard', isLoggedIn, (ctx) => {
         page = UserDashboard;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
+    router('/suggest-highlight', isLoggedIn, (ctx) => {
+        page = SuggestHighlight;
         currentRoute = ctx.pathname;
         params = ctx;
     });

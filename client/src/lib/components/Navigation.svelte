@@ -43,6 +43,13 @@ $effect(()=>{
                             label: "My reviews"
                         },
                         {
+                            label: "Suggest highlight",
+                            overrideClick: true,
+                            overrideFunction: () => {
+                                page.redirect("/suggest-highlight")
+                            }
+                        },
+                        {
                             label: "User dashboard",
                             overrideClick: true,
                             overrideFunction: () => {
