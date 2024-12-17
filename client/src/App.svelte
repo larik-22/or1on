@@ -11,6 +11,8 @@
     import UserDashboard from "./pages/UserDashboard.svelte";
     import { Modals } from 'svelte-modals'
     import Navigation from "./lib/components/Navigation.svelte";
+    import TestHomepage from "./pages/TestHomepage.svelte";
+    import SuggestHighlight from "./pages/SuggestHighlight.svelte";
 
     let page: any;
     let params: Context;

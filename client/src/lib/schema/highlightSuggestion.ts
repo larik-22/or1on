@@ -6,4 +6,5 @@ export const highlightSuggestionSchema = z.object({
 	name: z.string().min(3, "Name should be at least 3 characters"),
 	description: z.string().min(5, "Description should be at least 5 characters"),
 	category: z.string().min(1, "Please select a category"),
+	businessDescription: z.string().optional(),
 })
