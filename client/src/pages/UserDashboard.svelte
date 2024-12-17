@@ -1,9 +1,9 @@
 <script lang="ts">
-    import ChangePassword from "../components/userDashboard/ChangePassword.svelte";
-    import ChangeUsername from "../components/userDashboard/ChangeUsername.svelte";
-    import LogOut from "../components/userDashboard/LogOut.svelte";
-    import BurgerBar from "../components/burgerBar/BurgerBar.svelte";
+
     import {writable} from "svelte/store";
+    import ChangePassword from "../lib/components/userDashboard/ChangePassword.svelte";
+    import ChangeUsername from "../lib/components/userDashboard/ChangeUsername.svelte";
+    import LogOut from "../lib/components/userDashboard/LogOut.svelte";
 
     let currentSection = writable('');
 </script>

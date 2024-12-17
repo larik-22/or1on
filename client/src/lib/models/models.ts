@@ -47,7 +47,7 @@ export enum HighlightType {
 	CATEGORY_C = "Category C",
 	CATEGORY_D = "Category D",
 	CATEGORY_G = "Category G",
-	Default = "Default"
+	OTHER = "Other"
 }
 
 /**

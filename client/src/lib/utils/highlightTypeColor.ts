@@ -9,7 +9,8 @@ const highlightTypeToColor: Record<HighlightType, string> = {
 	[HighlightType.CATEGORY_C]: "#0000FF",
 	[HighlightType.CATEGORY_D]: "#FFFF00",
 	[HighlightType.CATEGORY_G]: "#6f7eca",
-	[HighlightType.Default]: "#FFFFFF"
+	[HighlightType.CATEGORY_E]: "#000000",
+	[HighlightType.OTHER]: "#FFFFFF"
 
 }
 
@@ -19,5 +20,5 @@ const highlightTypeToColor: Record<HighlightType, string> = {
  * @returns The color associated with the highlight type
  */
 export const getHighlightColor = (highlightType: HighlightType): string => {
-	return highlightTypeToColor[highlightType] || highlightTypeToColor[HighlightType.Default];
+	return highlightTypeToColor[highlightType] || highlightTypeToColor[HighlightType.OTHER];
 }

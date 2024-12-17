@@ -780,5 +780,11 @@ paths:
             description: Incorrect current password
         '500':
           description: Internal server error
-
-
+  /feedbacks:
+    get:
+      tags:
+        - GET
+      summary: Get all feedbacks
+      responses:
+        '200':
+          description: A list of feedbacks

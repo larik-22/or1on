@@ -44,9 +44,9 @@
     ]);
 
     import {fetchWithAuthSvelte} from "../lib/utils/fetchWithAuth.svelte";
-    import type {Row, TableType} from "../components/table/Table.svelte";
-    import Table from "../components/table/Table.svelte";
-    import {type ActionConfig} from "../components/table/Action.svelte";
+    import type {Row, TableType} from "../lib/components/table/Table.svelte";
+    import Table from "../lib/components/table/Table.svelte";
+    import {type ActionConfig} from "../lib/components/table/Action.svelte";
     import EditTextField from "../components/moderatorDashboard/EditTextField.svelte";
     import WarningPopUp from "../components/moderatorDashboard/WarningPopUp.svelte";
 

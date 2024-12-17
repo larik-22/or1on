@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Feedback } from "../../lib/models/models";
+	import type { Feedback } from "../../models/models";
 
 	//TODO once backend is implemented, replace mockFeedbackData with feedbackData
 	let feedbackData: any[] = $props();
