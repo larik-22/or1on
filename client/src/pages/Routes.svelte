@@ -9,6 +9,8 @@
      * Fetches the Routes from the backend
      */
     const fetchRoutes = async () => {
+        const data = await fetch(`${import.meta.env.VITE_BACKEND_URL}/routes`);
+        routes = await data.json() as FeatureCollection;
     }
 
     /**
