@@ -545,6 +545,9 @@ describe('GET /users/:id', () => {
 
 describe('DELETE /users/:id', () => {
     it('should delete user successfully', async () => {
+        const mockUser = {id: '550e8400-e29b-41d4-a716-446655440020',
+            email: 'user@example.com',
+            is_admin: false};
         const adminUser = {
             email: 'admin@example.com',
             password: 'password123',
@@ -557,9 +560,15 @@ describe('DELETE /users/:id', () => {
             ...createdAdmin,
             password: adminUser.password
         });
+        em.findOne = vi.fn( async (entity, condition) =>{
+            if(entity === User && condition.id === '550e8400-e29b-41d4-a716-446655440020'){
+                return mockUser
+            }
+        });
         em.nativeDelete = vi.fn( async () => 1);
 
-        const response = await app.request('/users/1', {method: 'DELETE',
+        const response = await app.request('/users/550e8400-e29b-41d4-a716-446655440020',
+            {method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
 
         expect(response.status).toBe(200);
@@ -568,7 +577,7 @@ describe('DELETE /users/:id', () => {
     });
 })
 
-describe('GET /feedbacks/highlight/:id', () => {
+describe('GET /highlights/:id/feedbacks', () => {
     it('should fetch all feedbacks from a highlight', async () => {
         const feedbacks = [{id: 1,
             highlight: {id: 1,
@@ -581,21 +590,21 @@ describe('GET /feedbacks/highlight/:id', () => {
 
         em.find = vi.fn(async () => feedbacks);
 
-        const response = await app.request('/feedbacks/highlight/1', {method: 'GET'}, mockEnv);
+        const response = await app.request('/highlights/1/feedbacks', {method: 'GET'}, mockEnv);
 
         expect(response.status).toBe(200);
         const responseBody = await response.json();
         expect(responseBody).toEqual(feedbacks);
     });
     it('should return 400 if highlight id is invalid', async () => {
-        const response = await app.request('/feedbacks/highlight/invalidHighlightId',
+        const response = await app.request('/highlights/invalidHighlightId/feedbacks',
             {method: 'GET'}, mockEnv);
 
         expect(response.status).toBe(400);
     });
 })
 
-describe('GET /feedbacks/user/:id', () => {
+describe('GET /users/:id/feedbacks', () => {
     it('should fetch all feedbacks from a user', async () => {
         const feedback = [{id: '1',
             user: {id: '550e8400-e29b-41d4-a716-446655440020',
@@ -617,7 +626,7 @@ describe('GET /feedbacks/user/:id', () => {
 
         em.find = vi.fn(async () => feedback);
 
-        const response = await app.request('/feedbacks/user/550e8400-e29b-41d4-a716-446655440020',
+        const response = await app.request('/users/550e8400-e29b-41d4-a716-446655440020/feedbacks',
             {method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
 
@@ -640,7 +649,7 @@ describe('GET /feedbacks/user/:id', () => {
         });
         em.find = vi.fn( async () => []);
 
-        const response = await app.request('/feedbacks/user/550e8400-e29b-41d4-a716-446655440020',
+        const response = await app.request('/users/550e8400-e29b-41d4-a716-446655440020/feedbacks',
             {method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
 
@@ -661,7 +670,7 @@ describe('GET /feedbacks/user/:id', () => {
             ...createdAdmin,
             password: adminUser.password
         });
-        const response = await app.request('/feedbacks/user/invalidUserId',
+        const response = await app.request('/users/7/feedbacks',
             {method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
 
@@ -713,24 +722,39 @@ describe('PUT /feedbacks/:id/approve', () => {
     });
 })
 
-describe('DELETE /feedbacks/:id', () => {
+describe('DELETE /users/:id/feedbacks/:id', () => {
     it('should delete feedback', async () => {
-        const user = {
+        const mockUser = {id: '550e8400-e29b-41d4-a716-446655440020',
             email: 'user@example.com',
+            is_admin: false};
+        const adminUser = {
+            email: 'admin@example.com',
             password: 'password123',
-            isAdmin: false,
+            isAdmin: true,
             username: '880005553535',
         };
 
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
-        const createdUser = await createUser(em, user);
+        const createdUser = await createUser(em, adminUser);
         const token = await generateToken({
             ...createdUser,
-            password: user.password
+            password: adminUser.password
         });
-        em.nativeDelete = vi.fn(async () => 1);
+        em.findOne = vi.fn( async (entity, condition) =>{
+            if(entity === User && condition.id === '550e8400-e29b-41d4-a716-446655440020'){
+                return mockUser
+            }
+        });
+        em.nativeDelete = vi.fn(async (entity, condition) => {
+            if(entity === Feedback && condition.id === 1){
+                return 1
+            }
+            return 0
+        });
 
-        const response = await app.request('feedbacks/1', {method: 'DELETE',
+        const response = await app.request(
+            '/users/550e8400-e29b-41d4-a716-446655440020/feedbacks/1',
+            {method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
 
         expect(response.status).toBe(200);
@@ -738,24 +762,67 @@ describe('DELETE /feedbacks/:id', () => {
         expect(responseBody.message).toEqual('Feedback deleted successfully');
     });
     it('should return 400 if invalid feedback id', async () => {
-        const user = {
-            email: 'user@example.com',
+        const adminUser = {
+            email: 'admin@example.com',
             password: 'password123',
-            isAdmin: false,
+            isAdmin: true,
             username: '880005553535',
         };
 
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
-        const createdUser = await createUser(em, user);
+        const createdUser = await createUser(em, adminUser);
         const token = await generateToken({
             ...createdUser,
-            password: user.password
+            password: adminUser.password
         });
-        const response = await app.request('feedbacks/invalidFeedbackId',
+        const response = await app.request(
+            '/users/550e8400-e29b-41d4-a716-446655440020/feedbacks/invalidId',
             {method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
 
         expect(response.status).toBe(400);
+    });
+    it('should return 400 if invalid user id', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdUser = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdUser,
+            password: adminUser.password
+        });
+        const response = await app.request('/users/5/feedbacks/1',
+            {method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(400);
+    });
+    it('should return 404 if user is not found', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.findOne = vi.fn( async () => null);
+
+        const response = await app.request(
+            '/users/550e8400-e29b-41d4-a716-446655440020/feedbacks/1',
+            {method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(404);
     });
 })
 

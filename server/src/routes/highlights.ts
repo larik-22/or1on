@@ -9,6 +9,7 @@ import {updateHighlight, deleteHighlight} from "../controllers/highlightControll
 import {createHighlight, approveHighlightSuggestion} from "../controllers/highlightController.js";
 import {getAllHighlights, getHighlightById} from "../controllers/highlightController.js";
 import logger from "../utils/logger.js";
+import {getFeedbackByHighlight} from "../controllers/feedbackController.js";
 
 dotenv.config();
 
@@ -22,6 +23,8 @@ const highlightSchema = z.object({
     longitude:z.number().nullable(),
     is_approved: z.boolean().default(false)
 })
+
+const numberIdSchema = z.object({id: z.preprocess((val) => Number(val), z.number())});
 
 /**
  * Handles fetching all highlights.
@@ -63,6 +66,37 @@ highlights.get('/:id', async (ctx) => {
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
+
+/**
+ * Fetches all feedback by highlight id.
+ *
+ * @param ctx - The Hono context object.
+ * @returns A response the list of feedbacks or an error message.
+ */
+highlights.get('/:id/feedbacks', async (ctx) => {
+    try {
+        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const params = numberIdSchema.safeParse(ctx.req.param());
+
+        if (!params.success){
+            return ctx.json(createErrorResponse(400, 'Invalid highlightId parameter'), 400)
+        }
+
+        const {id} = params.data;
+
+        const feedback = await getFeedbackByHighlight(em, id);
+
+        if(feedback === null){
+            return ctx.json({message: 'No feedback found'}, 404);
+        }
+
+        return ctx.json(feedback, 200);
+    }catch (error){
+        logger.error('Error while fetching feedbacks', { error: error });
+        return ctx.json(createErrorResponse(500, 'Internal error'), 500);
+    }
+})
+
 
 /**
  * Handles creating a highlight.
