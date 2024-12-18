@@ -13,6 +13,9 @@ export class Tour {
     @Property()
     name!: string;
 
+    @Property()
+    category!: string;
+
     @Property({ nullable: true })
     description?: string;
 

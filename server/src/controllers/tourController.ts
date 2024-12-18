@@ -67,13 +67,14 @@ export const getHighlightsByTour = async (em: EntityManager, tourId: number):
  */
 export const createTour = async (em: EntityManager, data: Omit<Tour, 'id'>): Promise<void> => {
     try {
-        const { name, description, duration_time, start_hour } = data;
+        const { name, category, description, duration_time, start_hour, highlights } = data;
         const newTour = em.create(Tour, {
             name: name,
+            category: category,
             description: description,
             duration_time: duration_time,
             start_hour: start_hour,
-            highlights: []
+            highlights: highlights ?? []
         });
 
         await em.persistAndFlush(newTour);
