@@ -31,7 +31,7 @@ const tourSchema = z.object({
 tours.get('/', async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
-        const tours = getAllTours(em);
+        const tours = await getAllTours(em);
 
         return ctx.json({tours}, 200);
     }catch (error){
@@ -50,7 +50,7 @@ tours.get('/:id', async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const { id } = ctx.req.param();
-        const tour = getTourById(em, parseInt(id));
+        const tour = await getTourById(em, parseInt(id));
 
         if (!tour){
             return ctx.json({message: 'Tour not found'}, 404)
@@ -73,7 +73,7 @@ tours.get(':id/highlights', async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtpayload') as EntityManager;
         const { id } = ctx.req.param();
-        const highlights = getHighlightsByTour(em, parseInt(id));
+        const highlights = await getHighlightsByTour(em, parseInt(id));
 
         if (!highlights){
             return ctx.json({message: 'No highlights found'}, 404);
