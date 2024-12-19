@@ -19,7 +19,8 @@ const tourSchema = z.object({
     description: z.string().optional().nullable(),
     duration_time: z.string().optional().nullable(),
     start_hour: z.string().optional().nullable(),
-    highlights: z.array(z.any()).optional()
+    highlights: z.array(z.any()).optional(),
+    category: z.string()
 })
 
 /**
