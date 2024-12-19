@@ -7,11 +7,11 @@
 	import {fetchWithAuthSvelte} from "../../utils/fetchWithAuth.svelte.js";
 	import {onMount, tick} from "svelte";
 
-	interface HighlightModalProps extends Omit<ModalProps<any>, 'id'> {
+	interface HighlightModalProps extends ModalProps<any> {
 		name: string,
 		description: string,
 		businessOffer: string | null,
-		id: number,
+		id: string,
 	}
 
 	const {isOpen, name, id, description, businessOffer, close}: HighlightModalProps = $props()
