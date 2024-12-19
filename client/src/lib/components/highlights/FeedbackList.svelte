@@ -6,10 +6,9 @@
 	const mockFeedbackData: Feedback[] = [
 		{
 			id: 1,
-			tour: null,
 			highlight: {
-				id: 1,
-				name: "Highlight 1"
+				id: 3,
+				name: "Highlight 3"
 			},
 			user: {
 				id: "123e4567-e89b-12d3-a456-426614174000",
@@ -17,29 +16,26 @@
 				email: "john_doe@example.com"
 			},
 			rating: 5,
-			comment: "Great highlight!"
+			comment: "Great highlight!",
+			businessOffer: "10% off"
 		},
 		{
 			id: 2,
-			tour: {
-				id: 2,
-				name: "Tour 2"
+			highlight: {
+				id: 3,
+				name: "Highlight 3"
 			},
-			highlight: null,
 			user: {
 				id: "123e4567-e89b-12d3-a456-426614174001",
 				username: "jane_doe",
 				email: "jane_doe@example.com"
 			},
 			rating: 4,
-			comment: "Very informative."
+			comment: "Very informative.",
+			businessOffer: null
 		},
 		{
 			id: 3,
-			tour: {
-				id: 3,
-				name: "Tour 3"
-			},
 			highlight: {
 				id: 3,
 				name: "Highlight 3"
@@ -50,7 +46,8 @@
 				email: "alice_smith@example.com"
 			},
 			rating: 3,
-			comment: "It was okay."
+			comment: "It was okay.",
+			businessOffer: "Free drink"
 		}
 	];
 

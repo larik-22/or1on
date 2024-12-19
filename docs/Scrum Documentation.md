@@ -192,7 +192,7 @@ Meeting Notes:
 - Ilarion: Not done with ORN-073, will finish by 18/12
 - Ignat: ORN-073 will be done in parallel with new task ORN-068 until 20/12
 - Rafael: ORN-058 is done. Assigned to ORN-062
-- Botond: Almost done with ORN-076, needs help with testing. Assigned to $$$...BOMBOCLAT PUT ISSUE NUMBER HERe...$$$
+- Botond: Almost done with ORN-076, needs help with testing.
 - Robert: Finished ORN-064. Assigned to ORN-071.  
 - Sarina: ORN-048 is done, will be merged by 18/12. Petko will help with the issues. 
 - Jan: ORN-063 made progress, will finish by 18/12. Assigned to ORN-077
@@ -202,3 +202,17 @@ Attendees: Rafael, Ilarion, Ignat, Petko, Sarina, Botond, Robert, Jan;
 Absentees: None;
 
 ---
+
+### 5th Meeting (18/12/2024)
+Meeting Notes:
+- Ilarion: Done with ORN-073. Assigned to ORN-072
+- Ignat: Made progress on two issues.
+- Rafael: Made progress on ORN-062.
+- Botond: Done with issue with ORN-076. Assigned to ORN-078
+- Robert: Fixing ORN-064 and almost done with ORN-071.
+- Sarina: Will notify about the progress later
+- Jan: Will notify about the progress later
+- Petko: Will notify about the progress later
+
+Attendees: Rafael, Ilarion, Ignat, Botond, Robert;
+Absentees: Sarina, Jan, Petko;

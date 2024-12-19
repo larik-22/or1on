@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {CircleMarker, Control, ControlZoom, GeoJSON, Map, TileLayer} from 'sveaflet';
+	import {Control, ControlZoom, GeoJSON, Map, TileLayer} from 'sveaflet';
 	import L, {LatLng, Layer} from 'leaflet';
 	import {modals} from 'svelte-modals'
 	import type {FeatureCollection} from "geojson";
@@ -10,30 +10,49 @@
 	import HighlightModal from "../lib/components/highlights/HighlightModal.svelte";
 	import {onMount} from "svelte";
 	import FilterDropdown from "../lib/components/highlights/FilterDropdown.svelte";
+	import "leaflet.markercluster";
+
 
 	let geoJSONData: FeatureCollection | null = $state(null);
 	let geoJSONElement: SGeoJson | null = $state(null);
 	let map: SMap | null = $state(null);
 	let currentHighlightFilter: string[] = $state([]);
 	let userLocation: LatLng | null = $state(null);
+	const markerClusterGroup: L.MarkerClusterGroup = $state(L.markerClusterGroup({
+		showCoverageOnHover: true,
+		spiderfyOnMaxZoom: true,
+		removeOutsideVisibleBounds: true,
+		zoomToBoundsOnClick: true,
+
+		iconCreateFunction: (cluster) => {
+			const count = cluster.getChildCount();
+			return L.divIcon({
+				html: `<div class="cluster-icon">${count}</div>`,
+				className: "custom-cluster-icon",
+				iconSize: L.point(40, 40),
+			});
+		}
+	}));
 
 	onMount(() => {
+		fetchGeoJSON();
+
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition((position) => {
 				userLocation = new L.LatLng(position.coords.latitude, position.coords.longitude);
 			});
 		}
 
-		// Zoom to user location
-		// $effect(() => {
-		// 	if (userLocation) {
-		// 		// map?.setView(userLocation, 13);
-		//
-		// 		// Add user location marker
-		// 		const userMarker = new L.Marker(userLocation);
-		// 		userMarker.addTo(map);
-		// 	}
-		// })
+		//Zoom to user location
+		$effect(() => {
+			if (userLocation) {
+				//map?.setView(userLocation, 13);
+
+				// Add user location marker
+				const userMarker = new L.Marker(userLocation);
+				userMarker.addTo(map);
+			}
+		})
 	});
 
 	/**
@@ -42,6 +61,16 @@
 	const fetchGeoJSON = async () => {
 		const data = await fetch(`${import.meta.env.VITE_BACKEND_URL}/map/highlights`);
 		geoJSONData = await data.json() as FeatureCollection;
+
+		geoJSONData?.features.forEach((feature) => {
+			const latlng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+			const marker = handlePointToLayer(feature, latlng) as L.Marker;
+			marker.on('click', () => openHighlightModal(feature)); // Open modal on marker click
+			markerClusterGroup.addLayer(marker);
+		});
+
+		geoJSONElement?.clearLayers();
+		map?.addLayer(markerClusterGroup);
 	}
 
 	/**
@@ -60,18 +89,44 @@
 	 * @param feature
 	 * @param latlng
 	 */
-	const handlePointToLayer = (feature: HighlightFeature, latlng: LatLng): Layer => {
+	const handlePointToLayer = (feature: HighlightFeature, latlng: L.LatLng): L.Layer => {
 		const color = getHighlightColor(feature.properties.category);
+		const radius = 8;
 
-		return new L.CircleMarker(latlng, {
-			radius: 8,
+		const marker = L.circleMarker(latlng, {
+			radius,
 			fillColor: color,
-			color: "#000",
-			weight: 1,
-			opacity: 1,
-			fillOpacity: 0.5
+			color: "#333",
+			weight: 1.5,
+			opacity: 0.8,
+			fillOpacity: 0.7,
 		});
-	}
+
+		// Add hover and click interactivity
+		marker.on("mouseover", () => {
+			marker.setStyle({
+				radius: radius * 1.2,
+				fillOpacity: 0.9
+			});
+		});
+		marker.on("mouseout", () => {
+			marker.setStyle({
+				radius,
+				fillOpacity: 0.7
+			});
+		});
+
+		// Add a tooltip with feature name
+		if (feature.properties.name) {
+			marker.bindTooltip(feature.properties.name, {
+				permanent: false,
+				direction: "top",
+				className: "custom-tooltip"
+			});
+		}
+
+		return marker;
+	};
 
 	/**
 	 * Opens the modal with the highlight information
@@ -118,19 +173,19 @@
 			geoJSONElement.addData(filteredGeoJSON);
 		}
 	};
-
-	fetchGeoJSON();
 </script>
+
+
 
 <div class="w-full" style="height: 100svh">
 	<Map
+			bind:instance={map}
 			options={{
 				center: [52.254298, 6.168155],
 				zoom: 13.5,
 				closePopupOnClick: true,
 				zoomControl: false,
-			}}
-			bind:instance={map}>
+			}}>
 		<TileLayer url={'https://tile.openstreetmap.org/{z}/{x}/{y}.png'}/>
 		{#if geoJSONData}
 			<GeoJSON
@@ -155,6 +210,5 @@
 		{/if}
 	</Map>
 </div>
-
 
 
