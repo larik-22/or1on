@@ -22,7 +22,7 @@ const users = new Hono();
  */
 users.get('/', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const users = await getAllUsers(em);
 
         return ctx.json({users}, 200);
@@ -41,7 +41,7 @@ users.get('/', isLoggedIn, isAdmin, async (ctx) => {
  */
 users.get('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();
         const user = await getUserById(em, id);
 
@@ -65,7 +65,7 @@ users.get('/:id', isLoggedIn, isAdmin, async (ctx) => {
  */
 users.get('/:id/feedbacks', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const {id} = ctx.req.param();
 
         if (!validate(id)){
@@ -93,7 +93,7 @@ users.get('/:id/feedbacks', isLoggedIn, isAdmin, async (ctx) => {
  */
 users.delete('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();
 
         const user = await getUserById(em, id);
@@ -120,7 +120,7 @@ users.delete('/:id', isLoggedIn, isAdmin, async (ctx) => {
  */
 users.delete('/:id/feedbacks/:feedbackId', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
 
         const {id, feedbackId} = ctx.req.param();
 

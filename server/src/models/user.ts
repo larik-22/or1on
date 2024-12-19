@@ -19,4 +19,7 @@ export class User {
 
     @Property()
     isAdmin = false;
+
+    @Property()
+    verified = false;
 }

@@ -23,7 +23,7 @@ const numberIdSchema = z.object({id: z.preprocess((val) => Number(val), z.number
  */
 feedbacks.put('/:id/approve', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const params = numberIdSchema.safeParse(ctx.req.param());
 
         if (!params.success){
