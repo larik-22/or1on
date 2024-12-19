@@ -1904,3 +1904,123 @@ describe('POST /userDashboard/update-password', () => {
         expect(response.status).toBe(400);
     });
 });
+
+describe('POST /highlights/:id/feedbacks', () => {
+    it('should successfully submit feedback', async () => {
+        const user = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: 'userTest',
+        };
+
+        const createdUser = await getUserByEmail(em, user.email) as User;
+        const token = await generateToken({
+            ...createdUser,
+            password: user.password,
+        });
+
+        const feedbackData = {
+            rating: 5,
+            feedbackMessage: 'Great highlight!',
+        };
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.email === user.email) {
+                return createdUser;
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+
+        const response = await app.request('/highlights/1/feedbacks', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+            body: JSON.stringify(feedbackData),
+        }, mockEnv);
+
+        const responseBody = await response.json();
+        expect(response.status).toBe(201);
+        expect(responseBody.message).toBe('Feedback submitted successfully');
+    });
+
+    it('should return 400 for invalid feedback data', async () => {
+        const user = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: 'userTest',
+        };
+
+        const createdUser = await getUserByEmail(em, user.email) as User;
+        const token = await generateToken({
+            ...createdUser,
+            password: user.password,
+        });
+
+        const invalidFeedbackData = {
+            rating: 'notANumber', // Invalid rating type
+            feedbackMessage: 'Great highlight!',
+        };
+
+        const response = await app.request('/highlights/1/feedbacks', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+            body: JSON.stringify(invalidFeedbackData),
+        }, mockEnv);
+
+        const responseBody = await response.json();
+        expect(response.status).toBe(400);
+        expect(responseBody.message).toBe('Invalid feedback data');
+    });
+
+    it('should return 404 if user is not found', async () => {
+        const user = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: 'userTest',
+        };
+
+        const createdUser = await getUserByEmail(em, user.email) as User;
+        const token = await generateToken({
+            ...createdUser,
+            password: user.password,
+        });
+
+        const feedbackData = {
+            rating: 5,
+            feedbackMessage: 'Great highlight!',
+        };
+
+        em.findOne = vi.fn(async () => null);
+
+        const response = await app.request('/highlights/1/feedbacks', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+            body: JSON.stringify(feedbackData),
+        }, mockEnv);
+
+        const responseBody = await response.json();
+        expect(response.status).toBe(404);
+        expect(responseBody.message).toBe('User not found');
+    });
+
+    it('should return 401 if user is not authenticated', async () => {
+        const feedbackData = {
+            rating: 5,
+            feedbackMessage: 'Great highlight!',
+        };
+
+        const response = await app.request('/highlights/1/feedbacks', {
+            method: 'POST',
+            body: JSON.stringify(feedbackData),
+        }, mockEnv);
+
+        const responseBody = await response.json();
+        expect(response.status).toBe(401);
+        expect(responseBody.error.code).toBe(401);
+        expect(responseBody.error.message).toBe('Unauthorized');
+    });
+});
