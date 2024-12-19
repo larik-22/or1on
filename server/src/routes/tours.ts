@@ -31,7 +31,7 @@ const tourSchema = z.object({
  */
 tours.get('/', async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const tours = await getAllTours(em);
 
         return ctx.json({tours}, 200);
@@ -49,7 +49,7 @@ tours.get('/', async (ctx) => {
  */
 tours.get('/:id', async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();
         const tour = await getTourById(em, parseInt(id));
 
@@ -72,7 +72,7 @@ tours.get('/:id', async (ctx) => {
  */
 tours.get(':id/highlights', async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();
         const highlights = await getHighlightsByTour(em, parseInt(id));
 
@@ -96,7 +96,7 @@ tours.get(':id/highlights', async (ctx) => {
  */
 tours.post('/', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const body = await ctx.req.json();
 
         const tour = tourSchema.safeParse(body);
@@ -122,7 +122,7 @@ tours.post('/', isLoggedIn, isAdmin, async (ctx) => {
  */
 tours.put('/:id', async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();
 
         const tour = await getTourById(em, parseInt(id));
@@ -153,7 +153,7 @@ tours.put('/:id', async (ctx) => {
  */
 tours.delete('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();
 
         await deleteTour(em, parseInt(id));

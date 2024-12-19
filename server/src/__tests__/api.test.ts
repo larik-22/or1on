@@ -579,14 +579,38 @@ describe('DELETE /users/:id', () => {
 
 describe('GET /highlights/:id/feedbacks', () => {
     it('should fetch all feedbacks from a highlight', async () => {
-        const feedbacks = [{id: 1,
-            highlight: {id: 1,
-                name: 'something',
-                description: 'someDescription',
-                category: 'history',
-                is_approved: false},
-            user: {id: '1', email: 'test@mail1.com', isAdmin: false},
-            rating: 4}];
+        const expectedFeedbacks = [
+            {
+                "id": 1,
+                "highlight": {
+                    "id": 1,
+                    "name": "something"
+                },
+                "user": {
+                    "id": "1",
+                    "username": "test@mail1.com"
+                },
+                "rating": 4,
+                "comment": "someDescription"
+            }
+        ]
+
+        const feedbacks = [
+            {
+                "id": 1,
+                "highlight": {
+                    "id": 1,
+                    "name": "something"
+                },
+                "user": {
+                    "id": "1",
+                    "username": "test@mail1.com"
+                },
+                "rating": 4,
+                "comment": "someDescription",
+                "is_approved": true,
+            }
+        ]
 
         em.find = vi.fn(async () => feedbacks);
 
@@ -594,7 +618,7 @@ describe('GET /highlights/:id/feedbacks', () => {
 
         expect(response.status).toBe(200);
         const responseBody = await response.json();
-        expect(responseBody).toEqual(feedbacks);
+        expect(responseBody).toEqual(expectedFeedbacks);
     });
     it('should return 400 if highlight id is invalid', async () => {
         const response = await app.request('/highlights/invalidHighlightId/feedbacks',
