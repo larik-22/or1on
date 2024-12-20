@@ -166,6 +166,14 @@ highlights.post('/', isLoggedIn, async (ctx) => {
             return ctx.json(createErrorResponse(400, 'Invalid data'), 400);
         }
 
+        const payload = ctx.get('jwtPayload') as User
+
+        if (payload.isAdmin){
+            highlight.data.is_approved = true
+        } else {
+            highlight.data.is_approved = true
+        }
+
         await createHighlight(em, highlight.data);
 
         return ctx.json({message: 'Highlight created successfully'}, 201)
