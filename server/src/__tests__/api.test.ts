@@ -893,6 +893,36 @@ describe('GET /highlights/:id', () => {
 
 describe('POST /highlights', () => {
     it('should create a new highlight', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdUser = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdUser,
+            password: adminUser.password
+        });
+
+        const highlightData = {
+            name: "something",
+            description: "some description",
+            category: "history",
+            latitude: 40.7128,
+            longitude: -74.0060,
+        }
+        const response = await app.request('/highlights', {
+            method: 'POST',
+            body: JSON.stringify(highlightData),
+            headers: { 'Authorization': `Bearer ${token}`}
+        }, mockEnv);
+
+        expect(response.status).toBe(201);
+    });
+    it('should create a new highlight suggestion', async () => {
         const user = {
             email: 'user@example.com',
             password: 'password123',
@@ -913,7 +943,6 @@ describe('POST /highlights', () => {
             category: "history",
             latitude: 40.7128,
             longitude: -74.0060,
-            is_approved: false
         }
         const response = await app.request('/highlights', {
             method: 'POST',
@@ -936,7 +965,6 @@ describe('POST /highlights', () => {
             category: "history",
             latitude: 40.7128,
             longitude: -74.0060,
-            is_approved: false
         }
         em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
         const createdUser = await createUser(em, user);

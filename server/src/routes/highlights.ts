@@ -10,6 +10,7 @@ import {createHighlight, approveHighlightSuggestion} from "../controllers/highli
 import {getAllHighlights, getHighlightById} from "../controllers/highlightController.js";
 import logger from "../utils/logger.js";
 import {getFeedbackByHighlight} from "../controllers/feedbackController.js";
+import type {User} from "../models/user.js";
 
 dotenv.config();
 
@@ -113,6 +114,14 @@ highlights.post('/', isLoggedIn, async (ctx) => {
 
         if (!highlight.success){
             return ctx.json(createErrorResponse(400, 'Invalid data'), 400);
+        }
+
+        const payload = ctx.get('jwtPayload') as User
+
+        if (payload.isAdmin){
+            highlight.data.is_approved = true
+        } else {
+            highlight.data.is_approved = true
         }
 
         await createHighlight(em, highlight.data);
