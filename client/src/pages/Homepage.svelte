@@ -114,7 +114,7 @@
 		await modals.open(HighlightModal, {
 			name: feature.properties.name,
 			description: feature.properties.description,
-			id: feature.properties.id
+			highlightId: feature.properties.id
 		})
 	}
 

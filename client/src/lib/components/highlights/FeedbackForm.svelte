@@ -7,13 +7,11 @@
 	export type feedbackFormPayload = {
 		rating: number;
 		feedbackMessage: string;
-		userid: string | undefined;
 	};
 
 	let { formSubmitted } = $props();
 
 	let feedbackData: feedbackFormPayload = $state({
-		userid: decodeToken($authToken)?.id,
 		rating: 0,
 		feedbackMessage: "",
 	})

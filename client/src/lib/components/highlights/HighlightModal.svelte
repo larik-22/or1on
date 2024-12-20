@@ -7,17 +7,17 @@
 	import {fetchWithAuthSvelte} from "../../utils/fetchWithAuth.svelte.js";
 	import {onMount, tick} from "svelte";
 
-	interface HighlightModalProps extends ModalProps<any> {
+	interface HighlightModalProps extends ModalProps {
 		name: string,
 		description: string,
+		highlightId: string,
 		businessOffer: string | null,
-		id: string,
 	}
 
-	const {isOpen, name, id, description, businessOffer, close}: HighlightModalProps = $props()
+	const {name, description, highlightId, businessOffer, close, isOpen}: HighlightModalProps = $props()
 
 	// promise, that will trigger the re-render
-	let feedbackPromise: Promise<any> | null = $state(null);
+	let feedbackPromise: Promise<any> | null = $state(fetchFeedback());
 
 	// Error message
 	let submissionError: string | null = $state(null);
@@ -30,10 +30,10 @@
 	 * Fetch feedback from the server and cache it for 5 minutes
 	 * @returns {Promise<any>} - The feedback data
 	 */
-	const fetchFeedback = async () => {
+	async function fetchFeedback (){
 		try {
 			const cache = await caches.open(cacheName);
-			const cacheKey = `${import.meta.env.VITE_BACKEND_URL}/highlights/${id}/feedbacks`;
+			const cacheKey = `${import.meta.env.VITE_BACKEND_URL}/highlights/${highlightId}/feedbacks`;
 			const cachedResponse = await cache.match(cacheKey);
 
 			if (cachedResponse) {
@@ -43,7 +43,6 @@
 
 				// Check if cache is still valid (5 minutes)
 				if ((now.getTime() - cachedTime.getTime()) < 5 * 60 * 1000) {
-					console.log('Using cached data');
 					return cachedData;
 				}
 			}
@@ -72,7 +71,7 @@
 		try {
 			submissionError = null;
 
-			const data = await fetchWithAuthSvelte(`${import.meta.env.VITE_BACKEND_URL}/highlights/${id}/feedbacks`, {
+			const data = await fetchWithAuthSvelte(`${import.meta.env.VITE_BACKEND_URL}/highlights/${highlightId}/feedbacks`, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify(formData),
@@ -160,8 +159,7 @@
 			{:then data}
 				<!-- Back Button -->
 				<FeedbackList {data}/>
-				<FeedbackForm
-						formSubmitted={handleFeedbackSubmit}
+				<FeedbackForm formSubmitted={handleFeedbackSubmit}
 				/>
 			{:catch error}
 				<div class="mx-4 mt-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
