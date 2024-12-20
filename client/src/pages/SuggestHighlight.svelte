@@ -6,8 +6,8 @@
 	import {fetchWithAuthSvelte} from "../lib/utils/fetchWithAuth.svelte";
 
 	type HighlightForm = {
-		lat: number | null,
-		lng: number | null,
+		latitude: number | null,
+		longitude: number | null,
 		name: string,
 		description: string,
 		category: HighlightType,
@@ -17,11 +17,11 @@
 	let selectedLocation: L.LatLng | undefined = $state(undefined);
 
 	let highlightPayload: HighlightForm = $state({
-		lat: null,
-		lng: null,
+		latitude: null,
+		longitude: null,
 		name: "",
 		description: "",
-		category: HighlightType.CATEGORY_A,
+		category: HighlightType.HISTORICAL,
 		businessDescription: undefined
 	})
 
@@ -29,14 +29,14 @@
 	let submitError: string | undefined = $state(undefined);
 
 	$effect(() => {
-		highlightPayload.lat = selectedLocation?.lat || null;
-		highlightPayload.lng = selectedLocation?.lng || null;
+		highlightPayload.latitude = selectedLocation?.lat || null;
+		highlightPayload.longitude = selectedLocation?.lng || null;
 		highlightPayload.name = highlightPayload.name;
 		highlightPayload.description = highlightPayload.description;
 		highlightPayload.category = highlightPayload.category as HighlightType;
 		highlightPayload.businessDescription = highlightPayload?.businessDescription;
-
 		validated = highlightSuggestionSchema.safeParse(highlightPayload).success;
+		$inspect(validated, highlightPayload)
 	})
 
 
@@ -67,11 +67,11 @@
 				if (response.ok) {
 					submitError = undefined;
 					highlightPayload = {
-						lat: null,
-						lng: null,
+						latitude: null,
+						longitude: null,
 						name: "",
 						description: "",
-						category: HighlightType.CATEGORY_A,
+						category: HighlightType.HISTORICAL,
 						businessDescription: undefined
 					}
 					selectedLocation = undefined;
