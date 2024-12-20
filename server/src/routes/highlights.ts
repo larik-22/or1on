@@ -168,7 +168,7 @@ highlights.post('/', isLoggedIn, async (ctx) => {
 
         const payload = ctx.get('jwtPayload') as User
 
-        if (payload.isAdmin){
+        if (payload.isAdmin || payload.verified){
             highlight.data.is_approved = true
         } else {
             highlight.data.is_approved = true
