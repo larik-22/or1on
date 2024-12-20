@@ -2,21 +2,22 @@
 	import {fade} from "svelte/transition";
 	import type {ModalProps} from 'svelte-modals'
 	import FeedbackList from "./FeedbackList.svelte";
-	import FeedbackForm from "./FeedbackForm.svelte";
 	import type feedbackFormPayload from "./FeedbackForm.svelte";
+	import FeedbackForm from "./FeedbackForm.svelte";
 	import {fetchWithAuthSvelte} from "../../utils/fetchWithAuth.svelte.js";
 	import {onMount, tick} from "svelte";
 
-	interface HighlightModalProps extends Omit<ModalProps<any>, 'id'> {
+	interface HighlightModalProps extends ModalProps {
 		name: string,
 		description: string,
-		id: number,
+		highlightId: string,
+		businessOffer: string | null,
 	}
 
-	const {isOpen, name, id, description, close}: HighlightModalProps = $props()
+	const {name, description, highlightId, businessOffer, close, isOpen}: HighlightModalProps = $props()
 
 	// promise, that will trigger the re-render
-	let feedbackPromise: Promise<any> | null = $state(null);
+	let feedbackPromise: Promise<any> | null = $state(fetchFeedback());
 
 	// Error message
 	let submissionError: string | null = $state(null);
@@ -29,10 +30,10 @@
 	 * Fetch feedback from the server and cache it for 5 minutes
 	 * @returns {Promise<any>} - The feedback data
 	 */
-	const fetchFeedback = async () => {
+	async function fetchFeedback (){
 		try {
 			const cache = await caches.open(cacheName);
-			const cacheKey = `${import.meta.env.VITE_BACKEND_URL}/highlights/${id}/feedbacks`;
+			const cacheKey = `${import.meta.env.VITE_BACKEND_URL}/highlights/${highlightId}/feedbacks`;
 			const cachedResponse = await cache.match(cacheKey);
 
 			if (cachedResponse) {
@@ -42,7 +43,6 @@
 
 				// Check if cache is still valid (5 minutes)
 				if ((now.getTime() - cachedTime.getTime()) < 5 * 60 * 1000) {
-					console.log('Using cached data');
 					return cachedData;
 				}
 			}
@@ -71,7 +71,7 @@
 		try {
 			submissionError = null;
 
-			const data = await fetchWithAuthSvelte(`${import.meta.env.VITE_BACKEND_URL}/highlights/${id}/feedbacks`, {
+			const data = await fetchWithAuthSvelte(`${import.meta.env.VITE_BACKEND_URL}/highlights/${highlightId}/feedbacks`, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify(formData),
@@ -88,7 +88,7 @@
 			await tick();
 
 			if (errorElement) {
-				errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				errorElement.scrollIntoView({behavior: 'smooth', block: 'center'});
 			}
 		}
 	};
@@ -115,10 +115,12 @@
 </script>
 
 {#if isOpen}
+
 	{#snippet iconGoBack()}
-		<svg width="1.25rem" height="1.25rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-gray-200">
-			<path class="fill-white" d="M21.75 18.75C21.75 18.9489 21.671 19.1397 21.5303 19.2803C21.3897 19.421 21.1989 19.5 21 19.5C20.8011 19.5 20.6103 19.421 20.4696 19.2803C20.329 19.1397 20.25 18.9489 20.25 18.75C20.2475 16.5627 19.3775 14.4657 17.8309 12.9191C16.2842 11.3725 14.1873 10.5025 12 10.5H4.81029L8.03061 13.7194C8.17134 13.8601 8.2504 14.051 8.2504 14.25C8.2504 14.449 8.17134 14.6399 8.03061 14.7806C7.88987 14.9213 7.699 15.0004 7.49998 15.0004C7.30096 15.0004 7.11009 14.9213 6.96935 14.7806L2.46935 10.2806C2.39962 10.211 2.3443 10.1282 2.30656 10.0372C2.26882 9.94615 2.24939 9.84855 2.24939 9.74999C2.24939 9.65143 2.26882 9.55383 2.30656 9.46278C2.3443 9.37174 2.39962 9.28902 2.46935 9.21936L6.96935 4.71936C7.11009 4.57863 7.30096 4.49957 7.49998 4.49957C7.699 4.49957 7.88987 4.57863 8.03061 4.71936C8.17134 4.8601 8.2504 5.05097 8.2504 5.24999C8.2504 5.44901 8.17134 5.63988 8.03061 5.78061L4.81029 8.99999H12C14.585 9.00272 17.0634 10.0308 18.8913 11.8587C20.7191 13.6866 21.7472 16.165 21.75 18.75Z"
-				  fill=""/>
+		<svg width="1.25rem" height="1.25rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+			 class="text-gray-200">
+			<path class="fill-white" d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2"
+				  stroke-linecap="round" stroke-linejoin="round"/>
 		</svg>
 	{/snippet}
 
@@ -128,8 +130,9 @@
 			transition:fade|global={{duration: 300}}
 	>
 		<!-- The Modal -->
-		<div class="bg-white rounded-md shadow-lg w-full max-w-3xl pointer-events-auto overflow-y-auto overflow-x-hidden max-h-[650px] py-4">
-			<div class="px-4 flex justify-end sticky top-1">
+		<div class="bg-white rounded-md shadow-lg w-full max-w-3xl pointer-events-auto overflow-y-auto overflow-x-hidden max-h-[650px] pb-4 relative">
+			<!-- Close Button -->
+			<div class="px-4 flex justify-end sticky top-3">
 				<button
 						class="transition-colors duration-300 bg-red-500 hover:bg-red-200 text-gray-200 px-2 py-1 rounded-lg flex items-center gap-1"
 						onclick={() => close()}
@@ -138,19 +141,25 @@
 					Close
 				</button>
 			</div>
+			<!-- Business Offer -->
+			{#if businessOffer}
+				<div class="p-4 bg-yellow-100 border-b border-yellow-300 rounded-md shadow-sm mt-[-2rem]">
+					<p class="text-yellow-800 font-semibold">Business Offer</p>
+					<p class="text-yellow-700 mt-1">{businessOffer}</p>
+				</div>
+			{/if}
 			<div class="p-4 border-b">
 				<h2 class="text-xl font-medium mb-2">{name}</h2>
 				<p>{description}</p>
 			</div>
-			<!-- Feedback list & form -->
 			{#await feedbackPromise}
 				<div class="p-4 border-t">
 					<p>Loading... I am gonna be a spinning icon one day</p>
 				</div>
 			{:then data}
+				<!-- Back Button -->
 				<FeedbackList {data}/>
-				<FeedbackForm
-						formSubmitted={handleFeedbackSubmit}
+				<FeedbackForm formSubmitted={handleFeedbackSubmit}
 				/>
 			{:catch error}
 				<div class="mx-4 mt-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -160,7 +169,8 @@
 
 			<!-- Error message -->
 			{#if submissionError}
-				<div class="mx-4 mt-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded" bind:this={errorElement}>
+				<div class="mx-4 mt-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded"
+					 bind:this={errorElement}>
 					<p>{submissionError}</p>
 				</div>
 			{/if}
