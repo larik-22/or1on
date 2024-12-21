@@ -1,28 +1,52 @@
 <script>
     import { createEventDispatcher } from "svelte";
+    import FilterDropdown from "../highlights/FilterDropdown.svelte";
 
     export let tours = [];
     const dispatch = createEventDispatcher();
+
+    let filterOptions = [];
+    let currentFilter = [];
+
+    $: {
+        // Extract unique categories for the filter dropdown
+        const categories = tours.map((tour) => tour.category).filter((category) => category !== undefined);
+        filterOptions = [...new Set(categories)];
+    }
+
+    /**
+     * Filters the tours based on the active filters
+     */
+    const applyFilter = () => {
+        return currentFilter.length === 0
+            ? tours // Show all tours if no filter is selected
+            : tours.filter((tour) => currentFilter.includes(tour.category));
+    };
 
     const formatDuration = (duration) => {
         const { hours, minutes } = duration;
         return `${hours}h ${minutes}m`;
     };
-
-    const handleClick = (id) => {
-        dispatch("select", id); // Dispatch 'select' event with the tour ID
-    };
 </script>
 
-<div class="w-4/5 bg-white p-6 rounded-lg shadow-md">
-    <h2 class="text-xl font-bold text-gray-800 mb-6">Tour Viewer</h2>
+<div class="w-full max-w-6xl bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Tour Viewer</h2>
 
-    {#if tours.length > 0}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {#each tours as tour (tour.id)}
+    <!-- Filter Dropdown -->
+    <div class="mb-4">
+        <FilterDropdown
+                bind:currentFilter={currentFilter}
+                applyFilter={applyFilter}
+                filterOptions={filterOptions}
+        />
+    </div>
+
+    {#if applyFilter().length > 0}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto h-[29rem]">
+            {#each applyFilter() as tour (tour.id)}
                 <div
                         class="tour-card p-4 bg-gray-100 border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:bg-gray-200"
-                        on:click={() => handleClick(tour.id)}
+                        on:click={() => dispatch('select', tour.id)}
                 >
                     <h3 class="text-lg font-bold text-gray-800 mb-2">{tour.name}</h3>
                     <p class="text-sm text-gray-600 mb-1">
@@ -41,6 +65,6 @@
             {/each}
         </div>
     {:else}
-        <p class="text-center text-gray-500">No tours available.</p>
+        <p class="text-center text-gray-500">No tours match your filter criteria.</p>
     {/if}
 </div>
