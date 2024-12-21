@@ -4,6 +4,7 @@
     import ModeratorDashboard from "./pages/ModeratorDashboard.svelte";
     import Register from "./pages/Register.svelte";
     import Login from "./pages/Login.svelte";
+    import Routes from "./pages/Routes.svelte";
     import type {Context} from 'page';
     import isNotLoggedIn from "./lib/middleware/notLoggedIn";
     import isAdmin from "./lib/middleware/isAdmin.js";
@@ -26,6 +27,12 @@
 
     router('/', (ctx: Context) => {
         page = Homepage;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
+    router('/routes', (ctx: Context) => {
+        page = Routes;
         currentRoute = ctx.pathname;
         params = ctx;
     });
