@@ -57,10 +57,10 @@ $effect(()=>{
                             }
                         },
                         {
-                            label: "Routes",
+                            label: "Tours",
                             overrideClick: true,
                             overrideFunction: () => {
-                                page.redirect("/routes")
+                                page.redirect("/tours")
                             }
                         },
                         {
@@ -103,10 +103,10 @@ $effect(()=>{
             case "/test":
                     BarItems = [
                         {
-                            label: "Routes",
+                            label: "Tours",
                             overrideClick: true,
                             overrideFunction: () => {
-                                page.redirect("/routes")
+                                page.redirect("/tours")
                             }
                         },
                         ]

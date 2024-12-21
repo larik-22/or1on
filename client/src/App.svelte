@@ -4,7 +4,7 @@
     import ModeratorDashboard from "./pages/ModeratorDashboard.svelte";
     import Register from "./pages/Register.svelte";
     import Login from "./pages/Login.svelte";
-    import Routes from "./pages/Routes.svelte";
+    import Tours from "./pages/Tours.svelte";
     import type {Context} from 'page';
     import isNotLoggedIn from "./lib/middleware/notLoggedIn";
     import isAdmin from "./lib/middleware/isAdmin.js";
@@ -31,8 +31,8 @@
         params = ctx;
     });
 
-    router('/routes', (ctx: Context) => {
-        page = Routes;
+    router('/tours', (ctx: Context) => {
+        page = Tours;
         currentRoute = ctx.pathname;
         params = ctx;
     });
