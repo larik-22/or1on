@@ -42,7 +42,10 @@
     </div>
 
     {#if applyFilter().length > 0}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto h-[29rem]">
+        <div
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                style="max-height: 30rem; overflow-y: auto;"
+        >
             {#each applyFilter() as tour (tour.id)}
                 <div
                         class="tour-card p-4 bg-gray-100 border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:bg-gray-200"
