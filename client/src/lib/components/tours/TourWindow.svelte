@@ -30,21 +30,24 @@
 </script>
 
 <div class="w-full max-w-6xl bg-white p-8 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">Tour Viewer</h2>
+    <!-- Header with Filter Button -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Tour Viewer</h2>
 
-    <!-- Filter Dropdown -->
-    <div class="mb-4">
-        <FilterDropdown
-                bind:currentFilter={currentFilter}
-                applyFilter={applyFilter}
-                filterOptions={filterOptions}
-        />
+        <!-- Filter Dropdown -->
+        <div class="flex-shrink-0">
+            <FilterDropdown
+                    bind:currentFilter={currentFilter}
+                    applyFilter={applyFilter}
+                    filterOptions={filterOptions}
+            />
+        </div>
     </div>
 
     {#if applyFilter().length > 0}
         <div
                 class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                style="max-height: 30rem; overflow-y: auto;"
+                style="max-height: 35rem; overflow-y: auto;"
         >
             {#each applyFilter() as tour (tour.id)}
                 <div
