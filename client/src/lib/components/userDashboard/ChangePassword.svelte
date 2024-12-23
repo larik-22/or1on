@@ -39,10 +39,6 @@
                 return;
             }
 
-            const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
-
-            const userId = payload.id; // Ensure `userId` exists in the token payload
-
             // Make the API call to update the password
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/userDashboard/update-password`, {
                 method: "POST",
@@ -51,7 +47,6 @@
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    userId,
                     oldPassword: formData.currentPassword,
                     newPassword: formData.newPassword,
                 }),
@@ -65,7 +60,7 @@
             } else {
                 errors = { message: [result.message || "Failed to update password."] };
             }
-        } catch {
+        } catch (err) {
             errors = { message: ["An unexpected error occurred. Please try again."] };
         } finally {
             isSubmitting = false;
@@ -75,63 +70,38 @@
 </script>
 
 
-<div class="flex bg-gray-100 h-screen">
-    <div
-            class="absolute bg-white p-6 border rounded-lg shadow-md w-full max-w-sm"
-            style="top: 50%; left: 55%; transform: translate(-50%, -50%);"
-    >
-        <h2 class="text-2xl font-semibold mb-4 text-center">Change Password</h2>
-        <form onsubmit={handleSubmit}>
-            <div class="mb-4">
-                <label class="block mb-2 font-semibold">Current Password</label>
-                <input
-                        type="password"
-                        bind:value={formData.currentPassword}
-                        class="w-full p-2 border rounded"
-                        required
-                />
-                {#if errors.currentPassword}
-                    <p class="text-red-600 text-sm">{errors.currentPassword[0]}</p>
-                {/if}
-            </div>
+<form onsubmit={handleSubmit} class="flex flex-col gap-4">
+    <label>
+        <span class="text-gray-500 select-none text-xs">Current Password</span>
+        <input type="password" bind:value={formData.currentPassword} required />
+        {#if errors.currentPassword}
+            <p class="text-red-600">{errors.currentPassword[0]}</p>
+        {/if}
+    </label>
 
-            <div class="mb-4">
-                <label class="block mb-2 font-semibold">New Password</label>
-                <input
-                        type="password"
-                        bind:value={formData.newPassword}
-                        class="w-full p-2 border rounded"
-                        required
-                />
-                {#if errors.newPassword}
-                    <p class="text-red-600 text-sm">{errors.newPassword[0]}</p>
-                {/if}
-            </div>
+    <label>
+        <span class="text-gray-500 select-none text-xs">New Password</span>
+        <input type="password" bind:value={formData.newPassword} required />
+        {#if errors.newPassword}
+            <p class="text-red-600">{errors.newPassword[0]}</p>
+        {/if}
+    </label>
 
-            <div class="mb-4">
-                <label class="block mb-2 font-semibold">Confirm New Password</label>
-                <input
-                        type="password"
-                        bind:value={formData.confirmPassword}
-                        class="w-full p-2 border rounded"
-                        required
-                />
-                {#if errors.confirmPassword}
-                    <p class="text-red-600 text-sm">{errors.confirmPassword[0]}</p>
-                {/if}
-            </div>
+    <label>
+        <span class="text-gray-500 select-none text-xs">Confirm New Password</span>
+        <input type="password" bind:value={formData.confirmPassword} required />
+        {#if errors.confirmPassword}
+            <p class="text-red-600">{errors.confirmPassword[0]}</p>
+        {/if}
+    </label>
 
-            {#if errors.message}
-                <p class="text-red-600 mb-4 text-sm text-center">{errors.message[0]}</p>
-            {/if}
+    {#if errors.message}
+        <p class="bg-red-100 border border-red-400 text-red-700 px-2 py-1 rounded relative mt-1.5 text-xs text-center">
+            {errors.message}
+        </p>
+    {/if}
 
-            <button
-                    type="submit"
-                    class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 w-full"
-                    disabled={isSubmitting}
-            >
-                {isSubmitting ? "Submitting..." : "Submit"}
-            </button>
-        </form>
-    </div>
-</div>
+    <button type="submit" disabled={isSubmitting} class="bg-blue-500 text-white px-4 py-2 rounded">
+        {isSubmitting ? "Submitting..." : "Change Password"}
+    </button>
+</form>
