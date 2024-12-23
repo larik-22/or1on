@@ -1,31 +1,35 @@
-<script>
-    import { createEventDispatcher } from "svelte";
+<script lang="ts">
+    import {createEventDispatcher} from "svelte";
     import FilterDropdown from "../highlights/FilterDropdown.svelte";
 
     export let tours = [];
     const dispatch = createEventDispatcher();
 
-    let filterOptions = [];
-    let currentFilter = [];
+    let filterOptions: string[] = [];
+    let currentFilter: string[] = [];
 
     $: {
         // Extract unique categories for the filter dropdown
-        const categories = tours.map((tour) => tour.category).filter((category) => category !== undefined);
-        filterOptions = [...new Set(categories)];
+        const categories = tours
+            .map((tour) => tour.category)
+            .filter((category): category is string => category !== undefined);
+        filterOptions = Array.from(new Set(categories));
     }
 
     /**
      * Filters the tours based on the active filters
      */
-    const applyFilter = () => {
+    const applyFilter = (): Tour[] => {
         return currentFilter.length === 0
             ? tours // Show all tours if no filter is selected
             : tours.filter((tour) => currentFilter.includes(tour.category));
     };
 
-    const formatDuration = (duration) => {
-        const { hours, minutes } = duration;
-        return `${hours}h ${minutes}m`;
+    /**
+     * Formats the duration time as a string
+     */
+    const formatDuration = (duration: { hours: number; minutes: number }): string => {
+        return `${duration.hours}h ${duration.minutes}m`;
     };
 </script>
 
@@ -45,10 +49,7 @@
     </div>
 
     {#if applyFilter().length > 0}
-        <div
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                style="max-height: 35rem; overflow-y: auto;"
-        >
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="max-height: 34rem; overflow-y: auto;">
             {#each applyFilter() as tour (tour.id)}
                 <div
                         class="tour-card p-4 bg-gray-100 border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:bg-gray-200"
