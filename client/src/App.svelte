@@ -4,15 +4,15 @@
     import ModeratorDashboard from "./pages/ModeratorDashboard.svelte";
     import Register from "./pages/Register.svelte";
     import Login from "./pages/Login.svelte";
-    import AdminUser from "./pages/AdminUser.svelte";
-    import LoggedInUser from "./pages/LoggedInUser.svelte";
     import type {Context} from 'page';
     import isNotLoggedIn from "./lib/middleware/notLoggedIn";
     import isAdmin from "./lib/middleware/isAdmin.js";
     import isLoggedIn from "./lib/middleware/loggedIn";
     import UserDashboard from "./pages/UserDashboard.svelte";
     import { Modals } from 'svelte-modals'
-    import Navigation from "./components/Navigation.svelte";
+    import Navigation from "./lib/components/Navigation.svelte";
+    import TestHomepage from "./pages/TestHomepage.svelte";
+    import SuggestHighlight from "./pages/SuggestHighlight.svelte";
 
     let page: any;
     let params: Context;
@@ -20,6 +20,12 @@
 
     router('/', (ctx: Context) => {
         page = Homepage;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
+    router('/test', (ctx: Context) => {
+        page = TestHomepage;
         currentRoute = ctx.pathname;
         params = ctx;
     });
@@ -48,14 +54,14 @@
         params = ctx;
     });
 
-    router('/test-logged-in', isLoggedIn, (ctx: Context) => {
-        page = LoggedInUser;
+    router('/user-dashboard', isLoggedIn, (ctx) => {
+        page = UserDashboard;
         currentRoute = ctx.pathname;
         params = ctx;
     });
 
-    router('/test-admin', isAdmin, (ctx: Context) => {
-        page = AdminUser;
+    router('/suggest-highlight', isLoggedIn, (ctx) => {
+        page = SuggestHighlight;
         currentRoute = ctx.pathname;
         params = ctx;
     });

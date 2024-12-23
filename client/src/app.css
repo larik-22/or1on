@@ -2,26 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-    --site--max-width: 90rem;
-    --site--margin: 1rem;
-    --container--main: calc(var(--site--max-width) - var(--site--margin) * 2);
-    --container--full: calc(100vw - var(--site--margin) * 2);
-    --section-space--main: 6rem;
+.custom-cluster-icon {
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 40px;
+    width: 40px;
+    height: 40px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-.container-base {
-    position: relative;
-    width: 100%;
-    max-width: var(--container--main);
-    margin-right: auto;
-    margin-left: auto;
-}
-
-.container-full {
-    position: relative;
-    width: 100%;
-    max-width: var(--container--full);
-    margin-right: auto;
-    margin-left: auto;
+.custom-tooltip {
+    background-color: rgba(50, 50, 50, 0.8);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    font-size: 12px;
 }

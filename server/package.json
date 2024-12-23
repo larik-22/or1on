@@ -5,7 +5,10 @@
     "dev": "tsx watch src/index.ts",
     "lint": "eslint .",
     "test": "vitest run --coverage",
-    "insert-highlights": "tsx src/scripts/insert-highlights.ts"
+    "insert-highlights": "tsx src/scripts/insert-highlights.ts",
+    "insert-users": "tsx src/scripts/insert-users.ts",
+    "insert-feedbacks": "tsx src/scripts/insert-feedbacks.ts",
+    "insert-tours": "tsx src/scripts/insert-tours.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.7",
@@ -16,6 +19,7 @@
     "dotenv": "^16.4.5",
     "hono": "^4.6.12",
     "mikro-orm": "^6.4.0",
+    "ts-node": "^10.9.2",
     "uuid": "^11.0.3",
     "winston": "^3.17.0",
     "zod": "^3.23.8"
