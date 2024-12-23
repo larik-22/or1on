@@ -1,87 +1,93 @@
 <script lang="ts">
-    import {authToken} from "../../lib/stores/auth";
+    import {updateUsernameSchema} from "../../schema/updateUsernameSchema";
+    import {authToken} from "../../stores/auth";
     import {get} from "svelte/store";
 
-    let currentUsername: string = 'current_user'; //this has the pre fill of the current username
-    let newUsername: string = '';
-    let successMessage: string = '';
-    let errorMessage: string = '';
-    let loading: boolean = false;
+    let formData = $state({
+        currentUsername: "current_user",
+        newUsername: "",
+    });
 
-    const handleSubmit = async (): Promise<void> => {
-        errorMessage = '';
-        successMessage = '';
+    let errors: Record<string, string[]> = $state({});
+    let isSubmitting = $state(false);
 
-        if (loading) return;
+    /**
+     * Handle form submission for updating the username.
+     * Validates input, sends the request to the backend, and manages success or error states.
+     * @param e - The form submission event.
+     */
+    const handleSubmit = async (e: Event) => {
+        e.preventDefault();
 
-        if (!/^[a-zA-Z0-9]{3,15}$/.test(newUsername)) {
-            errorMessage = "Username must be alphanumeric and between 3-15 characters.";
+        // Validate the form data using schema
+        const result = updateUsernameSchema.safeParse(formData);
+        if (!result.success) {
+            errors = result.error.flatten().fieldErrors;
             return;
         }
 
-        const token = get(authToken);
-
-        if (!token) {
-            errorMessage = "Unauthorized. Please log in.";
-            return;
-        }
-
-        loading = true;
+        // Clear errors and set submitting state
+        errors = {};
+        isSubmitting = true;
 
         try {
-            const response = await fetch('http://localhost:5173/userDashboard/update-username', {
-                method: 'POST',
+            const token = get(authToken);
+            if (!token) {
+                errors = {message: ["Unauthorized. Please log in."]};
+                return;
+            }
+
+            // Make the API call to update the username
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/userDashboard/update-username`, {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    oldUsername: currentUsername,
-                    newUsername: newUsername
-                })
+                    oldUsername: formData.currentUsername,
+                    newUsername: formData.newUsername,
+                }),
             });
 
+            // Handle the API response
             const result = await response.json();
-
             if (response.ok && result.success) {
-                successMessage = "Username changed successfully!";
-                currentUsername = newUsername;
-                newUsername = '';
+                alert("Username changed successfully!^^");
+                formData.newUsername = "";
             } else {
-                errorMessage = result.message || "Failed to update username.";
+                errors = {message: [result.message || "Failed to update username:("]};
             }
-        } catch (e) {
-            errorMessage = "Network error. Please try again later.";
+        } catch (err) {
+            errors = {message: ["An unexpected error occurred. Please try again."]};
         } finally {
-            loading = false;
+            isSubmitting = false;
         }
     };
 </script>
 
 
-<div class="bg-gray-100 p-8 border rounded-lg shadow-md max-w-xl mx-auto">
-    <h2 class="text-2xl font-semibold mb-4">Change Username</h2>
-    <form on:submit|preventDefault={handleSubmit}>
-        <div class="mb-4">
-            <label for="currentUsername" class="block mb-2 font-semibold">Current Username</label>
-            <input type="text" id="currentUsername" value={currentUsername} class="w-full p-2 border rounded bg-gray-200" disabled />
-        </div>
+<form onsubmit={handleSubmit} class="flex flex-col gap-4">
+    <label>
+        <span class="text-gray-500 select-none text-xs">Current Username</span>
+        <input type="text" value={formData.currentUsername} readonly />
+    </label>
 
-        <div class="mb-4">
-            <label for="newUsername" class="block mb-2 font-semibold">New Username</label>
-            <input type="text" id="newUsername" bind:value={newUsername} class="w-full p-2 border rounded" required />
-        </div>
-
-        {#if errorMessage}
-            <p class="text-red-600 mb-4">{errorMessage}</p>
+    <label>
+        <span class="text-gray-500 select-none text-xs">New Username</span>
+        <input type="text" bind:value={formData.newUsername} required />
+        {#if errors.newUsername}
+            <p class="text-red-600">{errors.newUsername[0]}</p>
         {/if}
+    </label>
 
-        {#if successMessage}
-            <p class="text-green-600 mb-4">{successMessage}</p>
-        {/if}
+    {#if errors.message}
+        <p class="bg-red-100 border border-red-400 text-red-700 px-2 py-1 rounded relative mt-1.5 text-xs text-center">
+            {errors.message}
+        </p>
+    {/if}
 
-        <button type="submit" class="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600" disabled={loading}>
-            {loading ? "Submitting..." : "Submit"}
-        </button>
-    </form>
-</div>
+    <button type="submit" disabled={isSubmitting} class="bg-blue-500 text-white px-4 py-2 rounded">
+        {isSubmitting ? "Submitting..." : "Change Username"}
+    </button>
+</form>

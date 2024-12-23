@@ -1,6 +1,6 @@
 <script lang="ts">
-    //import {authToken} from "../../lib/stores/auth";
-    import { logout} from "../../lib/utils/authHandler.svelte";
+    import {authToken} from "../../stores/auth";
+    import {logout} from "../../utils/authHandler.svelte";
     import { onMount} from "svelte";
 
     let showConfirmation = false;
@@ -18,7 +18,6 @@
     };
 
     onMount(() => {
-        // further logic if needed during component mount
     });
 </script>
 
