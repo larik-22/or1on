@@ -15,6 +15,8 @@ export type Highlight = {
 export interface Tour {
 	id: number;
 	name: string;
+	description: string;
+	highlights: Highlight[];
 }
 
 /**
