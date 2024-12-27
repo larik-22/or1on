@@ -21,7 +21,7 @@ import bcrypt from "bcryptjs";
             id: randomUUID(),
             username: 'admin1',
             email: 'admin1@dummy.com',
-            password: await bcrypt.hash('password2',10),
+            password: await bcrypt.hash('Password2',10),
             isAdmin: true
         },
         {
