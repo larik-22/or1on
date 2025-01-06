@@ -1,27 +1,29 @@
 <script lang="ts">
-    import {createEventDispatcher} from "svelte";
     import FilterDropdown from "../highlights/FilterDropdown.svelte";
 
-    export let tours = [];
-    const dispatch = createEventDispatcher();
+    const { tours, onSelect } = $props<{
+        tours: any[],
+        onSelect: (id: string) => void
+    }>();
 
-    let filterOptions: string[] = [];
-    let currentFilter: string[] = [];
+    let currentFilter: string[] = $state([]);
 
-    $: {
-        // Extract unique categories for the filter dropdown
+    /**
+    * Filter formation options
+     */
+    const filterOptions = $derived(() => {
         const categories = tours
             .map((tour) => tour.category)
             .filter((category): category is string => category !== undefined);
-        filterOptions = Array.from(new Set(categories));
-    }
+        return Array.from(new Set(categories));
+    });
 
     /**
      * Filters the tours based on the active filters
      */
-    const applyFilter = (): Tour[] => {
+    const applyFilter = (): any[] => {
         return currentFilter.length === 0
-            ? tours // Show all tours if no filter is selected
+            ? tours // show all if no filter
             : tours.filter((tour) => currentFilter.includes(tour.category));
     };
 
@@ -34,11 +36,8 @@
 </script>
 
 <div class="w-full max-w-6xl bg-white p-8 rounded-lg shadow-md">
-    <!-- Header with Filter Button -->
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Tour Viewer</h2>
-
-        <!-- Filter Dropdown -->
         <div class="flex-shrink-0">
             <FilterDropdown
                     bind:currentFilter={currentFilter}
@@ -53,7 +52,7 @@
             {#each applyFilter() as tour (tour.id)}
                 <div
                         class="tour-card p-4 bg-gray-100 border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:bg-gray-200"
-                        on:click={() => dispatch('select', tour.id)}
+                        on:click={() => onSelect(tour.id)}
                 >
                     <h3 class="text-lg font-bold text-gray-800 mb-2">{tour.name}</h3>
                     <p class="text-sm text-gray-600 mb-1">

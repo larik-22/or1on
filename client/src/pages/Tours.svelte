@@ -20,29 +20,19 @@
 
     /**
      * Handles navigation to a specific tour's page
-     * @param event The event containing the selected tour ID
+     * @param id The selected tour ID
      */
-    const handleRouteSelect = (event: CustomEvent<string>): void => {
-        const tourID = event.detail;
-        page.redirect(`/tours/${tourID}`); //Change to the tour page later
+    const handleRouteSelect = (id: string): void => {
+        page.redirect(`/tours/${id}`); //Change to the tour page later
     };
-
-    onMount(() => {
-        fetchRoutes()
-            .then((data) => (tours = data))
-            .catch((error) => {
-                console.error("Error fetching tours:", error);
-                tours = [];
-            });
-    });
 </script>
 
 <div class="w-full h-screen flex flex-col bg-gray-100 p-4">
-    {#if tours === undefined}
+    {#await fetchRoutes()}
         <p class="text-center text-gray-500">Loading tours...</p>
-    {:else if tours.length > 0}
-        <TourWindow tours={tours} on:select={handleRouteSelect} />
-    {:else}
-        <p class="text-center text-gray-500">No tours available</p>
-    {/if}
+    {:then data}
+        <TourWindow tours={data} onSelect={handleRouteSelect} />
+    {:catch error}
+        <p class="text-center text-red-500">Failed to load tours: {error.message}</p>
+    {/await}
 </div>
