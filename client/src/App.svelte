@@ -122,9 +122,18 @@
 
     <Modals>
         {#snippet backdrop({ close })}
-            <div class="fixed inset-0 z-[999]" onclick={() => close()}>
-
-            </div>
+        <div
+                role="button"
+                tabindex="0"
+                class="fixed inset-0 z-[999]"
+                on:click={() => close()}
+                on:keypress={(e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      close();
+    }
+  }}
+        >
+        </div>
         {/snippet}
     </Modals>
 </main>
