@@ -21,19 +21,16 @@
     }
     const feedbackUrl = `${import.meta.env.VITE_BACKEND_URL}users/${userId}/feedbacks`;
 
-    /* eslint-disable @typescript-eslint/no-empty-object-type */
     async function fetchUserFeedbacks(): Promise<{}[]> {
         let data = await fetchWithAuthSvelte(feedbackUrl)
         return await data.json()
     }
-    /* eslint-enable @typescript-eslint/no-empty-object-type */
 
     /**
      * Convert the fetched data into a table that is readable by the Table component
      * @param data
      * */
 
-    /* eslint-disable @typescript-eslint/no-empty-object-type */
     function DataToTable(data: {}[]): TableType {
         let columns: string[] = ["Id", "Tour", "HighlightId", "Username", "Rating", "Comment", "Approved State"];
         let rows: Row[] = [];
@@ -60,7 +57,6 @@
             rows: rows
         };
     }
-    /* eslint-enable @typescript-eslint/no-empty-object-type */
 
     /*
    * Function to execute when confirming the editing
@@ -84,7 +80,6 @@
 
     let feedBackValue: string = $state("");
     let ratingValue = $state();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let currentRow: Row;
 
     let actionCssConfig: string = "border-[1px] bg-zinc-950 text-neutral-100 p-[5px] rounded-[6px] border-transparent";

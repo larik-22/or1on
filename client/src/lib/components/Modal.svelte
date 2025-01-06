@@ -19,7 +19,6 @@
     let {
         modal = $bindable(),
         enableEditModal = $bindable(),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         customCss = "",
     }: {
         modal: ModalType;
@@ -36,32 +35,23 @@
                 <h2 class="text-lg font-semibold mb-4">{modal.title}</h2>
                 {#each modal.sections as section}
                     <div class="mb-4">
-                        <label class="block mb-2 font-medium">
-                            {section.sectionTitle}
                         {#if section.sectionType === "basic"}
                             <input type="text" value={section.getValue()} oninput={(e) => {
                                 if (e != null && e.target != null) {
-                                    console.log(e.target.value);
-                                    section.setValue(e.target.value);
                                 }
                             }} class="w-full border px-2 py-1 rounded"/>
                         {:else if section.sectionType === "descriptive"}
                             <textarea value={section.getValue()} oninput={(e) => {
                                 if (e != null && e.target != null) {
-                                    console.log(e.target.value);
-                                    section.setValue(e.target.value);
                                 }
                             }} class="w-full border px-2 py-1 rounded"></textarea>
                         {:else if section.sectionType === "number" && section.maxValue !== undefined && section.minValue !== undefined}
                             <input type="number" bind:value={section.value} oninput={(e) => {
                                 if (e != null && e.target != null) {
-                                    console.log(e.target.value);
-                                    section.setValue(e.target.value);
                                 }
                             }} max="{section.maxValue}"
                                    min="{section.minValue}" class="w-full border px-2 py-1 rounded">
                         {/if}
-                        </label>
                     </div>
                 {/each}
                 <div class="flex justify-end gap-4">
@@ -81,7 +71,6 @@
         </div>
     {/if}
 </main>
-
 
 <style>
     main {
