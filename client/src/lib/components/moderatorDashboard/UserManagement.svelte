@@ -51,7 +51,7 @@ let users = [
 	<div class="border-[1px] bg-[#f9fafb] shadow-md w-[50vw] h-fit mb-[10vh]">
 		<ListItem disableButton={true} user={{username: "Username:", role: "Role:", id: "ID:"}} bind:enabled_popup={enabled_popup}></ListItem>
 		<ul class="overflow-y-scroll max-h-[600px]">
-			{#each users as user, i}
+			{#each users as user}
 				<ListItem user={user} disableButton={false} bind:enabled_popup={enabled_popup}></ListItem>
 			{/each}
 		</ul>

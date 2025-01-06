@@ -14,6 +14,7 @@
 <script lang="ts">
     import BurgerBarItem from "./BurgerBarItem.svelte";
     import page from "page";
+    import type {SvelteComponent} from "svelte";
     let {
         BarItems = [],
         Location = "",
@@ -22,10 +23,10 @@
         AdditionalComponent,
     }: {
         BarItems: BarItem[],
-        Location: String
+        Location: string
         Width?: string
         MinWidth?: string
-        AdditionalComponent?: any
+        AdditionalComponent?: typeof SvelteComponent
     } = $props();
 
     let lastClicked: string = $state("0");

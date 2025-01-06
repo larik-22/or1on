@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { Feedback } from "../../models/models";
 	let feedbackData: any = $props();
 </script>
 

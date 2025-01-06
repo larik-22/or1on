@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type {ModalProps} from "svelte-modals";
 	import {fade} from "svelte/transition";
-	import L, {type Layer, type LayerEvent, type LocationEvent, type TileEvent} from "leaflet";
-	import {ControlZoom, LayerGroup, Map, Marker, TileLayer} from "sveaflet";
+	import L, {type LocationEvent} from "leaflet";
+	import {ControlZoom, LayerGroup, Map, TileLayer} from "sveaflet";
 	import type SMap from "sveaflet/dist/SMap.svelte";
 	import type SLayerGroup from "sveaflet/dist/SLayerGroup.svelte";
 
@@ -48,8 +48,12 @@
 </script>
 
 {#if isOpen}
-	<div class="fixed z-[999] inset-0" onclick={handleClose}>
-	</div>
+	<button
+			type="button"
+			class="fixed z-[999] inset-0"
+			onclick={handleClose}
+			aria-label="Close modal"
+	></button>
 	<div
 			role="dialog"
 			class="fixed inset-0 z-[1000] pointer-events-none flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-md"

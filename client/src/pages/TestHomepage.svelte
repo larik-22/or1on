@@ -9,7 +9,6 @@
     import {getHighlightColor} from "../lib/utils/highlightTypeColor";
     import {onMount} from 'svelte';
     import {modals} from 'svelte-modals';
-    import.meta.env.VITE_GRASSHOPER_API_KEY
 
     let geoJSONData: GeoJsonObject | null = $state(null);
     let map: L.Map | null = $state(null);

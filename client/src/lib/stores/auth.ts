@@ -1,4 +1,4 @@
-import {derived, readable, writable} from "svelte/store";
+import {derived, writable} from "svelte/store";
 import {InvalidTokenError, jwtDecode, type JwtPayload} from "jwt-decode";
 import {logout} from "../utils/authHandler.svelte";
 
@@ -35,7 +35,7 @@ const isUserAdmin = derived(authToken, ($token) => {
 		try {
 			const payload = decodeToken($token);
 			return payload?.isAdmin || false;
-		} catch (e) {
+		} catch {
 			return false;
 		}
 	} else {
@@ -51,7 +51,7 @@ const isUserLoggedIn = derived(authToken, ($token) => {
 		try {
 			decodeToken($token);
 			return true;
-		} catch (e) {
+		} catch {
 			return false;
 		}
 	} else {
