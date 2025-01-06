@@ -167,8 +167,6 @@
 
 <svelte:head>
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"/>
-    <script src="leaflet-routing-machine.js"></script>
-    <script src="lrm-graphhopper.js"></script>
 </svelte:head>
 
 <div class="w-full" style="height: 100svh">
