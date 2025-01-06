@@ -31,22 +31,25 @@ export interface User {
  */
 export interface Feedback {
 	id: number;
-	tour: Tour | null;
 	highlight: Highlight | null;
 	user: User;
 	rating: number;
 	comment: string;
+	businessOffer: string | null;
 }
 
 /**
  * Enum for highlight types
  */
 export enum HighlightType {
-	CATEGORY_A = "Category A",
-	CATEGORY_B = "Category B",
-	CATEGORY_C = "Category C",
-	CATEGORY_D = "Category D",
-	CATEGORY_G = "Category G",
+	EDUCATION = "Education",
+	ARCHITECTURE = "Architecture",
+	ENTERTAINMENT = "Entertainment",
+	HISTORICAL = "Historical",
+	MUSEUM = "Museum",
+	NATURE = "Nature",
+	IT_COMPANY = "IT Company",
+	PUB = "Pub",
 	OTHER = "Other"
 }
 

@@ -9,6 +9,10 @@ import {updateHighlight, deleteHighlight} from "../controllers/highlightControll
 import {createHighlight, approveHighlightSuggestion} from "../controllers/highlightController.js";
 import {getAllHighlights, getHighlightById} from "../controllers/highlightController.js";
 import logger from "../utils/logger.js";
+import {createFeedback, getFeedbackByHighlight} from "../controllers/feedbackController.js";
+import type {User} from "../models/user.js";
+import {getUserByEmail} from "../controllers/userController.js";
+import {isUser} from "../middleware/isUser.js";
 
 dotenv.config();
 
@@ -23,6 +27,13 @@ const highlightSchema = z.object({
     is_approved: z.boolean().default(false)
 })
 
+const feedbackSchema = z.object({
+    rating: z.number(),
+    feedbackMessage: z.string()
+})
+
+const numberIdSchema = z.object({id: z.preprocess((val) => Number(val), z.number())});
+
 /**
  * Handles fetching all highlights.
  *
@@ -31,7 +42,7 @@ const highlightSchema = z.object({
  */
 highlights.get('/', async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const highlights = await getAllHighlights(em);
 
         return ctx.json({highlights}, 200)
@@ -49,7 +60,7 @@ highlights.get('/', async (ctx) => {
  */
 highlights.get('/:id', async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();
         const highlight = await getHighlightById(em, parseInt(id));
 
@@ -65,6 +76,80 @@ highlights.get('/:id', async (ctx) => {
 })
 
 /**
+ * Fetches all feedback by highlight id.
+ *
+ * @param ctx - The Hono context object.
+ * @returns A response the list of feedbacks or an error message.
+ */
+highlights.get('/:id/feedbacks', async (ctx) => {
+    try {
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
+        const params = numberIdSchema.safeParse(ctx.req.param());
+
+        if (!params.success){
+            return ctx.json(createErrorResponse(400, 'Invalid highlightId parameter'), 400)
+        }
+
+        const {id} = params.data;
+
+        const feedbacks = await getFeedbackByHighlight(em, id);
+
+        if (!feedbacks){
+            return ctx.json({message: 'No feedbacks found'}, 404);
+        }
+
+        const formattedFeedbacks = feedbacks
+            .filter(feedback => feedback.is_approved)
+            .map(feedback => ({
+                id: feedback.id,
+                highlight: {
+                    id: feedback.highlight?.id,
+                    name: feedback.highlight?.name
+                },
+                user: {
+                    id: feedback.user.id,
+                    username: feedback.user.username
+                },
+                rating: feedback.rating,
+                comment: feedback.comment
+            }));
+
+        return ctx.json(formattedFeedbacks, 200);
+    }catch (error){
+        logger.error('Error while fetching feedbacks', { error: error });
+        return ctx.json(createErrorResponse(500, 'Internal error'), 500);
+    }
+})
+
+highlights.post('/:id/feedbacks', isLoggedIn, isUser,async (ctx) => {
+    try {
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
+        const userPayload = ctx.get('jwtPayload') as User;
+        const { id } = ctx.req.param();
+        const body = await ctx.req.json();
+
+        const feedback = feedbackSchema.safeParse(body);
+        if (!feedback.success){
+            return ctx.json({ message: 'Invalid feedback data' }, 400);
+        }
+
+        const { rating, feedbackMessage } = feedback.data;
+
+        const user = await getUserByEmail(em, userPayload.email);
+
+        if (!user){
+            return ctx.json({message: 'User not found'}, 404);
+        }
+        await createFeedback(em, parseInt(id), user, rating, feedbackMessage);
+
+        return ctx.json({ message: 'Feedback submitted successfully' }, 201);
+    } catch (error) {
+        logger.error('Error while submitting feedback: ' + error);
+        return ctx.json(createErrorResponse(500, 'Internal error'), 500);
+    }
+});
+
+/**
  * Handles creating a highlight.
  *
  * @param ctx - The Hono context object.
@@ -73,12 +158,20 @@ highlights.get('/:id', async (ctx) => {
  */
 highlights.post('/', isLoggedIn, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const body = await ctx.req.json();
         const highlight = highlightSchema.safeParse(body);
 
         if (!highlight.success){
             return ctx.json(createErrorResponse(400, 'Invalid data'), 400);
+        }
+
+        const payload = ctx.get('jwtPayload') as User
+
+        if (payload.isAdmin || payload.verified){
+            highlight.data.is_approved = true
+        } else {
+            highlight.data.is_approved = true
         }
 
         await createHighlight(em, highlight.data);
@@ -99,7 +192,7 @@ highlights.post('/', isLoggedIn, async (ctx) => {
  */
 highlights.put('/:id/approve', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const {id} = ctx.req.param();
 
         if (id === null){
@@ -124,7 +217,7 @@ highlights.put('/:id/approve', isLoggedIn, isAdmin, async (ctx) => {
  */
 highlights.put('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const id = parseInt(ctx.req.param('id'))
 
         const highlight = await getHighlightById(em, id);
@@ -157,7 +250,7 @@ highlights.put('/:id', isLoggedIn, isAdmin, async (ctx) => {
  */
 highlights.delete('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const {id} = ctx.req.param();
 
         await deleteHighlight(em, parseInt(id));

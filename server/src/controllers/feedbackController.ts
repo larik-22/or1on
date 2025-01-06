@@ -1,6 +1,8 @@
 import {Feedback} from "../models/feedback.js";
 import {EntityManager} from "@mikro-orm/core";
 import logger from "../utils/logger.js";
+import {User} from "../models/user.js";
+import {getHighlightById} from "./highlightController.js";
 
 /**
  * Fetches all feedback posted by a specific user.
@@ -30,7 +32,9 @@ export const getFeedbackByUserId = async (em: EntityManager, userId: string):
 export const getFeedbackByHighlight = async (em: EntityManager, id: number):
     Promise<Feedback[] | null> => {
     try {
-        const feedbacks = await em.find(Feedback, {highlight: {id: id}});
+        const feedbacks = await em.find(
+            Feedback, {highlight: {id: id}}, { populate: ['user', 'highlight'] }
+        );
         if (feedbacks.length === 0){
             return null
         }
@@ -74,3 +78,45 @@ export const deleteFeedback = async (em: EntityManager, id: number): Promise<voi
         logger.error('Failed to find or delete feedback with id: ' + id + ' error: ' + error)
     }
 };
+/**
+ * Creates a new feedback entry for a specific highlight.
+ *
+ * @async
+ * @function createFeedback
+ * @param {EntityManager} em - The EntityManager instance used for database operations.
+ * @param {number} highlightId - The ID of the highlight for which feedback is being created.
+ * @param {User} user - The user creating the feedback.
+ * @param {number} rating - The rating provided by the user.
+ * @param {string} comment - The comment provided by the user.
+ * @returns {Promise<void>} A promise that resolves when the feedback is successfully created.
+ */
+export const createFeedback = async (
+    em: EntityManager,
+    highlightId: number,
+    user: User,
+    rating: number,
+    comment: string
+): Promise<void> => {
+    try {
+        const highlight = await getHighlightById(em, highlightId)
+
+        if (!highlight){
+            throw new Error('Highlight not found');
+        }
+
+        const feedback = em.create(Feedback, {
+            highlight,
+            user,
+            rating: rating,
+            comment: comment,
+            is_approved: user.verified
+        });
+        await em.persistAndFlush(feedback);
+        logger.info('Feedback created successfully!');
+    } catch (error) {
+        logger.error(
+            'Failed to create feedback for highlight id: ' + highlightId + ' error: ' + error
+        );
+    }
+};
+
