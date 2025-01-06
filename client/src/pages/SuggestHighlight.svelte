@@ -1,5 +1,5 @@
 <script lang="ts">
-	import L from 'sveaflet';
+	import L from 'leaflet';
 	import {HighlightType} from "../lib/models/models";
 	import {modals} from "svelte-modals";
 	import SuggestHighlightModal from "../lib/components/highlights/SuggestHighlightModal.svelte";
