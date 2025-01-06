@@ -22,6 +22,9 @@ export default tsEslint.config(
                 extraFileExtensions: [".svelte"],
             },
         },
+        rules: {
+            "@typescript-eslint/no-explicit-any": "off",
+        },
     },
     {
         ignores: [
