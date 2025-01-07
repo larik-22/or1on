@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { onMount } from "svelte";
     import page from "page";
     import TourWindow from "../lib/components/tours/TourWindow.svelte";
 
@@ -27,7 +26,7 @@
     };
 </script>
 
-<div class="w-full h-screen flex flex-col bg-gray-100 p-4">
+<div class="w-full h-screen flex justify-center items-center bg-gray-100">
     {#await fetchRoutes()}
         <p class="text-center text-gray-500">Loading tours...</p>
     {:then data}

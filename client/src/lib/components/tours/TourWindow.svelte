@@ -6,12 +6,14 @@
         onSelect: (id: string) => void
     }>();
 
+    console.log(tours);
+
     let currentFilter: string[] = $state([]);
 
     /**
     * Filter formation options
      */
-    const filterOptions = $derived(() => {
+    const filterOptions = $derived.by(() => {
         const categories = tours
             .map((tour) => tour.category)
             .filter((category): category is string => category !== undefined);
@@ -26,6 +28,10 @@
             ? tours // show all if no filter
             : tours.filter((tour) => currentFilter.includes(tour.category));
     };
+
+    $inspect(currentFilter)
+    console.log(filterOptions)
+    $inspect(filterOptions)
 
     /**
      * Formats the duration time as a string

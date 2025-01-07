@@ -47,8 +47,6 @@
     import type {Row, TableType} from "../lib/components/table/Table.svelte";
     import Table from "../lib/components/table/Table.svelte";
     import {type ActionConfig} from "../lib/components/table/Action.svelte";
-    import EditTextField from "../components/moderatorDashboard/EditTextField.svelte";
-    import WarningPopUp from "../components/moderatorDashboard/WarningPopUp.svelte";
 
     /**
      * Convert the fetched data into a table that is readable by the Table component

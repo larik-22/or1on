@@ -33,6 +33,13 @@
 
     let UserBarItems: BarItem[] = $state([
         {
+            label: "Tours",
+            overrideClick: true,
+            overrideFunction: () => {
+                page.redirect("/tours")
+            }
+        },
+        {
             label: "My highlights"
         },
         {
@@ -107,7 +114,7 @@
                 {
                     label: "Feedback",
                     action: () => {
-                       page.redirect("/feedbacks-management")
+                        page.redirect("/feedbacks-management")
                     }
                 }
             ]
@@ -214,8 +221,7 @@
                 case "/change-username":
                     if ($isUserAdmin) {
                         page.redirect("/")
-                    }
-                    else{
+                    } else {
                         BarItems = UserDashboardBarItems;
                         CurrentLocation = "User Dashboard"
                         AdditionalComponent = UserIndicator
@@ -224,8 +230,7 @@
                 case "/change-password":
                     if ($isUserAdmin) {
                         page.redirect("/")
-                    }
-                    else{
+                    } else {
                         BarItems = UserDashboardBarItems;
                         CurrentLocation = "User Dashboard"
                         AdditionalComponent = UserIndicator
@@ -234,8 +239,7 @@
                 case "/logout":
                     if ($isUserAdmin) {
                         page.redirect("/")
-                    }
-                    else{
+                    } else {
                         BarItems = UserDashboardBarItems;
                         CurrentLocation = "User Dashboard"
                         AdditionalComponent = UserIndicator
