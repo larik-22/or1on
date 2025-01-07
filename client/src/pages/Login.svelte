@@ -47,7 +47,7 @@
 				errors = { message: [err instanceof Error ? err.message : "An error occurred."] };
 				return;
 			}
-		} catch (err) {
+		} catch {
 			errors = { message: ["An unexpected error occurred. Please try again."] };
 		} finally {
 			isSubmitting = false;

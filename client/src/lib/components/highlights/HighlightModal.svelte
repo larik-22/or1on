@@ -57,7 +57,7 @@
 			await cache.put(cacheKey, cacheResponse);
 
 			return data;
-		} catch (err) {
+		} catch {
 			return [];
 		}
 	}
@@ -77,7 +77,7 @@
 				body: JSON.stringify(formData),
 			});
 
-			const response = await data.json();
+			await data.json();
 
 			// Reassign the promise to refetch feedback
 			feedbackPromise = fetchFeedback();
@@ -161,7 +161,7 @@
 				<FeedbackList {data}/>
 				<FeedbackForm formSubmitted={handleFeedbackSubmit}
 				/>
-			{:catch error}
+			{:catch}
 				<div class="mx-4 mt-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
 					<p>Couldn't load feedback data...</p>
 				</div>

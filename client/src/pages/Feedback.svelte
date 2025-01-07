@@ -49,7 +49,6 @@
     import type {Row, TableType} from "../lib/components/table/Table.svelte";
     import Table from "../lib/components/table/Table.svelte";
     import {type ActionConfig} from "../lib/components/table/Action.svelte";
-    import EditTextField from "../lib/components/moderatorDashboard/EditTextField.svelte";
     import WarningPopUp from "../lib/components/moderatorDashboard/WarningPopUp.svelte";
 
     /**
@@ -57,6 +56,8 @@
      * @param data
      * */
 
+    //TODO: Provide datatype
+    /* eslint-disable @typescript-eslint/no-empty-object-type */
     function DataToTable(data: {}[]): TableType {
         let columns: string[] = ["Id", "HighlightId", "User ID", "Rating", "Comment", "Approved State"];
         let rows: Row[] = [];
@@ -83,6 +84,7 @@
             rows: rows
         };
     }
+    /* eslint-enable @typescript-eslint/no-empty-object-type */
     let table = $state(DataToTable(testData));
 
     /*
@@ -90,22 +92,22 @@
    * In this case for test purposes we edit the array.
    * In production this will be replaced with an api call
    * */
-    let onConfirmEdit = async (newText: string) => {
-        currentRow.row[4] = newText;
-
-        const approveFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/highlights/${currentRow.row[1]}/feedbacks/${currentRow.row[0]}`;
-        // await fetchWithAuthSvelte(approveFeedbackUrl, {
-        //     method: "PUT",
-        //     body: JSON.stringify({
-        //         comment: currentRow[4],
-        //         approvedState: currentRow[5]
-        //     }),
-        // })
-    };
+    // let onConfirmEdit = async (newText: string) => {
+    //     currentRow.row[4] = newText;
+    //
+    //     const approveFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/highlights/${currentRow.row[1]}/feedbacks/${currentRow.row[0]}`;
+    //     // await fetchWithAuthSvelte(approveFeedbackUrl, {
+    //     //     method: "PUT",
+    //     //     body: JSON.stringify({
+    //     //         comment: currentRow[4],
+    //     //         approvedState: currentRow[5]
+    //     //     }),
+    //     // })
+    // };
     let onApproveFeedback = async () => {
         currentRow.row[5] = "true";
         currentRow.actionsVisibility = [false,true];
-        const approveFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/highlights/${currentRow.row[1]}/feedbacks/${currentRow.row[0]}`;
+        // const approveFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/highlights/${currentRow.row[1]}/feedbacks/${currentRow.row[0]}`;
 
         // await fetchWithAuthSvelte(approveFeedbackUrl, {
         //     method: "PUT",
@@ -126,10 +128,10 @@
     };
 
 
-    const feedbacksUrl = `${import.meta.env.VITE_BACKEND_URL}feedbacks`;
-    const feedbacksResp = fetchWithAuthSvelte(feedbacksUrl, {
-        method: "GET",
-    });
+    // const feedbacksUrl = `${import.meta.env.VITE_BACKEND_URL}feedbacks`;
+    // const feedbacksResp = fetchWithAuthSvelte(feedbacksUrl, {
+    //     method: "GET",
+    // });
 
     let enableEditComment = $state(false);
     let enableApproveFeedback = $state(false);
@@ -179,7 +181,7 @@
 
     let configs: ActionConfig[] = [approveActionConfig, editActionConfig, removeActionConfig];
 
-    let editModal : ModalType = {
+    let editModal : ModalType = $state({
         title: "Edit Feedback",
         confirmFunction: () => {
 
@@ -196,7 +198,7 @@
                 }
             }
         ]
-    }
+    })
 
 </script>
 
