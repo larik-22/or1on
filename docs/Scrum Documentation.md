@@ -293,3 +293,22 @@ Absentees: Sarina, Jan, Petko, Rafael, Robert;
 - What will we commit to doing in the next sprint:
     - The team will try to assign each member at least 3 issues in the next sprint.
     - The team will give strikes and warnings to members who don't finish their tasks on time.
+
+
+## Sprint 3 - Ilarion Petriv
+
+### Sprint 3 Planning
+![backlog](img/sprint_3_planning.png)
+
+### 1st Meeting (7/01/2024)
+
+Meeting Notes:
+- Discussed the issues for the sprint as a team, since on the last meeting it was 3 people at we couln't decide on the
+  issues.
+- Discussed the team issues about unequal involvement in the project.
+- Discussed the functionality of the application and the issues that need to be done for the next sprint.
+
+Attendees: Rafael, Ilarion, Ignat, Jan, Sarina, Robert;
+Absentees: Petko, Botond;
+
+### 2nd Meeting (8/01/2024)
