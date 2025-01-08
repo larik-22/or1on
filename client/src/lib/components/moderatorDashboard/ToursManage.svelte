@@ -2,13 +2,33 @@
     import WarningPopUp from "./WarningPopUp.svelte";
     import TourPopUp from "./TourPopUp.svelte";
     import Table, { type TableType, type Row } from '../table/Table.svelte';
-    import type { Tour } from '../../models/models';
     import { onMount } from 'svelte';
 
+    interface Tour {
+        id: number;
+        name: string;
+        description: string;
+        category?: string;
+        duration_time?: string;
+        start_hour?: string;
+    }
+
     let enabled_popup: boolean = false;
-    let currentTour: Tour = { id: 0, name: "", description: "", highlights: [] };
+    let currentTour: Tour = {
+        id: 0,
+        name: "",
+        description: "",
+        category: "",
+        duration_time: "",
+        start_hour: ""
+    };
+
     let tours: Tour[] = [];
-    let tableData: TableType = { columns: ["Name", "Description", "ID", "Highlights"], rows: [] };
+
+    let newTable: TableType = {
+        columns: ["Name", "Description", "Category", "Duration", "Start Time", "ID", "Highlights"],
+        rows: []
+    };
 
     async function fetchTours() {
         try {
@@ -18,16 +38,39 @@
                 }
             });
             if (response.ok) {
-                tours = await response.json();
-                tableData.rows = tours.map(tour => ({
-                    row: [tour.name, tour.description, tour.id.toString(), tour.highlights.join(", ")],
-                    actionsVisibility: [true, true, true]
-                }));
+                const data = await response.json();
+                if (data.tours && Array.isArray(data.tours)) {
+                    tours = data.tours.map(tour => ({
+                        ...tour,
+                        category: tour.category || "",
+                        duration_time: tour.duration_time || "",
+                        start_hour: tour.start_hour || ""
+                    }));
+
+                    newTable.rows = tours.map(tour => ({
+                        row: [
+                            tour.name || '',
+                            tour.description || '',
+                            tour.category || '',
+                            tour.duration_time || '',
+                            tour.start_hour || '',
+                            tour.id?.toString() || '',
+                            'Coming soon' // Placeholder for future highlights
+                        ],
+                        actionsVisibility: [true, true]
+                    }));
+                } else {
+                    tours = [];
+                    newTable.rows = [];
+                    console.error('No tours data received');
+                }
             } else {
                 console.error('Failed to fetch tours');
             }
         } catch (error) {
             console.error('Error fetching tours:', error);
+            tours = [];
+            newTable.rows = [];
         }
     }
 
@@ -36,11 +79,19 @@
     });
 
     function addTour() {
-        currentTour = { id: Date.now(), name: "", description: "", highlights: [] };
+        currentTour = {
+            id: 0,
+            name: "",
+            description: "",
+            category: "",
+            duration_time: "",
+            start_hour: ""
+        };
         enabled_popup = true;
     }
 
-    function deleteTour(id: number) {
+    function deleteTour(row: Row) {
+        const id = parseInt(row.row[5]); // ID is now in the sixth position
         fetch(`${import.meta.env.VITE_BACKEND_URL}/tours/${id}`, {
             method: 'DELETE',
             headers: {
@@ -49,7 +100,7 @@
         }).then(response => {
             if (response.ok) {
                 tours = tours.filter(tour => tour.id !== id);
-                tableData.rows = tableData.rows.filter(row => row.row[2] !== id.toString());
+                newTable.rows = newTable.rows.filter(r => r.row[5] !== id.toString());
             } else {
                 console.error('Failed to delete tour');
             }
@@ -58,7 +109,8 @@
         });
     }
 
-    function editTour(id: number) {
+    function editTour(row: Row) {
+        const id = parseInt(row.row[5]); // ID is now in the sixth position
         const tour = tours.find(tour => tour.id === id);
         if (tour) {
             currentTour = { ...tour };
@@ -66,9 +118,20 @@
         }
     }
 
-    function saveTour(tour: Tour) {
-        const method = tour.id ? 'PUT' : 'POST';
-        const url = tour.id ? `${import.meta.env.VITE_BACKEND_URL}/tours/${tour.id}` : `${import.meta.env.VITE_BACKEND_URL}/tours`;
+    function saveTour(event: CustomEvent<Tour>) {
+        const tour = event.detail;
+        const method ='POST';
+        const url = tour.id
+            ? `${import.meta.env.VITE_BACKEND_URL}/tours/${tour.id}`
+            : `${import.meta.env.VITE_BACKEND_URL}/tours`;
+
+        const tourData = {
+            name: tour.name,
+            description: tour.description,
+            category: tour.category || "",
+            duration_time: tour.duration_time || "",
+            start_hour: tour.start_hour || ""
+        };
 
         fetch(url, {
             method: method,
@@ -76,22 +139,11 @@
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
-            body: JSON.stringify(tour)
-        }).then(response => {
+            body: JSON.stringify(tourData)
+        }).then(async response => {
             if (response.ok) {
-                if (method === 'POST') {
-                    tours = [...tours, tour];
-                } else {
-                    const index = tours.findIndex(t => t.id === tour.id);
-                    if (index > -1) {
-                        tours[index] = tour;
-                    }
-                }
-                tableData.rows = tours.map(tour => ({
-                    row: [tour.name, tour.description, tour.id.toString(), tour.highlights.join(", ")],
-                    actionsVisibility: [true, true, true]
-                }));
                 enabled_popup = false;
+                await fetchTours();
             } else {
                 console.error('Failed to save tour');
             }
@@ -99,25 +151,40 @@
             console.error('Error saving tour:', error);
         });
     }
-
-    let newTable: TableType = {
-        columns: ["Name", "Description", "ID", "Highlights"],
-        rows: []
-    };
 </script>
 
 <main class="flex items-center justify-center w-full min-h-screen bg-gray-100">
     <div class="bg-white shadow-md rounded-lg w-4/5 mb-10 p-6">
-        <Table {newTable} actionsSlot={true} actionConfigs={[
-            { actionName: 'Edit', actionFunction: (row: Row) => editTour(parseInt(row.row[2])) },
-            { actionName: 'Delete', actionFunction: (row: Row) => deleteTour(parseInt(row.row[2])) }
-        ]}/>
+        <Table
+                {newTable}
+                actionsSlot={true}
+                actionConfigs={[
+                {
+                    actionName: 'Edit',
+                    actionFunction: editTour,
+                    actionClassStyle: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                },
+                {
+                    actionName: 'Delete',
+                    actionFunction: deleteTour,
+                    actionClassStyle: "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                }
+            ]}
+        />
         <div class="flex justify-center mt-4">
-            <button class="bg-green-500 text-white px-4 py-2 rounded" on:click={addTour}>Add Tour</button>
+            <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" on:click={addTour}>
+                Add Tour
+            </button>
         </div>
     </div>
 
-    <TourPopUp bind:enabled_popup={enabled_popup} tour={currentTour} on:save={(e) => saveTour(e.detail)}/>
+    {#if enabled_popup}
+        <TourPopUp
+                bind:enabled_popup
+                tour={currentTour}
+                on:save={saveTour}
+        />
+    {/if}
 </main>
 
 <style>
