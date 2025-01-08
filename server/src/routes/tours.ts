@@ -86,6 +86,28 @@ tours.get(':id/highlights', async (ctx) => {
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
+/**
+ * Handles fetching all highlights by tour id and returns them as a GeoJSON object.
+ *
+ * @param ctx - The Hono context object.
+ * @returns A response with the GeoJSON object or an error message.
+ */
+tours.get('/:id/map/highlights', async (ctx) => {
+    try {
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
+        const { id } = ctx.req.param();
+        const geoJSON = await getHighlightsByTour(em, parseInt(id));
+
+        if (!geoJSON) {
+            return ctx.json({ message: 'No highlights found' }, 404);
+        }
+
+        return ctx.json(geoJSON, 200);
+    } catch (error) {
+        logger.error('Error while fetching tour highlights', { error: error });
+        return ctx.json(createErrorResponse(500, 'Internal error'), 500);
+    }
+});
 
 /**
  * Handles creating a tour.
