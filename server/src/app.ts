@@ -25,7 +25,7 @@ export const createApp = (em: EntityManager): Hono => {
     });
 
     app.use('*', cors({
-        origin: process.env.CLIENT_URL || 'http://localhost:5173',
+        origin: 'http://localhost:5173',
         allowHeaders: ['Origin', 'Content-Type', 'Authorization'],
         allowMethods: ['GET', 'OPTIONS', 'POST', 'PUT', 'DELETE'],
         credentials: true,

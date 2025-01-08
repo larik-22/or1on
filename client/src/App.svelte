@@ -13,6 +13,12 @@
     import Navigation from "./lib/components/Navigation.svelte";
     import TestHomepage from "./pages/TestHomepage.svelte";
     import SuggestHighlight from "./pages/SuggestHighlight.svelte";
+    import UserFeedbacks from "./pages/UserFeedbacks.svelte";
+    import UserManagement from "./lib/components/moderatorDashboard/UserManagement.svelte";
+    import ChangePassword from "./lib/components/userDashboard/ChangePassword.svelte";
+    import ChangeUsername from "./lib/components/userDashboard/ChangeUsername.svelte";
+    import LogOut from "./lib/components/userDashboard/LogOut.svelte";
+    import Feedback from "./pages/Feedback.svelte";
 
     let page: any;
     let params: Context;
@@ -30,7 +36,7 @@
         params = ctx;
     });
 
-    router('/moderator-dashboard', (ctx) => {
+    router('/moderator-dashboard', isAdmin, (ctx) => {
         page = ModeratorDashboard;
         currentRoute = ctx.pathname;
         params = ctx;
@@ -66,6 +72,43 @@
         params = ctx;
     });
 
+    router('/feedbacks', isLoggedIn, (ctx) => {
+        page = UserFeedbacks;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    })
+
+    router('/user-management', isLoggedIn, isAdmin, (ctx) => {
+        page = UserManagement;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    })
+
+    router('/change-password', isLoggedIn, (ctx) => {
+        page = ChangePassword;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    })
+
+    router('/change-username', isLoggedIn, (ctx) => {
+        page = ChangeUsername;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    })
+
+    router('/logout', isLoggedIn, (ctx) => {
+        page = LogOut;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    })
+
+    router('/feedbacks-management', isLoggedIn, isAdmin, (ctx) => {
+        page = Feedback;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    })
+
+
     router.start();
 </script>
 
@@ -79,9 +122,18 @@
 
     <Modals>
         {#snippet backdrop({ close })}
-            <div class="fixed inset-0 z-[999]" onclick={() => close()}>
-
-            </div>
+        <div
+                role="button"
+                tabindex="0"
+                class="fixed inset-0 z-[999]"
+                on:click={() => close()}
+                on:keypress={(e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      close();
+    }
+  }}
+        >
+        </div>
         {/snippet}
     </Modals>
 </main>

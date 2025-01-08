@@ -1,5 +1,4 @@
 <script lang="ts">
-	import {HighlightType} from "../../models/models";
 
 	interface FilterDropdownProps {
 		applyFilter: () => void;
