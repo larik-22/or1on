@@ -11,6 +11,7 @@ import UserIndicator from "./userDashboard/UserIndicator.svelte";
 import ChangePassword from "./userDashboard/ChangePassword.svelte";
 import ChangeUsername from "./userDashboard/ChangeUsername.svelte";
 import LogOut from "./userDashboard/LogOut.svelte";
+import ToursManage from "./moderatorDashboard/ToursManage.svelte";
 
 
 let {
@@ -131,7 +132,7 @@ $effect(()=>{
                                 {
                                     label : "Manage",
                                     action: () => {
-                                        console.log("Hi")
+                                        currentPage = ToursManage
                                     }
                                 }
                             ]

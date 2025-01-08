@@ -1,6 +1,15 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
-    import type { Tour, Highlight } from '../../models/models';
+
+    // Define interfaces to match current backend state
+    interface Tour {
+        id: number;
+        name: string;
+        description: string;
+        category?: string;
+        duration_time?: string;
+        start_hour?: string;
+    }
 
     export let enabled_popup: boolean;
     export let tour: Tour;
@@ -15,16 +24,6 @@
     function close() {
         enabled_popup = false;
     }
-
-    function handleHighlightsInput(e: Event) {
-        const input = (e.target as HTMLInputElement).value;
-        tour.highlights = input.split(',')
-            .filter(name => name.trim())
-            .map(name => ({
-                id: Date.now() + Math.random(), // Ensure unique IDs
-                name: name.trim()
-            }));
-    }
 </script>
 
 {#if enabled_popup}
@@ -33,24 +32,58 @@
             <h2 class="text-xl font-bold mb-4">{tour.id ? 'Edit Tour' : 'Add Tour'}</h2>
             <label class="block mb-2">
                 Name:
-                <input type="text" bind:value={tour.name} class="w-full p-2 mt-1 border border-gray-300 rounded" />
+                <input
+                        type="text"
+                        bind:value={tour.name}
+                        class="w-full p-2 mt-1 border border-gray-300 rounded"
+                        required
+                />
             </label>
             <label class="block mb-2">
                 Description:
-                <textarea bind:value={tour.description} class="w-full p-2 mt-1 border border-gray-300 rounded"></textarea>
+                <textarea
+                        bind:value={tour.description}
+                        class="w-full p-2 mt-1 border border-gray-300 rounded"
+                        required
+                ></textarea>
             </label>
-            <label class="block mb-4">
-                Highlights (comma separated):
+            <label class="block mb-2">
+                Category:
                 <input
                         type="text"
-                        value={tour.highlights.map(h => h.name).join(', ')}
-                        on:input={handleHighlightsInput}
+                        bind:value={tour.category}
+                        class="w-full p-2 mt-1 border border-gray-300 rounded"
+                />
+            </label>
+            <label class="block mb-2">
+                Duration Time:
+                <input
+                        type="text"
+                        bind:value={tour.duration_time}
+                        class="w-full p-2 mt-1 border border-gray-300 rounded"
+                />
+            </label>
+            <label class="block mb-4">
+                Start Hour:
+                <input
+                        type="text"
+                        bind:value={tour.start_hour}
                         class="w-full p-2 mt-1 border border-gray-300 rounded"
                 />
             </label>
             <div class="flex justify-between">
-                <button on:click={save} class="bg-green-500 text-white px-4 py-2 rounded">Save</button>
-                <button on:click={close} class="bg-red-500 text-white px-4 py-2 rounded">Cancel</button>
+                <button
+                        on:click={save}
+                        class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                >
+                    Save
+                </button>
+                <button
+                        on:click={close}
+                        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                >
+                    Cancel
+                </button>
             </div>
         </div>
     </div>
