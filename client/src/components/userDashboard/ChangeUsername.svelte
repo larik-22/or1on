@@ -1,87 +1,118 @@
 <script lang="ts">
-    import {authToken} from "../../lib/stores/auth";
+    import {updateUsernameSchema} from "../../lib/schema/updateUsernameSchema";
+    import { authToken, decodeToken } from "../../lib/stores/auth";
     import {get} from "svelte/store";
 
-    let currentUsername: string = 'current_user'; //this has the pre fill of the current username
-    let newUsername: string = '';
-    let successMessage: string = '';
-    let errorMessage: string = '';
-    let loading: boolean = false;
+    // Get the current username from the token
+    let username: string | null = decodeToken(get(authToken))?.username || "current_user";
 
-    const handleSubmit = async (): Promise<void> => {
-        errorMessage = '';
-        successMessage = '';
 
-        if (loading) return;
+    let formData = $state({
+        currentUsername: "current_user",
+        newUsername: "",
+    });
 
-        if (!/^[a-zA-Z0-9]{3,15}$/.test(newUsername)) {
-            errorMessage = "Username must be alphanumeric and between 3-15 characters.";
+    let errors: Record<string, string[]> = $state({});
+    let isSubmitting = $state(false);
+
+    /**
+     * Handle form submission for updating the username.
+     * Validates input, sends the request to the backend, and manages success or error states.
+     * @param e - The form submission event.
+     */
+    const handleSubmit = async (e: Event) => {
+        e.preventDefault();
+
+        // Validate the form data using schema
+        const result = updateUsernameSchema.safeParse(formData);
+        if (!result.success) {
+            errors = result.error.flatten().fieldErrors;
             return;
         }
 
-        const token = get(authToken);
-
-        if (!token) {
-            errorMessage = "Unauthorized. Please log in.";
-            return;
-        }
-
-        loading = true;
+        // Clear errors and set submitting state
+        errors = {};
+        isSubmitting = true;
 
         try {
-            const response = await fetch('http://localhost:5173/userDashboard/update-username', {
-                method: 'POST',
+            const token = get(authToken);
+            if (!token) {
+                errors = {message: ["Unauthorized. Please log in."]};
+                return;
+            }
+
+            // Make the API call to update the username
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/userDashboard/update-username`, {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    oldUsername: currentUsername,
-                    newUsername: newUsername
-                })
+                    oldUsername: formData.currentUsername,
+                    newUsername: formData.newUsername,
+                }),
             });
 
+            // Handle the API response
             const result = await response.json();
-
             if (response.ok && result.success) {
-                successMessage = "Username changed successfully!";
-                currentUsername = newUsername;
-                newUsername = '';
+                alert("Username changed successfully!^^");
+                formData.newUsername = "";
+                username = formData.currentUsername = result.newUsername; // update the shown username
             } else {
-                errorMessage = result.message || "Failed to update username.";
+                errors = {message: [result.message || "Failed to update username:("]};
             }
-        } catch (e) {
-            errorMessage = "Network error. Please try again later.";
+        } catch {
+            errors = {message: ["An unexpected error occurred. Please try again."]};
         } finally {
-            loading = false;
+            isSubmitting = false;
         }
     };
 </script>
 
 
-<div class="bg-gray-100 p-8 border rounded-lg shadow-md max-w-xl mx-auto">
-    <h2 class="text-2xl font-semibold mb-4">Change Username</h2>
-    <form on:submit|preventDefault={handleSubmit}>
-        <div class="mb-4">
-            <label for="currentUsername" class="block mb-2 font-semibold">Current Username</label>
-            <input type="text" id="currentUsername" value={currentUsername} class="w-full p-2 border rounded bg-gray-200" disabled />
-        </div>
+<div class="flex bg-gray-100 h-screen">
+    <div
+            class="absolute bg-white p-6 border rounded-lg shadow-md w-full max-w-sm"
+            style="top: 50%; left: 55%; transform: translate(-50%, -50%);"
+    >
+        <h2 class="text-2xl font-semibold mb-4 text-center">Change Username</h2>
+        <form onsubmit={handleSubmit}>
+            <div class="mb-4">
+                <label class="block mb-2 font-semibold">Current Username</label>
+                <input
+                        type="text"
+                        value={formData.currentUsername}
+                        class="w-full p-2 border rounded bg-gray-200"
+                        readonly
+                />
+            </div>
 
-        <div class="mb-4">
-            <label for="newUsername" class="block mb-2 font-semibold">New Username</label>
-            <input type="text" id="newUsername" bind:value={newUsername} class="w-full p-2 border rounded" required />
-        </div>
+            <div class="mb-4">
+                <label class="block mb-2 font-semibold">New Username</label>
+                <input
+                        type="text"
+                        bind:value={formData.newUsername}
+                        class="w-full p-2 border rounded"
+                        required
+                />
+                {#if errors.newUsername}
+                    <p class="text-red-600 text-sm">{errors.newUsername[0]}</p>
+                {/if}
+            </div>
 
-        {#if errorMessage}
-            <p class="text-red-600 mb-4">{errorMessage}</p>
-        {/if}
+            {#if errors.message}
+                <p class="text-red-600 mb-4 text-sm text-center">{errors.message[0]}</p>
+            {/if}
 
-        {#if successMessage}
-            <p class="text-green-600 mb-4">{successMessage}</p>
-        {/if}
-
-        <button type="submit" class="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600" disabled={loading}>
-            {loading ? "Submitting..." : "Submit"}
-        </button>
-    </form>
+            <button
+                    type="submit"
+                    class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 w-full"
+                    disabled={isSubmitting}
+            >
+                {isSubmitting ? "Submitting..." : "Submit"}
+            </button>
+        </form>
+    </div>
 </div>
