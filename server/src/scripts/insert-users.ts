@@ -14,28 +14,28 @@ import bcrypt from "bcryptjs";
             id: randomUUID(),
             username: 'dummyUser1',
             email: 'user1@dummy.com',
-            password: bcrypt.hash('password1',10),
+            password: await bcrypt.hash('password1',10),
             isAdmin: false
         },
         {
             id: randomUUID(),
             username: 'admin1',
             email: 'admin1@dummy.com',
-            password: bcrypt.hash('password2',10),
+            password: await bcrypt.hash('password2',10),
             isAdmin: true
         },
         {
             id: randomUUID(),
             username: 'dummyUser2',
             email: 'user2@dummy.com',
-            password: bcrypt.hash('password3',10),
+            password: await bcrypt.hash('password3',10),
             isAdmin: false
         },
         {
             id: randomUUID(),
             username: 'dummyUser3',
             email: 'user3@dummy.com',
-            password: bcrypt.hash('password4',10),
+            password: await bcrypt.hash('password4',10),
             isAdmin: false
         }
     ];
