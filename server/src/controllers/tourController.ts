@@ -1,6 +1,7 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Tour } from "../models/tour.js";
 import logger from '../utils/logger.js';
+import { Highlight } from '../models/highlight.js';
 
 /**
  * Fetches all tours
@@ -44,16 +45,19 @@ export const getTourById = async (em: EntityManager, id: number): Promise<Tour |
  * @param tourId - The id of the tour to find highlights for.
  */
 // eslint-disable-next-line max-len
-export const getHighlightsByTour = async (em: EntityManager, tourId: number): Promise<object | null> => {
+export const getHighlightsByTour = async (
+    em: EntityManager,
+    tourId: number
+): Promise<{ geoJSON: object | null, highlights: Highlight[] | null }> => {
     try {
         const tour = await em.findOne(Tour, { id: tourId }, { populate: ['highlights'] });
         if (!tour) {
-            return null;
+            return { geoJSON: null, highlights: null };
         }
 
         const highlights = tour.highlights.getItems();
         if (highlights.length === 0) {
-            return null;
+            return { geoJSON: null, highlights: null };
         }
 
         const geoJSON = {
@@ -73,10 +77,10 @@ export const getHighlightsByTour = async (em: EntityManager, tourId: number): Pr
             })),
         };
 
-        return geoJSON;
+        return { geoJSON, highlights };
     } catch (error) {
         logger.error('Failed to fetch highlights for tour with id: ' + tourId + ' error: ' + error);
-        return null;
+        return { geoJSON: null, highlights: null };
     }
 };
 
