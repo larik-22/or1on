@@ -3,6 +3,7 @@ import { User } from '../models/user.js';
 import bcrypt from 'bcryptjs';
 import logger from '../utils/logger.js';
 import { randomUUID } from 'crypto';
+import {generateToken} from "../utils/jwt.js";
 
 /**
  * Fetches all users
@@ -133,23 +134,24 @@ export const updateUsername = async (
     em: EntityManager,
     oldUsername: string,
     newUsername: string
-): Promise<{ success: boolean; message: string }> => {
+): Promise<{ success: boolean; message: string; token : string }> => {
     try {
         const user = await em.findOne(User, { username:oldUsername });
         if (!user) {
-            return { success: false, message: 'User not found' };
+            return { success: false, message: 'User not found', token: '' };
         }
 
         const emailExists = await em.count(User, { username: newUsername });
         if (emailExists > 0) {
-            return { success: false, message: 'Username is already in use' };
+            return { success: false, message: 'Username is already in use' , token: ''};
         }
 
         user.username = newUsername;
         await em.persistAndFlush(user);
+        const token = await generateToken({ ...user, password: user.password });
 
         logger.info(`User ${oldUsername} username updated to ${newUsername}`);
-        return { success: true, message: 'Username updated successfully' };
+        return { success: true, message: 'Username updated successfully', token };
     } catch (error) {
         logger.error(`Failed to update username for user ${oldUsername}: ${error}`);
         throw error;
@@ -171,24 +173,25 @@ export const updateUserPassword = async (
     oldPassword: string,
     newPassword: string
 
-): Promise<{ success: boolean; message: string }> => {
+): Promise<{ success: boolean; message: string, token: string }> => {
     try {
         const user = await em.findOne(User, { id: userId });
         if (!user) {
-            return { success: false, message: 'User not found' };
+            return { success: false, message: 'User not found' , token: ''};
         }
 
         const isPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
         if (!isPasswordCorrect) {
-            return { success: false, message: 'Incorrect current password' };
+            return { success: false, message: 'Incorrect current password' , token: ''};
         }
 
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedNewPassword;
         await em.persistAndFlush(user);
 
+        const token = await generateToken({ ...user, password: hashedNewPassword });
         logger.info(`User ${userId} password updated successfully`);
-        return { success: true, message: 'Password updated successfully' };
+        return { success: true, message: 'Password updated successfully', token };
     } catch (error) {
         logger.error(`Failed to update password for user ${userId}: ${error}`);
         throw error;

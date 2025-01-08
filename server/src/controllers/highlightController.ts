@@ -49,7 +49,14 @@ export const getHighlightById = async (em: EntityManager, id: number):
 export const createHighlight = async (em: EntityManager, data: Omit<Highlight, 'id'>):
     Promise<void> => {
     try{
-        const {name, description, category, latitude, longitude, is_approved} = data;
+        const {name,
+            description,
+            category,
+            businessDescription,
+            latitude,
+            longitude,
+            is_approved
+        } = data;
         const newHighlight = em.create(Highlight, {
             name: name,
             description: description,
@@ -57,6 +64,7 @@ export const createHighlight = async (em: EntityManager, data: Omit<Highlight, '
             latitude: latitude  ?? null,
             longitude: longitude ?? null,
             is_approved: is_approved ?? false,
+            businessDescription: businessDescription ?? 'none',
             tours: []
         })
 
