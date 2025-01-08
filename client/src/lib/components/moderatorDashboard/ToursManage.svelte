@@ -1,16 +1,23 @@
 <script lang="ts">
-    import WarningPopUp from "./WarningPopUp.svelte";
     import TourPopUp from "./TourPopUp.svelte";
     import Table, { type TableType, type Row } from '../table/Table.svelte';
     import { onMount } from 'svelte';
 
+    interface Highlight {
+        id: number;
+        name: string;
+        description?: string;
+        category?: string;
+    }
+
     interface Tour {
         id: number;
         name: string;
-        description: string;
-        category?: string;
+        description?: string;
+        category: string;
         duration_time?: string;
         start_hour?: string;
+        highlights: Highlight[];
     }
 
     let enabled_popup: boolean = false;
@@ -20,7 +27,8 @@
         description: "",
         category: "",
         duration_time: "",
-        start_hour: ""
+        start_hour: "",
+        highlights: []
     };
 
     let tours: Tour[] = [];
@@ -29,6 +37,13 @@
         columns: ["Name", "Description", "Category", "Duration", "Start Time", "ID", "Highlights"],
         rows: []
     };
+
+    function formatHighlights(highlights: Highlight[]): string {
+        if (!highlights || !Array.isArray(highlights) || highlights.length === 0) {
+            return 'No highlights';
+        }
+        return highlights.map(h => h.name).join(', ');
+    }
 
     async function fetchTours() {
         try {
@@ -44,7 +59,12 @@
                         ...tour,
                         category: tour.category || "",
                         duration_time: tour.duration_time || "",
-                        start_hour: tour.start_hour || ""
+                        start_hour: tour.start_hour || "",
+                        highlights: Array.isArray(tour.highlights?.getItems)
+                            ? tour.highlights.getItems()
+                            : Array.isArray(tour.highlights)
+                                ? tour.highlights
+                                : []
                     }));
 
                     newTable.rows = tours.map(tour => ({
@@ -55,7 +75,7 @@
                             tour.duration_time || '',
                             tour.start_hour || '',
                             tour.id?.toString() || '',
-                            'Coming soon' // Placeholder for future highlights
+                            formatHighlights(tour.highlights) // Format highlights for display
                         ],
                         actionsVisibility: [true, true]
                     }));
@@ -85,13 +105,14 @@
             description: "",
             category: "",
             duration_time: "",
-            start_hour: ""
+            start_hour: "",
+            highlights: []
         };
         enabled_popup = true;
     }
 
     function deleteTour(row: Row) {
-        const id = parseInt(row.row[5]); // ID is now in the sixth position
+        const id = parseInt(row.row[5]);
         fetch(`${import.meta.env.VITE_BACKEND_URL}/tours/${id}`, {
             method: 'DELETE',
             headers: {
@@ -110,7 +131,7 @@
     }
 
     function editTour(row: Row) {
-        const id = parseInt(row.row[5]); // ID is now in the sixth position
+        const id = parseInt(row.row[5]);
         const tour = tours.find(tour => tour.id === id);
         if (tour) {
             currentTour = { ...tour };
@@ -120,17 +141,19 @@
 
     function saveTour(event: CustomEvent<Tour>) {
         const tour = event.detail;
-        const method ='POST';
+        const method = tour.id ? 'PUT' : 'POST';
         const url = tour.id
             ? `${import.meta.env.VITE_BACKEND_URL}/tours/${tour.id}`
             : `${import.meta.env.VITE_BACKEND_URL}/tours`;
 
+        // Format the tour data according to your backend expectations
         const tourData = {
             name: tour.name,
-            description: tour.description,
-            category: tour.category || "",
-            duration_time: tour.duration_time || "",
-            start_hour: tour.start_hour || ""
+            description: tour.description || null,
+            category: tour.category,
+            duration_time: tour.duration_time || null,
+            start_hour: tour.start_hour || null,
+            highlights: tour.highlights.map(h => h.id) // Send only the highlight IDs
         };
 
         fetch(url, {

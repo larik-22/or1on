@@ -19,7 +19,7 @@ export class Tour {
     @Property({ nullable: true })
     description?: string;
 
-    @Property({ type: 'interval', nullable: true })
+    @Property({ type: 'time', nullable: true })
     duration_time?: string;
 
     @Property({ type: 'time', nullable: true })

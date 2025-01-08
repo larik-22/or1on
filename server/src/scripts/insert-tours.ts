@@ -25,7 +25,7 @@ import { Highlight } from "../models/highlight.js";
             name: 'Tour 1',
             description: 'Educational Tour of Deventer',
             category: 'Education',
-            duration_time: '1 hour',
+            duration_time: '02:00',
             start_hour: '09:00',
             is_approved: true,
             highlights: [
@@ -37,7 +37,7 @@ import { Highlight } from "../models/highlight.js";
             name: 'Tour 2',
             category: 'Architecture',
             description: 'Architectural Highlights of Deventer',
-            duration_time: '2 hours',
+            duration_time: '02:00',
             start_hour: '10:00',
             highlights: [
                 ...getHighlightsByCategory('Architecture'),
@@ -48,7 +48,7 @@ import { Highlight } from "../models/highlight.js";
             name: 'Tour 3',
             category: 'Entertainment',
             description: 'Entertainment and Culture Tour',
-            duration_time: '1.5 hours',
+            duration_time: '01:30',
             start_hour: '11:00',
             highlights: [
                 ...getHighlightsByCategory('Entertainment'),
@@ -60,7 +60,7 @@ import { Highlight } from "../models/highlight.js";
             name: 'Tour 4',
             category: 'Historical',
             description: 'Historical Deventer Tour',
-            duration_time: '3 hours',
+            duration_time: '03:00',
             start_hour: '12:00',
             highlights: [
                 ...highlights.filter(h => ['De Waag', 'Bergkerk', 'Lebuinuskerk'].includes(h.name)),
