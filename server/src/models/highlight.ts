@@ -28,7 +28,7 @@ export class Highlight {
     is_approved!: boolean;
 
     @Property()
-    offers!: string;
+    businessDescription!: string;
 
     @ManyToMany(() => Tour, (tour) => tour.highlights)
     tours = new Collection<Tour>(this);

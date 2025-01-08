@@ -25,7 +25,7 @@ export const createHighlightsGeoJSON = async (em: EntityManager):Promise<object>
                 name: highlight.name,
                 description: highlight.description,
                 category: highlight.category,
-                offers: highlight.offers,
+                businessDescription: highlight.businessDescription,
             },
         })),
     };

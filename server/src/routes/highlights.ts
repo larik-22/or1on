@@ -25,7 +25,7 @@ const highlightSchema = z.object({
     latitude:z.number().nullable(),
     longitude:z.number().nullable(),
     is_approved: z.boolean().default(false),
-    offers: z.string().optional()
+    businessDescription: z.string().optional()
 })
 
 const feedbackSchema = z.object({
