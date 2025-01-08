@@ -2,6 +2,7 @@
     import page from "page";
     import TourWindow from "../lib/components/tours/TourWindow.svelte";
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let tours: any[] | undefined = $state(undefined);
 
     /**

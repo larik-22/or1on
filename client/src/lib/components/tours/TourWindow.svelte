@@ -29,10 +29,6 @@
             : tours.filter((tour) => currentFilter.includes(tour.category));
     };
 
-    $inspect(currentFilter)
-    console.log(filterOptions)
-    $inspect(filterOptions)
-
     /**
      * Formats the duration time as a string
      */
@@ -56,9 +52,9 @@
     {#if applyFilter().length > 0}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="max-height: 34rem; overflow-y: auto;">
             {#each applyFilter() as tour (tour.id)}
-                <div
+                <button
                         class="tour-card p-4 bg-gray-100 border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:bg-gray-200"
-                        on:click={() => onSelect(tour.id)}
+                        onclick={() => onSelect(tour.id)}
                 >
                     <h3 class="text-lg font-bold text-gray-800 mb-2">{tour.name}</h3>
                     <p class="text-sm text-gray-600 mb-1">
@@ -73,7 +69,7 @@
                     <p class="text-sm text-gray-600">
                         <span class="font-semibold">Start Time:</span> {tour.start_hour}
                     </p>
-                </div>
+                </button>
             {/each}
         </div>
     {:else}
