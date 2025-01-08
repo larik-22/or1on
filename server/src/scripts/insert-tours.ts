@@ -10,7 +10,13 @@ import { Highlight } from "../models/highlight.js";
     // First, we'll fetch existing highlights
     const highlights = await em.find(Highlight, {});
 
-    // Helper function to get highlights by category
+
+    /**
+     * Helper function to get highlights by category.
+     *
+     * @param {string} category - The category of highlights to filter by.
+     * @returns {Highlight[]} - An array of highlights that match the given category.
+     */
     const getHighlightsByCategory = (category: string) =>
         highlights.filter(h => h.category === category);
 

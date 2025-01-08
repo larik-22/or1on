@@ -1476,8 +1476,8 @@ describe('getHighlightsByTour function', () => {
         const fetchedHighlights = await getHighlightsByTour(em, tour.id);
 
         expect(fetchedHighlights).toBeDefined();
-        expect(fetchedHighlights).toHaveLength(1)
-        expect(fetchedHighlights).toEqual(tour.highlights.getItems());
+        expect(fetchedHighlights.highlights).toHaveLength(1)
+        expect(fetchedHighlights.highlights).toEqual(tour.highlights.getItems());
     });
 })
 
