@@ -19,6 +19,7 @@
     import ChangeUsername from "./lib/components/userDashboard/ChangeUsername.svelte";
     import LogOut from "./lib/components/userDashboard/LogOut.svelte";
     import Feedback from "./pages/Feedback.svelte";
+    import Tours from "./pages/Tours.svelte";
 
     let page: any;
     let params: Context;
@@ -26,6 +27,12 @@
 
     router('/', (ctx: Context) => {
         page = Homepage;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
+    router('/tours', (ctx: Context) => {
+        page = Tours;
         currentRoute = ctx.pathname;
         params = ctx;
     });

@@ -54,6 +54,47 @@
     };
 
     /**
+     * Calculate distance between two points
+     */
+    const calculateDistance = (pointA: LatLng, pointB: LatLng): number => {
+        return pointA.distanceTo(pointB);
+    };
+
+    /**
+     * Generate a route by sorting points based on proximity
+     */
+    const generateRoute = (userLocation: LatLng, features: Feature[]): LatLng[] => {
+        const remainingPoints = features.map(feature => {
+            const [longitude, latitude] = feature.geometry.coordinates;
+            return new LatLng(latitude, longitude);
+        });
+
+        const route = [userLocation];
+        let lastPoint = userLocation;
+
+        while (remainingPoints.length > 0) {
+            // Find the closest point to the last point
+            let closestIndex = 0;
+            let closestDistance = calculateDistance(lastPoint, remainingPoints[0]);
+
+            for (let i = 1; i < remainingPoints.length; i++) {
+                const distance = calculateDistance(lastPoint, remainingPoints[i]);
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestIndex = i;
+                }
+            }
+
+            // Add the closest point to the route and remove it from remaining points
+            const closestPoint = remainingPoints.splice(closestIndex, 1)[0];
+            route.push(closestPoint);
+            lastPoint = closestPoint;
+        }
+
+        return route;
+    };
+
+    /**
      * Initializes the user marker, walked path, and routing control
      */
     const initializeMapElements = () => {
@@ -70,23 +111,18 @@
             opacity: 0.85,
         }).addTo(map);
 
-        // Initialize routing control
+        // Extract features and sort them by proximity to the initial location
         const features = (geoJSONData as any).features as Feature[];
-        const waypoints = features.map((feature) => {
-            const [longitude, latitude] = feature.geometry.coordinates;
-            return {
-                latLng: new LatLng(latitude, longitude),
-                name: feature.properties.name || "Unknown"
-            };
-        });
+        const sortedWaypoints = generateRoute(initialLocation, features);
 
+        // Initialize routing control
         routingControl = L.Routing.control({
-            waypoints: [initialLocation, ...waypoints],
+            waypoints: [...sortedWaypoints],
             routeWhileDragging: false,
             addWaypoints: false,
             router: L.Routing.graphHopper(
                 `${import.meta.env.VITE_GRASSHOPER_API_KEY}`,
-                {urlParameters: {vehicle: 'foot'}}
+                { urlParameters: { vehicle: 'foot' } }
             ),
             createMarker: () => null // Don’t create markers for waypoints
         }).addTo(map);
@@ -118,7 +154,7 @@
             routingControl.setWaypoints(newWaypoints.map(wp => wp.latLng));
 
             currentStep++;
-        }, 1000); // Update every second
+        }, 30000); // Update every 30 seconds
     };
 
     /**
