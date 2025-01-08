@@ -51,9 +51,9 @@ export const createHighlight = async (em: EntityManager, data: Omit<Highlight, '
     try{
         const {name, description, category, offers, latitude, longitude, is_approved} = data;
         const newHighlight = em.create(Highlight, {
-            name,
-            description,
-            category: category ?? null,
+            name: name,
+            description: description,
+            category: category,
             latitude: latitude  ?? null,
             longitude: longitude ?? null,
             is_approved: is_approved ?? false,

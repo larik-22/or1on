@@ -4,14 +4,17 @@ import {HighlightType} from "../models/models";
  * Maps highlight types to colors
  */
 const highlightTypeToColor: Record<HighlightType, string> = {
-	[HighlightType.CATEGORY_A]: "#fda762",
-	[HighlightType.CATEGORY_B]: "#00FF00",
-	[HighlightType.CATEGORY_C]: "#0000FF",
-	[HighlightType.CATEGORY_D]: "#FFFF00",
-	[HighlightType.CATEGORY_G]: "#6f7eca",
-	[HighlightType.OTHER]: "#FFFFFF"
+	[HighlightType.OTHER]: "#e0e0e0",
+	[HighlightType.EDUCATION]: "#ff9800",
+	[HighlightType.ARCHITECTURE]: "#e57373",
+	[HighlightType.ENTERTAINMENT]: "#f44336",
+	[HighlightType.HISTORICAL]: "#ec407a",
+	[HighlightType.MUSEUM]: "#8e24aa",
+	[HighlightType.NATURE]: "#4caf50",
+	[HighlightType.IT_COMPANY]: "#2196f3",
+	[HighlightType.PUB]: "#ffc107"
+};
 
-}
 
 /**
  * Returns the color associated with a given highlight type

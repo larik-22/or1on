@@ -1,14 +1,3 @@
-<script lang="ts">
-let {
-	highlights = [
-		["Highlight 1", "John Doe", "4", "description here", "25/25/2525"],
-		["Highlight 2", "John Doe", "4", "description here", "25/25/2525"],
-		["Highlight 3", "John Doe", "4", "description here", "25/25/2525"],
-		["Highlight 4", "John Doe", "4", "description here", "25/25/2525"],
-	]
-} : { highlights? : Array<string[]> } = $props();
-</script>
-
 <main class="h-[100vh] w-[100%] flex justify-center items-center">
 	<div class="rounded-[8px] h-fit w-fit bg-gray-50 shadow-md items p-[10vh] flex justify-center content-center">
 

@@ -10,24 +10,28 @@ import {Tour} from "../models/tour.js";
         {
             name: 'Tour 1',
             description: 'Description for Tour 1',
+            category: 'Education',
             duration_time: '1 hour',
             start_hour: '09:00',
             is_approved: true,
         },
         {
             name: 'Tour 2',
+            category: 'Architecture',
             description: 'Description for Tour 2',
             duration_time: '2 hours',
             start_hour: '10:00',
         },
         {
             name: 'Tour 3',
+            category: 'Entertainment',
             description: 'Description for Tour 3',
             duration_time: '1.5 hours',
             start_hour: '11:00',
         },
         {
             name: 'Tour 4',
+            category: 'Historical',
             description: 'Description for Tour 4',
             duration_time: '3 hours',
             start_hour: '12:00',

@@ -1,19 +1,17 @@
 <script lang="ts">
 	import {feedbackSchema} from "../../schema/feedbackSchema";
-	import {authToken, decodeToken, isUserAdmin, isUserLoggedIn} from "../../stores/auth";
+	import {isUserAdmin, isUserLoggedIn} from "../../stores/auth";
 	import {modals} from "svelte-modals";
 	import page from "page";
 
 	export type feedbackFormPayload = {
 		rating: number;
 		feedbackMessage: string;
-		userid: string | undefined;
 	};
 
 	let { formSubmitted } = $props();
 
 	let feedbackData: feedbackFormPayload = $state({
-		userid: decodeToken($authToken)?.id,
 		rating: 0,
 		feedbackMessage: "",
 	})
@@ -53,11 +51,11 @@
 >
 	<!-- Star Rating -->
 	<div>
-		<label class="block text-sm font-medium text-gray-700">
+		<p class="block text-sm font-medium text-gray-700">
 			Your Rating <span class="text-red-500">*</span>
-		</label>
+		</p>
 		<div class="flex items-center space-x-2 mt-2">
-			{#each Array(5).fill(null) as _, i}
+			{#each [0, 1, 2, 3, 4] as i}
 				<button
 						type="button"
 						class="focus:outline-none"

@@ -38,6 +38,7 @@
 		errors = {};
 
 		// remove confirmPassword from the data object
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const {confirmPassword, ...data} = formData;
 
 		// send data to the server
@@ -60,7 +61,7 @@
 				return;
 			}
 
-		} catch (err) {
+		} catch {
 			errors = { message: ["An unexpected error occurred. Please try again."] };
 		} finally {
 			isSubmitting = false;

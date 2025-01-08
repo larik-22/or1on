@@ -19,7 +19,8 @@ const tourSchema = z.object({
     description: z.string().optional().nullable(),
     duration_time: z.string().optional().nullable(),
     start_hour: z.string().optional().nullable(),
-    highlights: z.array(z.any()).optional()
+    highlights: z.array(z.any()).optional(),
+    category: z.string()
 })
 
 /**
@@ -30,8 +31,8 @@ const tourSchema = z.object({
  */
 tours.get('/', async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
-        const tours = getAllTours(em);
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
+        const tours = await getAllTours(em);
 
         return ctx.json({tours}, 200);
     }catch (error){
@@ -48,9 +49,9 @@ tours.get('/', async (ctx) => {
  */
 tours.get('/:id', async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();
-        const tour = getTourById(em, parseInt(id));
+        const tour = await getTourById(em, parseInt(id));
 
         if (!tour){
             return ctx.json({message: 'Tour not found'}, 404)
@@ -71,9 +72,9 @@ tours.get('/:id', async (ctx) => {
  */
 tours.get(':id/highlights', async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();
-        const highlights = getHighlightsByTour(em, parseInt(id));
+        const highlights = await getHighlightsByTour(em, parseInt(id));
 
         if (!highlights){
             return ctx.json({message: 'No highlights found'}, 404);
@@ -95,7 +96,7 @@ tours.get(':id/highlights', async (ctx) => {
  */
 tours.post('/', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const body = await ctx.req.json();
 
         const tour = tourSchema.safeParse(body);
@@ -121,7 +122,7 @@ tours.post('/', isLoggedIn, isAdmin, async (ctx) => {
  */
 tours.put('/:id', async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();
 
         const tour = await getTourById(em, parseInt(id));
@@ -152,7 +153,7 @@ tours.put('/:id', async (ctx) => {
  */
 tours.delete('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
-        const em = ctx.get('em' as 'jwtpayload') as EntityManager;
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();
 
         await deleteTour(em, parseInt(id));
