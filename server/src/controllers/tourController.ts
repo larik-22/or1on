@@ -1,7 +1,7 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Tour } from "../models/tour.js";
 import logger from '../utils/logger.js';
-import type { Highlight } from "../models/highlight.js";
+import { Highlight } from '../models/highlight.js';
 
 /**
  * Fetches all tours
@@ -37,26 +37,56 @@ export const getTourById = async (em: EntityManager, id: number): Promise<Tour |
     }
 }
 
-/**
- * Fetches all highlights by tour id from the database.
- *
- * @param em - The MikroORM EntityManager instance.
- * @param tourId - The id of the tour to find.
- * @returns {Promise<Highlight[] | null>} A promise resolving to
- * a list of highlights if found, otherwise null.
- */
-export const getHighlightsByTour = async (em: EntityManager, tourId: number):
-    Promise<Highlight[] | null> => {
+
+
+
+export const getHighlightsByTour =
+    // eslint-disable-next-line jsdoc/require-returns
+    /**
+     * Fetches all highlights by tour id from the
+     * database and returns them as a GeoJSON object.
+     *
+     * @param em - The MikroORM EntityManager instance.
+     * @param tourId - The id of the tour to find highlights for.
+     */
+    async (
+    em: EntityManager,
+    tourId: number
+): Promise<{ geoJSON: object | null, highlights: Highlight[] | null }> => {
     try {
-        const tour = await em.findOne(Tour, { id: tourId}, {populate: ['highlights']});
-        if (tour){
-            return tour.highlights.getItems();
+        const tour = await em.findOne(Tour, { id: tourId }, { populate: ['highlights'] });
+        if (!tour) {
+            return { geoJSON: null, highlights: null };
         }
+
+        const highlights = tour.highlights.getItems();
+        if (highlights.length === 0) {
+            return { geoJSON: null, highlights: null };
+        }
+
+        const geoJSON = {
+            type: 'FeatureCollection',
+            features: highlights.map((highlight) => ({
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [highlight.longitude, highlight.latitude],
+                },
+                properties: {
+                    id: highlight.id,
+                    name: highlight.name,
+                    description: highlight.description,
+                    category: highlight.category,
+                },
+            })),
+        };
+
+        return { geoJSON, highlights };
     } catch (error) {
-        logger.error('Failed to find tour or fetch highlights from tour with id: ' + tourId
-            + ' error: ' + error);
+        logger.error('Failed to fetch highlights for tour with id: ' + tourId + ' error: ' + error);
+        throw error; // Throw the error instead of returning null values
     }
-}
+};
 
 /**
  * Creates a new tour and stores it in the database.
