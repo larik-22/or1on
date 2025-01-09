@@ -1,17 +1,14 @@
 <script lang="ts">
     import { updateUsernameSchema } from "../../schema/updateUsernameSchema";
-    // import { authToken, decodeToken } from "../../lib/stores/auth";
-    import { authToken } from "../../stores/auth";
+    import {authToken, decodeToken} from "../../stores/auth";
     import {get} from "svelte/store";
-    import {Control} from "sveaflet";
+    import { setToken } from "../../utils/authHandler.svelte";
 
     // Get the current username from the token
-    //let username: string | null = decodeToken(get(authToken))?.username || "current_user";
-
-
+    let username: string | null = decodeToken(get(authToken))?.username ?? null;
 
     let formData = $state({
-        currentUsername: "current_user",
+        currentUsername: username || "current_user", // Use decoded username or fallback
         newUsername: "",
     });
 
@@ -33,7 +30,6 @@
             return;
         }
 
-        // Clear errors and set submitting state
         errors = {};
         isSubmitting = true;
 
@@ -57,17 +53,19 @@
                 }),
             });
 
-            // Handle the API response
-            const result = await response.json();
+            let result = await response.json();
+
+            setToken(result.token);
+
             if (response.ok && result.success) {
                 alert("Username changed successfully!^^");
                 formData.newUsername = "";
-                //username = formData.currentUsername = result.newUsername; // update the shown username
-            } else {
-                errors = {message: [result.message || "Failed to update username:("]};
+
+                formData.currentUsername = decodeToken(result.token)?.username ?? ""; // update the shown username
             }
-        } catch {
+        } catch(error) {
             errors = {message: ["An unexpected error occurred. Please try again."]};
+            console.log(error)
         } finally {
             isSubmitting = false;
         }
@@ -83,8 +81,9 @@
         <h2 class="text-2xl font-semibold mb-4 text-center">Change Username</h2>
         <form onsubmit={handleSubmit}>
             <div class="mb-4">
-                <Control class="block mb-2 font-semibold">Current Username</Control>
+                <label for="username" class="block mb-2 font-semibold">Current Username</label>
                 <input
+                        id="username"
                         type="text"
                         value={formData.currentUsername}
                         class="w-full p-2 border rounded bg-gray-200"
@@ -93,8 +92,9 @@
             </div>
 
             <div class="mb-4">
-                <Control class="block mb-2 font-semibold">New Username</Control>
+                <label for="newUsername" class="block mb-2 font-semibold">New Username</label>
                 <input
+                        id="newUsername"
                         type="text"
                         bind:value={formData.newUsername}
                         class="w-full p-2 border rounded"

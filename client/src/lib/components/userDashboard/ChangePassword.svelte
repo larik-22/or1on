@@ -2,9 +2,9 @@
     import {get} from "svelte/store";
     import { authToken } from "../../stores/auth";
     import { updatePasswordSchema } from "../../schema/updatePasswordSchema";
-    import {Control} from "sveaflet";
 
-    // the form state for password fields
+
+    // form state for password fields
     let formData = $state({
         currentPassword: "",
         newPassword: "",
@@ -30,7 +30,7 @@
             return;
         }
 
-        // Clear errors and set submitting state
+        // clear errors and set submitting state
         errors = {};
         isSubmitting = true;
 
@@ -41,7 +41,7 @@
                 return;
             }
 
-            // Make the API call to update the password
+            // API call to update the password
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/userDashboard/update-password`, {
                 method: "POST",
                 headers: {
@@ -54,7 +54,7 @@
                 }),
             });
 
-            // Handle the API response
+            // Handle response
             const result = await response.json();
             if (response.ok && result.success) {
                 alert("Password changed successfully!");
@@ -80,8 +80,8 @@
         <h2 class="text-2xl font-semibold mb-4 text-center">Change Password</h2>
         <form onsubmit={handleSubmit}>
             <div class="mb-4">
-                <Control class="block mb-2 font-semibold">Current Password</Control>
-                <input
+                <label for="password" class="block mb-2 font-semibold">Current Password</label>
+                <input id="password"
                         type="password"
                         bind:value={formData.currentPassword}
                         class="w-full p-2 border rounded"
@@ -93,8 +93,9 @@
             </div>
 
             <div class="mb-4">
-                <Control class="block mb-2 font-semibold">New Password</Control>
+                <label for="newPassword" class="block mb-2 font-semibold">New Password</label>
                 <input
+                        id="newPassword"
                         type="password"
                         bind:value={formData.newPassword}
                         class="w-full p-2 border rounded"
@@ -106,8 +107,8 @@
             </div>
 
             <div class="mb-4">
-                <Control class="block mb-2 font-semibold">Confirm New Password</Control>
-                <input
+                <label for="confirmPassword" class="block mb-2 font-semibold">Confirm New Password</label>
+                <input id="confirmPassword"
                         type="password"
                         bind:value={formData.confirmPassword}
                         class="w-full p-2 border rounded"
