@@ -37,15 +37,19 @@ export const getTourById = async (em: EntityManager, id: number): Promise<Tour |
     }
 }
 
-// eslint-disable-next-line jsdoc/require-returns
-/**
- * Fetches all highlights by tour id from the database and returns them as a GeoJSON object.
- *
- * @param em - The MikroORM EntityManager instance.
- * @param tourId - The id of the tour to find highlights for.
- */
-// eslint-disable-next-line max-len
-export const getHighlightsByTour = async (
+
+
+
+export const getHighlightsByTour =
+    // eslint-disable-next-line jsdoc/require-returns
+    /**
+     * Fetches all highlights by tour id from the
+     * database and returns them as a GeoJSON object.
+     *
+     * @param em - The MikroORM EntityManager instance.
+     * @param tourId - The id of the tour to find highlights for.
+     */
+    async (
     em: EntityManager,
     tourId: number
 ): Promise<{ geoJSON: object | null, highlights: Highlight[] | null }> => {
