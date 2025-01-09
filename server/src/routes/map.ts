@@ -16,11 +16,7 @@ const map = new Hono();
  */
 map.get('/highlights', async (ctx) => {
     try {
-        logger.info('ssss');
-        logger.info(process.env.CLIENT);
         logger.info('Fetching highlights for /map/highlights');
-
-
         const em = (ctx.get('em' as 'jwtPayload') as EntityManager).fork();
 
         const geoJSON = await createHighlightsGeoJSON(em);

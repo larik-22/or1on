@@ -13,7 +13,7 @@ services:
       context: ./client
       dockerfile: Dockerfile
     ports:
-      - ${CLIENT_PORT}:4173
+      - ${CLIENT_PORT}:${CLIENT_PORT}
     environment:
       VITE_GRASSHOPER_API_KEY: ${VITE_GRASSHOPER_API_KEY}
       VITE_BACKEND_URL: ${VITE_BACKEND_URL}
