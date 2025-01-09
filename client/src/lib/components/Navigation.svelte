@@ -12,6 +12,8 @@ import ChangePassword from "./userDashboard/ChangePassword.svelte";
 import ChangeUsername from "./userDashboard/ChangeUsername.svelte";
 import LogOut from "./userDashboard/LogOut.svelte";
 import ToursManage from "./moderatorDashboard/ToursManage.svelte";
+import HighlightsManage from "./moderatorDashboard/HighlightsManage.svelte";
+import HighlightSuggestion from "./moderatorDashboard/HighlightSuggestion.svelte";
 
 
 let {
@@ -109,13 +111,13 @@ $effect(()=>{
                                 {
                                     label : "Manage",
                                     action: () => {
-                                        console.log("Hi")
+                                        currentPage  = HighlightsManage
                                     }
                                 },
                                 {
                                     label : "Suggestions",
                                     action: () => {
-                                        console.log("Hi")
+                                        currentPage  = HighlightSuggestion
                                     }
                                 },
                                 {

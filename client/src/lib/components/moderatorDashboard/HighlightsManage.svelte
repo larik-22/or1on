@@ -1,216 +1,272 @@
 <script lang="ts">
 
   import Table from "../table/Table.svelte";
-  import WarningPopUp from "./WarningPopUp.svelte";
-  import EditTextField from "./EditTextField.svelte";
+  import Modal, {type ModalType} from "../Modal.svelte";
   import type { TableType, Row } from "../table/Table.svelte";
-  import { fetchWithAuthSvelte } from "../../lib/utils/fetchWithAuth.svelte";
-  import type { ActionConfig } from "../table/Action.svelte";
+  import { type ActionConfig } from "../table/Action.svelte";
+  import WarningPopUp from "./WarningPopUp.svelte";
+  import {onMount} from "svelte";
 
-  let highlights = [
-    { id: 1, name: "Highlight 1", description: "Description of Highlight 1", category: "Demure" },
-    { id: 2, name: "Highlight 2", description: "Description of Highlight 2", category: "Mindful" },
-    { id: 3, name: "Highlight 3", description: "Description of Highlight 3", category: "What color is the sky" },
-    { id: 4, name: "Highlight 4", description: "Description of Highlight 4", category: "FreakyAAh" },
+  const API_BASE =  `${import.meta.env.VITE_BACKEND_URL}/highlights`;
 
-  ]
+  // State variables
+  let highlights = [];
+  let newTable: TableType = { columns: [], rows: [] };
+  let enableModal = false;
+  let enabled_popup = false; // Matches WarningPopUp prop
+  let modalConfig: ModalType;
+  let popupText = "";
+  let currentHighlightRow: Row | null = null;
 
-  let currentRow: Row | null = null;
-  let enabledPopup: boolean = $state(false);
-  let editPopup: boolean = $state(false);
-  let editValue: string = "";
-  let addPopup: boolean = $state(false);
- // let newHighlight = { id: 0, name: "", description: "", category: "" };
-
-  // Reactive properties for adding a new highlight
-  let newName = "";
-  let newDescription = "";
-  let newCategory = "";
-
-  // to convert highlights data to TableType
-  function dataToTable(data: typeof highlights): TableType {
-    const columns = ["Id", "Name", "Description", "Category"];
-    const rows = data.map((highlight) => ({
-      row: [highlight.id.toString(), highlight.name, highlight.description, highlight.category],
-      actionsVisibility: [true, true, true] //show all actions by defaultt
-    }));
-    return { columns, rows };
-  }
-
-  let newTable: TableType = $state(dataToTable(highlights));
-  let customCss: string = "border-transparent w-[100%] h-[100%]";
-
-  //delete highlight
-  let deleteActionConfig: ActionConfig = {
-    actionName: "Delete",
-    actionFunction: async (row: Row) => {
-      currentRow = row;
-      enabledPopup = true;
-    },
-    actionClassStyle: "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600",
+  // stores the currently selected highlight for add/edit actions
+  let currentHighlight = {
+    id: 0,
+    name: "",
+    description: "",
+    category: "",
+    latitude: null,
+    longitude: null,
+    is_approved: false,
+    businessDescription: null,
   };
 
-  //edit highlight
-  let editActionConfig: ActionConfig = {
-    actionName: "Edit",
-    actionFunction: async (row: Row) => {
-      currentRow = row;
-      editValue = row.row[1]; //assuming the second column is the editable field (name)
-      editPopup = true;
-    },
-    actionClassStyle:  "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600",
-  };
-
-  //confirm delete highlight function
-  function confirmDelete() {
-    if (currentRow) {
-      const index = newTable.rows.findIndex((r) => r === currentRow);
-      if (index > -1) {
-        newTable.rows.splice(index, 1);
-      }
+  async function fetchHighlights() {
+    try {
+      const response = await fetch(API_BASE, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const data = await response.json();
+      highlights = data.highlights || [];
+      newTable = formatTableData(highlights);
+    } catch (error) {
+      console.error("Failed to fetch highlights:", error);
     }
-    enabledPopup = false;
   }
 
-  // Confirm edit highlight function
-  function confirmEdit(newText: string) {
-    if (currentRow) {
-      const index = newTable.rows.findIndex((r) => r === currentRow);
-      if (index > -1) {
-        newTable.rows[index].row[1] = newText; // Update the name field
-      }
-    }
-    editPopup = false;
+  // Format highlights into Table format
+  function formatTableData(data) {
+    // sort highlights by id in ascending order
+    data.sort((a, b) => a.id - b.id);
+
+    return {
+      columns: ["ID", "Name", "Description", "Category", "Business Description"],
+      rows: data.map((highlight) => ({
+        row: [
+          highlight.id.toString(),
+          highlight.name,
+          highlight.description,
+          highlight.category,
+          highlight.businessDescription || "none",
+        ],
+        actionsVisibility: [true, true],
+      })),
+    };
   }
 
-  // Add highlight
-  function addHighlight() {
-    if (!newName || !newDescription || !newCategory) {
-      alert("Please fill all fields!");
-      return;
+  // Open the modal for add/edit actions
+  function openModal(action: "add" | "edit", row: Row | null = null) {
+    enableModal = true;
+
+    if (action === "edit" && row) {
+      const id = parseInt(row.row[0]);
+      const existingHighlight = highlights.find((h) => h.id === id);
+      currentHighlight = { ...existingHighlight };
+    } else {
+      currentHighlight = {
+        id: 0,
+        name: "",
+        description: "",
+        category: "",
+        latitude: null,
+        longitude: null,
+        businessDescription: null,
+      };
     }
 
-    const newId = newTable.rows.length + 1; // Generate a new unique ID
-    newTable = {
-      ...newTable,
-      rows: [
-        ...newTable.rows,
+    modalConfig = {
+      title: action === "edit" ? "Edit Highlight" : "Add Highlight",
+      sections: [
         {
-          row: [newId.toString(), newName, newDescription, newCategory],
-          actionsVisibility: [true, true, true], // Show all actions
+          sectionTitle: "Name",
+          sectionType: "basic",
+          getValue: () => currentHighlight.name,
+          setValue: (value) => (currentHighlight.name = value),
+        },
+        {
+          sectionTitle: "Description",
+          sectionType: "descriptive",
+          getValue: () => currentHighlight.description,
+          setValue: (value) => (currentHighlight.description = value),
+        },
+        {
+          sectionTitle: "Category",
+          sectionType: "basic",
+          getValue: () => currentHighlight.category,
+          setValue: (value) => (currentHighlight.category = value),
+        },
+        {
+          sectionTitle: "Business Description",
+          sectionType: "descriptive",
+          getValue: () => currentHighlight.businessDescription,
+          setValue: (value) => (currentHighlight.businessDescription = value),
         },
       ],
+      confirmFunction: action === "edit" ? saveEditHighlight : saveNewHighlight,
     };
-
-    // Clear the input fields
-    newName = "";
-    newDescription = "";
-    newCategory = "";
-
-    // Close the popup
-    addPopup = false;
   }
+
+  // Save new highlight to backend
+  async function saveNewHighlight() {
+    console.log("payload sent to backend: ", currentHighlight)
+    try {
+      const response = await fetch(API_BASE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(currentHighlight),
+      });
+
+      if (response.ok) {
+        await fetchHighlights(); // refresh
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to save new highlight: ", errorData);
+      }
+    } catch (error) {
+      console.error("Error saving new highlight:", error);
+    }
+  }
+
+  // Save edited highlight to backend
+  async function saveEditHighlight() {
+    try {
+      const response = await fetch(`${API_BASE}/${currentHighlight.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(currentHighlight),
+      });
+
+      if (response.ok) {
+        await fetchHighlights(); // refresh
+      } else {
+        console.error("Failed to update highlight");
+      }
+    } catch (error) {
+      console.error("Error updating highlight:", error);
+    }
+  }
+
+  // Trigger warning popup for delete confirmation
+  function openDeletePopup(row: Row) {
+    currentHighlightRow = row;
+    popupText = `Are you sure you want to delete the highlight: "${row.row[1]}"?`;
+    enabled_popup = true;
+  }
+
+
+  // Delete a highlight
+  async function confirmDeleteHighlight() {
+    if (currentHighlightRow) {
+      const id = parseInt(currentHighlightRow.row[0]);
+      try {
+        const response = await fetch(`${API_BASE}/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (response.ok) {
+          await fetchHighlights(); // Refresh
+        } else {
+          console.error("Failed to delete highlight");
+        }
+      } catch (error) {
+        console.error("Error deleting highlight:", error);
+      }
+    }
+  }
+
+  // Table action configurations
+  const actionConfigs: ActionConfig[] = [
+    {
+      actionName: "Edit",
+      actionFunction: (row) => openModal("edit", row),
+      actionClassStyle: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600",
+    },
+    {
+      actionName: "Delete",
+      actionFunction: openDeletePopup,
+      actionClassStyle: "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600",
+    },
+  ];
+
+  onMount(() => {
+    fetchHighlights();
+  });
+
+
 </script>
 
-<main class="flex flex-col items-center justify-center w-full h-full">
-  <div class="bg-gray-50 shadow-md w-[90%] lg:w-[80%] p-6 rounded-lg">
-    <div class="flex justify-end mb-4">
+<main class="flex flex-col items-center w-full min-h-screen bg-gray-50 py-8">
+  <!-- Title -->
+  <div class="w-4/5">
+
+    <hr class="border-t-2 border-gray-200 mb-6" />
+  </div>
+
+  <!-- Table for showing highlights -->
+  <div class="bg-white shadow-lg rounded-lg w-4/5 p-6">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">Manage Highlights</h1>
+    <hr class="border-t-2 border-gray-200 mb-6" />
+    <Table {newTable} actionsSlot={true} {actionConfigs} />
+
+    <div class="flex justify-end mt-6">
       <button
-              class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onclick={() => (addPopup = true)}
+              class="bg-green-500 text-white px-5 py-3 rounded-lg font-medium shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-200"
+              on:click={() => openModal("add")}
       >
-        Add Highlight
+        + Add Highlight
       </button>
     </div>
-
-    <!-- Table component displaying highlights -->
-    <Table newTable={newTable} actionConfigs={[deleteActionConfig, editActionConfig]} />
-
-    <!-- Delete confirmation popup -->
-    {#if enabledPopup}
-      <WarningPopUp
-              bind:enabled_popup={enabledPopup}
-              popupText="Are you sure you want to delete this highlight?"
-              onConfirmFunction={confirmDelete}
-      />
-    {/if}
-
-    <!-- Edit text field popup -->
-    {#if editPopup}
-      <EditTextField
-              bind:enabled_popup={editPopup}
-              bind:commentValue={editValue}
-              on:confirmEdit={(e) => confirmEdit(e.detail)}
-      />
-    {/if}
-
-    <!-- Add highlight popup -->
-    {#if addPopup}
-      <div class="popup-wrapper">
-        <div class="popup-overlay" onclick={() => (addPopup = false)}></div>
-        <div class="bg-white p-6 rounded shadow-md">
-          <h2 class="text-lg font-semibold mb-4">Add New Highlight</h2>
-          <div class="mb-4">
-            <label class="block mb-2 font-medium">Name</label>
-            <input type="text" bind:value={newName} class="w-full border px-2 py-1 rounded" />
-          </div>
-          <div class="mb-4">
-            <label class="block mb-2 font-medium">Description</label>
-            <textarea bind:value={newDescription} class="w-full border px-2 py-1 rounded"></textarea>
-          </div>
-          <div class="mb-4">
-            <label class="block mb-2 font-medium">Category</label>
-            <input type="text" bind:value={newCategory} class="w-full border px-2 py-1 rounded" />
-          </div>
-          <div class="flex justify-end gap-4">
-            <button
-                    class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                    onclick={() => (addPopup = false)}
-            >
-              Cancel
-            </button>
-            <button
-                    class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                    onclick={addHighlight}
-            >
-              Add
-            </button>
-          </div>
-        </div>
-      </div>
-    {/if}
   </div>
+
+  <!-- Warning popup for delete confirmation -->
+  {#if enabled_popup}
+    <WarningPopUp
+            bind:enabled_popup
+            popupText={popupText}
+            onConfirmFunction={confirmDeleteHighlight}
+    />
+  {/if}
+
+  <!-- add/edit actions -->
+  {#if enableModal}
+    <Modal bind:modal={modalConfig} bind:enableEditModal={enableModal} />
+  {/if}
 </main>
 
 <style>
   main {
-    height: 100vh;
-    background-color: #f8f9fa;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-family: "Arial", sans-serif;
   }
 
-  .bg-gray-50 {
-    box-sizing: border-box;
+  h1 {
+    text-align: left;
   }
 
-  /* Centering the popups */
-  .popup-wrapper {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 50;
+  hr {
+    border-color: #e5e7eb;
   }
 
-  .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.03);
-    z-index: 40;
+  button:focus {
+    outline: none;
   }
 </style>
