@@ -1,5 +1,4 @@
 <script lang="ts">
-    import {authToken} from "../../stores/auth";
     import {logout} from "../../utils/authHandler.svelte";
     import { onMount} from "svelte";
 

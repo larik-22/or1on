@@ -60,7 +60,7 @@
             } else {
                 errors = { message: [result.message || "Failed to update password."] };
             }
-        } catch (err) {
+        } catch {
             errors = { message: ["An unexpected error occurred. Please try again."] };
         } finally {
             isSubmitting = false;
