@@ -3,7 +3,6 @@ import type {HighlightFeature} from "../models/models";
 import {modals} from "svelte-modals";
 import HighlightModal from "../components/highlights/HighlightModal.svelte";
 import L from "leaflet";
-import type SMap from "sveaflet/dist/SMap.svelte";
 
 /**
  * Handles the point to layer conversion
@@ -78,12 +77,11 @@ export const getUserLocation = (): Promise<L.LatLng> => {
 }
 
 /**
- * Displays the user location on the map and zooms to it
- * @param map The map to display the location on
+ * Gets a marker for the user location
  * @param latlng The location to display
  */
-export const displayUserLocation = (map: SMap, latlng: L.LatLng) => {
-	map.setView(latlng, 15);
+export const getUserLocationMarker = (latlng: L.LatLng) => {
+	//map.setView(latlng, 15);
 
 	const marker = L.marker(latlng, {
 		icon: L.icon({
@@ -93,6 +91,7 @@ export const displayUserLocation = (map: SMap, latlng: L.LatLng) => {
 			popupAnchor: [0, -15]
 		})
 	});
+	marker.bindPopup("You are here");
 
-	marker.addTo(map);
+	return marker;
 }
