@@ -94,47 +94,56 @@
 
             <!-- Tour Details -->
             <div class="space-y-4 mb-6">
-                <label class="block">
+                <label for="tour-name" class="block">
                     Name:
-                    <input
-                            type="text"
-                            bind:value={tour.name}
-                            class="w-full p-2 mt-1 border border-gray-300 rounded"
-                            required
-                    />
                 </label>
-                <label class="block">
+                <input
+                        id="tour-name"
+                        type="text"
+                        bind:value={tour.name}
+                        class="w-full p-2 mt-1 border border-gray-300 rounded"
+                        required
+                />
+
+                <label for="tour-description" class="block">
                     Description:
-                    <textarea
-                            bind:value={tour.description}
-                            class="w-full p-2 mt-1 border border-gray-300 rounded"
-                            required
-                    ></textarea>
                 </label>
-                <label class="block">
+                <textarea
+                        id="tour-description"
+                        bind:value={tour.description}
+                        class="w-full p-2 mt-1 border border-gray-300 rounded"
+                        required
+                ></textarea>
+
+                <label for="tour-category" class="block">
                     Category:
-                    <input
-                            type="text"
-                            bind:value={tour.category}
-                            class="w-full p-2 mt-1 border border-gray-300 rounded"
-                    />
                 </label>
-                <label class="block">
+                <input
+                        id="tour-category"
+                        type="text"
+                        bind:value={tour.category}
+                        class="w-full p-2 mt-1 border border-gray-300 rounded"
+                />
+
+                <label for="tour-duration" class="block">
                     Duration Time:
-                    <input
-                            type="time"
-                            bind:value={tour.duration_time}
-                            class="w-full p-2 mt-1 border border-gray-300 rounded"
-                    />
                 </label>
-                <label class="block">
+                <input
+                        id="tour-duration"
+                        type="time"
+                        bind:value={tour.duration_time}
+                        class="w-full p-2 mt-1 border border-gray-300 rounded"
+                />
+
+                <label for="tour-start-hour" class="block">
                     Start Hour:
-                    <input
-                            type="time"
-                            bind:value={tour.start_hour}
-                            class="w-full p-2 mt-1 border border-gray-300 rounded"
-                    />
                 </label>
+                <input
+                        id="tour-start-hour"
+                        type="time"
+                        bind:value={tour.start_hour}
+                        class="w-full p-2 mt-1 border border-gray-300 rounded"
+                />
             </div>
 
             <!-- Highlights Section -->
@@ -148,8 +157,9 @@
                 {:else}
                     <!-- Category Filter -->
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Filter by Category:</label>
+                        <label for="filter-category" class="block text-sm font-medium text-gray-700">Filter by Category:</label>
                         <select
+                                id="filter-category"
                                 bind:value={filterCategory}
                                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                         >

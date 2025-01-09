@@ -1,7 +1,7 @@
 <script lang="ts">
 
 import BurgerBar from "./burgerBar/BurgerBar.svelte";
-let actionT = $state("none")
+
 import page from "page";
 import type {BarItem} from "./burgerBar/BurgerBar.svelte";
 import {isUserLoggedIn, isUserAdmin} from "../stores/auth";
