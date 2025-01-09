@@ -5,8 +5,14 @@
     import page from "page";
     import type {BarItem} from "./burgerBar/BurgerBar.svelte";
     import {isUserLoggedIn, isUserAdmin} from "../stores/auth";
+    import UserManagement from "./moderatorDashboard/UserManagement.svelte";
     import Homepage from "../../pages/Homepage.svelte";
     import UserIndicator from "./userDashboard/UserIndicator.svelte";
+    import ChangePassword from "./userDashboard/ChangePassword.svelte";
+    import ChangeUsername from "./userDashboard/ChangeUsername.svelte";
+    import LogOut from "./userDashboard/LogOut.svelte";
+    import ToursManage from "./moderatorDashboard/ToursManage.svelte";
+
 
     let {
         currentRoute,
@@ -25,230 +31,237 @@
         }
     ]);
 
-
-    let UserBarItems: BarItem[] = $state([
-        {
-            label: "Tours",
-            overrideClick: true,
-            overrideFunction: () => {
-                page.redirect("/tours")
-            }
-        },
-        {
-            label: "My highlights"
-        },
-        {
-            label: "My reviews"
-        },
-        {
-            label: "My feedbacks",
-            overrideClick: true,
-            overrideFunction: () => {
-                page.redirect("/feedbacks")
-            }
-        },
-        {
-            label: "Suggest highlight",
-            overrideClick: true,
-            overrideFunction: () => {
-                page.redirect("/suggest-highlight")
-            }
-        },
-        {
-            label: "User dashboard",
-            overrideClick: true,
-            overrideFunction: () => {
-                page.redirect("/user-dashboard")
-            }
-        },
-        {
-            label: "Test Path",
-            overrideClick: true,
-            overrideFunction: () => {
-                page.redirect("/test")
-            }
-        },
-    ])
-    let AdminBarItems: BarItem[] = $state([
-        {
-            label: "Moderator dashboard",
-            overrideClick: true,
-            overrideFunction: () => {
-                page.redirect("/moderator-dashboard")
-            }
-        },
-    ])
-
-    let AdminDashboardBarItems: BarItem[] = $state([
-        {
-            label: "Users",
-            subitems: [
-                {
-                    label: "Manage",
-                    action: () => {
-                        page.redirect("/user-management")
-                    }
-                }
-            ]
-        },
-        {
-            label: "Highlights",
-            subitems: [
-                {
-                    label: "Manage",
-                    action: () => {
-                        console.log("Hi")
-                    }
-                },
-                {
-                    label: "Suggestions",
-                    action: () => {
-                        console.log("Hi")
-                    }
-                },
-                {
-                    label: "Feedback",
-                    action: () => {
-                       page.redirect("/feedbacks-management")
-                    }
-                }
-            ]
-        },
-        {
-            label: "Tours",
-            subitems: [
-                {
-                    label: "Manage",
-                    action: () => {
-                        console.log("Hi")
-                    }
-                }
-            ]
-        }
-    ])
-    let UserDashboardBarItems: BarItem[] = $state([
-        {
-            label: "Change Password",
-            overrideClick: true,
-            overrideFunction: () => {
-                page.redirect("change-password")
-            }
-        },
-        {
-            label: "Change Username",
-            overrideClick: true,
-            overrideFunction: () => {
-                page.redirect("change-username")
-            }
-        },
-        {
-            label: "Log Out",
-            overrideClick: true,
-            overrideFunction: () => {
-                page.redirect("logout")
-            }
-        }
-    ])
-
-
     $effect(() => {
         if ($isUserLoggedIn) {
             switch (currentRoute) {
                 case "/":
-                    if ($isUserAdmin) {
-                        BarItems = AdminBarItems;
+                    if (!$isUserAdmin) {
+                        BarItems = [
+                            {
+                                label: "Tours",
+                                overrideClick: true,
+                                overrideFunction: () => {
+                                    page.redirect("/tours")
+                                }
+                            },
+                            {
+                                label: "My Highlights",
+                                overrideClick: true,
+                                overrideFunction: () => {
+                                    page.redirect("/my-highlights")
+                                }
+                            },
+                            {
+                                label: "My reviews"
+                            },
+                            {
+                                label: "Suggest highlight",
+                                overrideClick: true,
+                                overrideFunction: () => {
+                                    page.redirect("/suggest-highlight")
+                                }
+                            },
+                            {
+                                label: "User dashboard",
+                                overrideClick: true,
+                                overrideFunction: () => {
+                                    page.redirect("/user-dashboard")
+                                }
+                            },
+                            {
+                                label: "Test Path",
+                                overrideClick: true,
+                                overrideFunction: () => {
+                                    page.redirect("/test")
+                                }
+                            },
+                        ]
                         AdditionalComponent = UserIndicator
                         CurrentLocation = "Home"
                     } else {
-                        BarItems = UserBarItems;
+                        BarItems = [
+                            {
+                                label: "Moderator dashboard",
+                                overrideClick: true,
+                                overrideFunction: () => {
+                                    page.redirect("/moderator-dashboard")
+                                }
+                            },
+                        ]
                         AdditionalComponent = UserIndicator
                         CurrentLocation = "Home"
                     }
                     break;
-
+                case "/tours":
+                    BarItems = [
+                        {
+                            label: "My Highlights",
+                            overrideClick: true,
+                            overrideFunction: () => {
+                                page.redirect("/my-highlights")
+                            }
+                        },
+                        {
+                            label: "My reviews"
+                        },
+                        {
+                            label: "Suggest highlight",
+                            overrideClick: true,
+                            overrideFunction: () => {
+                                page.redirect("/suggest-highlight")
+                            }
+                        },
+                        {
+                            label: "User dashboard",
+                            overrideClick: true,
+                            overrideFunction: () => {
+                                page.redirect("/user-dashboard")
+                            }
+                        },
+                        {
+                            label: "Test Path",
+                            overrideClick: true,
+                            overrideFunction: () => {
+                                page.redirect("/test")
+                            }
+                        },
+                    ]
+                    AdditionalComponent = UserIndicator
+                    CurrentLocation = "Tours"
+                    break;
+                case "/my-highlights":
+                    BarItems = [
+                        {
+                            label: "Tours",
+                            overrideClick: true,
+                            overrideFunction: () => {
+                                page.redirect("/tours")
+                            }
+                        },
+                        {
+                            label: "My reviews"
+                        },
+                        {
+                            label: "Suggest highlight",
+                            overrideClick: true,
+                            overrideFunction: () => {
+                                page.redirect("/suggest-highlight")
+                            }
+                        },
+                        {
+                            label: "User dashboard",
+                            overrideClick: true,
+                            overrideFunction: () => {
+                                page.redirect("/user-dashboard")
+                            }
+                        },
+                        {
+                            label: "Test Path",
+                            overrideClick: true,
+                            overrideFunction: () => {
+                                page.redirect("/test")
+                            }
+                        },
+                    ]
+                    AdditionalComponent = UserIndicator
+                    CurrentLocation = "My Highlights"
+                    break;
                 case "/test":
                     BarItems = []
                     CurrentLocation = "Test Page PLS WORK MAN"
                     break;
-
                 case "/moderator-dashboard":
-                    BarItems = AdminDashboardBarItems;
-                    CurrentLocation = "Moderator Dashboard"
-                    AdditionalComponent = UserIndicator
+                    if ($isUserAdmin) {
+                        BarItems = [
+                            {
+                                label: "Users",
+                                subitems: [
+                                    {
+                                        label: "Manage",
+                                        action: () => {
+                                            currentPage = UserManagement
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                label: "Highlights",
+                                subitems: [
+                                    {
+                                        label: "Manage",
+                                        action: () => {
+                                            console.log("Hi")
+                                        }
+                                    },
+                                    {
+                                        label: "Suggestions",
+                                        action: () => {
+                                            console.log("Hi")
+                                        }
+                                    },
+                                    {
+                                        label: "Feedback",
+                                        action: () => {
+                                            console.log("Hi")
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                label: "Tours",
+                                subitems: [
+                                    {
+                                        label: "Manage",
+                                        action: () => {
+                                            currentPage = ToursManage
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                        CurrentLocation = "Moderator Dashboard"
+                        AdditionalComponent = UserIndicator
+                    } else {
+                        page.redirect("/")
+                    }
+
                     break;
 
                 case "/user-dashboard":
-                    if ($isUserAdmin) {
-                        page.redirect("/")
+                    if (!$isUserAdmin) {
+                        BarItems = [
+                            {
+                                label: "Change Password",
+                                overrideClick: true,
+                                overrideFunction: () => {
+                                    currentPage = ChangePassword
+                                }
+                            },
+                            {
+                                label: "Change Username",
+                                overrideClick: true,
+                                overrideFunction: () => {
+                                    currentPage = ChangeUsername
+                                }
+                            },
+                            {
+                                label: "Log Out",
+                                overrideClick: true,
+                                overrideFunction: () => {
+                                    currentPage = LogOut
+                                }
+                            }
+                        ]
+                        CurrentLocation = "User Dashboard"
+                        AdditionalComponent = UserIndicator
                     } else {
-                        BarItems = UserDashboardBarItems;
-                        CurrentLocation = "User Dashboard"
-                        AdditionalComponent = UserIndicator
+                        page.redirect("/")
                     }
+
                     break;
 
-                case "/user-management":
-                    CurrentLocation = "User Management"
-                    BarItems = AdminDashboardBarItems;
-                    AdditionalComponent = UserIndicator
-                    break;
-
-                case "/feedbacks":
-                    if ($isUserAdmin) {
-                        page.redirect("/")
-                    } else {
-                        CurrentLocation = "My Feedbacks"
-                        BarItems = UserBarItems;
-                        AdditionalComponent = UserIndicator
-                    }
-                    break;
-
-                case "/suggest-highlight":
-                    if ($isUserAdmin) {
-                        page.redirect("/")
-                    } else {
-                        CurrentLocation = "Suggest Highlight"
-                        BarItems = UserBarItems;
-                        AdditionalComponent = UserIndicator
-                    }
-                    break;
-
-                case "/change-username":
-                    if ($isUserAdmin) {
-                        page.redirect("/")
-                    }
-                    else{
-                        BarItems = UserDashboardBarItems;
-                        CurrentLocation = "User Dashboard"
-                        AdditionalComponent = UserIndicator
-                    }
-                    break;
-                case "/change-password":
-                    if ($isUserAdmin) {
-                        page.redirect("/")
-                    }
-                    else{
-                        BarItems = UserDashboardBarItems;
-                        CurrentLocation = "User Dashboard"
-                        AdditionalComponent = UserIndicator
-                    }
-                    break;
-                case "/logout":
-                    if ($isUserAdmin) {
-                        page.redirect("/")
-                    }
-                    else{
-                        BarItems = UserDashboardBarItems;
-                        CurrentLocation = "User Dashboard"
-                        AdditionalComponent = UserIndicator
-                    }
-                    break;
-                case "/feedbacks-management":
-                    BarItems = AdminDashboardBarItems;
-                    CurrentLocation = "Feedbacks Management"
-                    AdditionalComponent = UserIndicator
-                    break;
             }
+
         } else {
             BarItems = [
                 {

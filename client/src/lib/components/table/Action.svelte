@@ -4,6 +4,7 @@
         actionIconPath?: string;
         actionFunction: (value?: any) => void;
         actionClassStyle?: string;
+
     }
 
 </script>
