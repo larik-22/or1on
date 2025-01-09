@@ -2074,8 +2074,16 @@ describe('GET /:id/map/highlights', () => {
         };
 
         em.findOne = vi.fn(async () => ({
+
             highlights: {
-                getItems: () => [{
+                getItems:
+                    /**
+                     * Handles the GET request to fetch highlights for a specific map.
+                     *
+                     * @returns {Promise<void>} A promise that resolves when the highlights
+                     * are successfully fetched.
+                     */
+                    () => [{
                     id: 1,
                     name: 'Test Highlight',
                     description: 'Test Description',
@@ -2099,8 +2107,17 @@ describe('GET /:id/map/highlights', () => {
 
     it('should return 404 when no highlights found', async () => {
         em.findOne = vi.fn(async () => ({
+
             highlights: {
-                getItems: () => []
+                getItems:
+                    /**
+                     * Handles the GET request to fetch highlights for a specific map.
+                     *
+                     * @returns {Promise<Response>} A promise that resolves to
+                     * the response object containing the highlights.
+                     */
+                    () => []
+
             }
         }));
 
