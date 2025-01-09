@@ -11,12 +11,14 @@
 	import {onMount} from "svelte";
 	import FilterDropdown from "../lib/components/highlights/FilterDropdown.svelte";
 	import "leaflet.markercluster";
+	import {displayUserLocation, getMapMarker, getUserLocation} from "../lib/utils/mapUtils.svelte";
+	import {userLocation} from "../lib/stores/userLocation";
 
 	let geoJSONData: FeatureCollection | null = $state(null);
 	let geoJSONElement: SGeoJson | null = $state(null);
 	let map: SMap | null = $state(null);
 	let currentHighlightFilter: string[] = $state([]);
-	let userLocation: LatLng | null = $state(null);
+
 	let markerClusterGroup: L.MarkerClusterGroup = $state(L.markerClusterGroup({
 		showCoverageOnHover: false,
 		spiderfyOnMaxZoom: true,
@@ -35,20 +37,10 @@
 	onMount(() => {
 		fetchGeoJSON();
 
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition((position) => {
-				userLocation = new L.LatLng(position.coords.latitude, position.coords.longitude);
-			});
-		}
-
 		//Zoom to user location
 		$effect(() => {
-			if (userLocation) {
-				//map?.setView(userLocation, 13);
-
-				// Add user location marker
-				const userMarker = new L.Marker(userLocation);
-				userMarker.addTo(map);
+			if ($userLocation != null) {
+				displayUserLocation(map, $userLocation);
 			}
 		})
 	});
@@ -67,56 +59,9 @@
 	 * @param latlng
 	 */
 	const handlePointToLayer = (feature: HighlightFeature, latlng: L.LatLng): L.Layer => {
-		const color = getHighlightColor(feature.properties.category);
-		const radius = 8;
-
-		const marker = L.circleMarker(latlng, {
-			radius,
-			fillColor: color,
-			color: "#333",
-			weight: 1.5,
-			opacity: 0.8,
-			fillOpacity: 0.7,
-		});
-
-		marker.on("mouseover", () => {
-			marker.setStyle({
-				radius: radius * 1.2,
-				fillOpacity: 0.8,
-			});
-		});
-
-		marker.on("mouseout", () => {
-			marker.setStyle({
-				radius,
-				fillOpacity: 0.7
-			});
-		});
-
-		marker.on('click', () => openHighlightModal(feature));
-
-		if (feature.properties.name) {
-			marker.bindTooltip(`<strong>${feature.properties.name}</strong><br>Click to see more information`, {
-				permanent: false,
-				direction: "top",
-				className: "custom-tooltip"
-			});
-		}
-
+		const marker: L.CircleMarker = getMapMarker(feature, latlng);
 		return markerClusterGroup.addLayer(marker);
 	};
-
-	/**
-	 * Opens the modal with the highlight information
-	 * @param feature The feature to show in the modal
-	 */
-	const openHighlightModal = async (feature: HighlightFeature) => {
-		await modals.open(HighlightModal, {
-			name: feature.properties.name,
-			description: feature.properties.description,
-			highlightId: feature.properties.id
-		})
-	}
 
 	/**
 	 * Filters the GeoJSON features based on the current filter
@@ -129,9 +74,7 @@
 		return false;
 	}
 
-	/**
-	 * Applies the current filter to the GeoJSON data
-	 */
+
 	/**
 	 * Applies the current filter to the GeoJSON data
 	 */
