@@ -21,6 +21,7 @@
     import Feedback from "./pages/Feedback.svelte";
     import Tours from "./pages/Tours.svelte";
     import MyHighlights from "./pages/MyHighlights.svelte";
+    import TourPage from "./pages/TourPage.svelte";
 
     let page: any;
     let params: Context;
@@ -34,6 +35,12 @@
 
     router('/tours', (ctx: Context) => {
         page = Tours;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
+    router("/tours/:id", (ctx: Context) => {
+        page = TourPage;
         currentRoute = ctx.pathname;
         params = ctx;
     });
