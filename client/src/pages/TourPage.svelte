@@ -1,15 +1,13 @@
 <script lang="ts">
 	import page, {type Context} from "page";
 	import {Control, ControlZoom, GeoJSON, Map, TileLayer} from "sveaflet";
-	//@ts-ignore
+	//@ts-expect-error - This is available but still highlighted as error (idk why)
 	import type SMap from "sveaflet/dist/SMap.svelte";
 	import type {Feature, FeatureCollection} from "geojson";
-	//@ts-ignore
-	import type SGeoJson from "sveaflet/dist/SGeoJSON.svelte";
 	import L, {LatLng} from "leaflet";
 	import {type Tour} from "../lib/models/models";
 	import {onDestroy, onMount} from "svelte";
-	import {getUserLocationMarker, getMapMarker, getUserLocation} from "../lib/utils/mapUtils.svelte";
+	import {getUserLocationMarker, getMapMarker} from "../lib/utils/mapUtils.svelte";
 	import 'leaflet-routing-machine';
 	import 'lrm-graphhopper';
 	import {userLocation} from "../lib/stores/userLocation";
