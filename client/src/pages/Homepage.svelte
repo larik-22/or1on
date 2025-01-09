@@ -1,23 +1,20 @@
 <script lang="ts">
 	import {Control, ControlZoom, GeoJSON, Map, TileLayer} from 'sveaflet';
 	import L, {LatLng} from 'leaflet';
-	import {modals} from 'svelte-modals'
 	import type {FeatureCollection} from "geojson";
 	import {type HighlightFeature, HighlightType} from "../lib/models/models";
-	import {getHighlightColor} from "../lib/utils/highlightTypeColor";
 	import type SMap from "sveaflet/dist/SMap.svelte";
 	import type SGeoJson from "sveaflet/dist/SGeoJSON.svelte";
-	import HighlightModal from "../lib/components/highlights/HighlightModal.svelte";
 	import {onMount} from "svelte";
 	import FilterDropdown from "../lib/components/highlights/FilterDropdown.svelte";
 	import "leaflet.markercluster";
-	import {displayUserLocation, getMapMarker, getUserLocation} from "../lib/utils/mapUtils.svelte";
-	import {userLocation} from "../lib/stores/userLocation";
+	import {getUserLocationMarker, getMapMarker, getUserLocation} from "../lib/utils/mapUtils.svelte";
 
 	let geoJSONData: FeatureCollection | null = $state(null);
 	let geoJSONElement: SGeoJson | null = $state(null);
 	let map: SMap | null = $state(null);
 	let currentHighlightFilter: string[] = $state([]);
+	let userLocation: LatLng | null = $state(null);
 
 	let markerClusterGroup: L.MarkerClusterGroup = $state(L.markerClusterGroup({
 		showCoverageOnHover: false,
@@ -37,10 +34,16 @@
 	onMount(() => {
 		fetchGeoJSON();
 
+		getUserLocation().then((location) => {
+			userLocation = location;
+		}).catch(() => {
+			userLocation = null;
+		});
+
 		//Zoom to user location
 		$effect(() => {
-			if ($userLocation != null) {
-				displayUserLocation(map, $userLocation);
+			if (userLocation != null) {
+				map?.addLayer(getUserLocationMarker(userLocation));
 			}
 		})
 	});
