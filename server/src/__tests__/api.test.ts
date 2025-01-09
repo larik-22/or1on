@@ -2052,3 +2052,80 @@ describe('POST /highlights/:id/feedbacks', () => {
         expect(responseBody.error.message).toBe('Unauthorized');
     });
 });
+describe('GET /:id/map/highlights', () => {
+    it('should successfully return highlights', async () => {
+        const mockGeoJSON = {
+            type: 'FeatureCollection',
+            features: [
+                {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [0, 0],
+                    },
+                    properties: {
+                        id: 1,
+                        name: 'Test Highlight',
+                        description: 'Test Description',
+                        category: 'Test Category',
+                    },
+                },
+            ],
+        };
+
+        em.findOne = vi.fn(async () => ({
+            highlights: {
+                getItems: () => [{
+                    id: 1,
+                    name: 'Test Highlight',
+                    description: 'Test Description',
+                    category: 'Test Category',
+                    latitude: 0,
+                    longitude: 0,
+                }]
+            }
+        }));
+
+        const response = await app.request('/tours/1/map/highlights', {
+            method: 'GET'
+        }, mockEnv);
+
+        expect(response.status).toBe(200);
+        expect(JSON.parse(await response.text())).toEqual({
+            geoJSON: mockGeoJSON,
+            highlights: expect.any(Array)
+        });
+    });
+
+    it('should return 404 when no highlights found', async () => {
+        em.findOne = vi.fn(async () => ({
+            highlights: {
+                getItems: () => []
+            }
+        }));
+
+        const response = await app.request('/tours/1/map/highlights', {
+            method: 'GET'
+        }, mockEnv);
+
+        expect(response.status).toBe(404);
+        const text = await response.text();
+        expect(JSON.parse(text)).toEqual({ message: 'No highlights found' });
+    });
+
+    it('should return 500 on internal error', async () => {
+        em.findOne = vi.fn(async () => {
+            throw new Error('Database error');
+        });
+
+        const response = await app.request('/tours/1/map/highlights', {
+            method: 'GET'
+        }, mockEnv);
+
+        expect(response.status).toBe(500);
+        const text = await response.text();
+        const body = JSON.parse(text);
+        expect(body.error.code).toBe(500);
+        expect(body.error.message).toBe('Internal error');
+    });
+});

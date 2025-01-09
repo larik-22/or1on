@@ -80,7 +80,7 @@ export const getHighlightsByTour = async (
         return { geoJSON, highlights };
     } catch (error) {
         logger.error('Failed to fetch highlights for tour with id: ' + tourId + ' error: ' + error);
-        return { geoJSON: null, highlights: null };
+        throw error; // Throw the error instead of returning null values
     }
 };
 

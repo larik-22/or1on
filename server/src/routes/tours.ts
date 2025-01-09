@@ -96,13 +96,18 @@ tours.get('/:id/map/highlights', async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();
-        const geoJSON = await getHighlightsByTour(em, parseInt(id));
+        const result = await getHighlightsByTour(em, parseInt(id));
 
-        if (!geoJSON) {
+        // Check if either geoJSON or highlights are null
+        if (!result.geoJSON || !result.highlights) {
             return ctx.json({ message: 'No highlights found' }, 404);
         }
 
-        return ctx.json(geoJSON, 200);
+        // Return the entire result object as a properly formatted JSON response
+        return ctx.json({
+            geoJSON: result.geoJSON,
+            highlights: result.highlights
+        }, 200);
     } catch (error) {
         logger.error('Error while fetching tour highlights', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
