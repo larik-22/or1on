@@ -1,9 +1,21 @@
+<script lang="ts">
+
+    import {authToken, decodeToken} from "../../stores/auth";
+
+    let username : string = $state(getUsername());
+
+    function getUsername(): string {
+        let name: string | undefined = decodeToken($authToken)?.username
+        return name == null ? "username" : name
+    }
+</script>
+
 <main>
     <div class="bg-gray-200 border-r border-gray-300 min-w-[320px] w-[15vw]">
         <div class="text-center mb-6 ">
             <img src="/path/to/profile-pic.jpg" alt="Profile of Username"
                  class="w-16 h-16 rounded-full mx-auto mb-2 border-2 border-gray-300" />
-            <h3 class="text-xl font-semibold text-gray-800">Hello, Username</h3>
+            <h3 class="text-xl font-semibold text-gray-800">Hello, {username}</h3>
         </div>
     </div>
 </main>
