@@ -1,5 +1,6 @@
 stages:
   - lint_and_test
+  - publish
 
 lint_and_test:
   stage: lint_and_test
@@ -21,4 +22,28 @@ lint_and_test:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
       when: always
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      when: always
+
+publish:
+  stage: publish
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - echo "$PAT" | docker login "$REGISTRY" -u "$GITLAB_USER_LOGIN" --password-stdin
+  script:
+    - docker build ./client --file ./client/Dockerfile --tag "$REGISTRY/$PROJECT_PATH/or1on-client:latest"
+    - docker push "$REGISTRY/$PROJECT_PATH/or1on-client:latest"
+
+    - docker build ./server --file ./server/Dockerfile --tag "$REGISTRY/$PROJECT_PATH/or1on-server:latest"
+    - docker push "$REGISTRY/$PROJECT_PATH/or1on-server:latest"
+
+    - docker pull postgres:latest
+    - docker tag postgres:latest "$REGISTRY/$PROJECT_PATH/postgres:latest"
+    - docker push "$REGISTRY/$PROJECT_PATH/postgres:latest"
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "develop"'
       when: always
