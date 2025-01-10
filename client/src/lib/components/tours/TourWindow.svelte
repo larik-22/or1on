@@ -1,17 +1,15 @@
 <script lang="ts">
     import FilterDropdown from "../highlights/FilterDropdown.svelte";
 
-    const { tours, onSelect } = $props<{
+    const {tours, onSelect} = $props<{
         tours: any[],
         onSelect: (id: string) => void
     }>();
 
-    console.log(tours);
-
     let currentFilter: string[] = $state([]);
 
     /**
-    * Filter formation options
+     * Filter formation options
      */
     const filterOptions = $derived.by(() => {
         const categories = tours
@@ -53,22 +51,23 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="max-height: 34rem; overflow-y: auto;">
             {#each applyFilter() as tour (tour.id)}
                 <button
-                        class="tour-card p-4 bg-gray-100 border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:bg-gray-200"
                         onclick={() => onSelect(tour.id)}
                 >
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">{tour.name}</h3>
-                    <p class="text-sm text-gray-600 mb-1">
-                        <span class="font-semibold">Category:</span> {tour.category}
-                    </p>
-                    <p class="text-sm text-gray-600 mb-1">
-                        <span class="font-semibold">Description:</span> {tour.description}
-                    </p>
-                    <p class="text-sm text-gray-600 mb-1">
-                        <span class="font-semibold">Duration:</span> {formatDuration(tour.duration_time)}
-                    </p>
-                    <p class="text-sm text-gray-600">
-                        <span class="font-semibold">Start Time:</span> {tour.start_hour}
-                    </p>
+                    <div class="bg-white p-4 mb-4 rounded-lg shadow-md w-full max-w-lg">
+                        <h3 class="text-xl font-semibold text-gray-800">{tour.name}</h3>
+                        <p class="text-sm text-gray-600 mb-1">
+                            <span class="font-semibold">Category:</span> {tour.category}
+                        </p>
+                        <p class="text-sm text-gray-600 mb-1">
+                            <span class="font-semibold">Description:</span> {tour.description}
+                        </p>
+                        <p class="text-sm text-gray-600 mb-1">
+                            <span class="font-semibold">Duration:</span> {formatDuration(tour.duration_time)}
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            <span class="font-semibold">Start Time:</span> {tour.start_hour}
+                        </p>
+                    </div>
                 </button>
             {/each}
         </div>
