@@ -1,10 +1,9 @@
 <script lang="ts">
-
+  /* eslint-disable  */
   import Table from "../table/Table.svelte";
   import WarningPopUp from "./WarningPopUp.svelte";
   import EditTextField from "./EditTextField.svelte";
   import type { TableType, Row } from "../table/Table.svelte";
-  import { fetchWithAuthSvelte } from "../../lib/utils/fetchWithAuth.svelte";
   import type { ActionConfig } from "../table/Action.svelte";
 
   let highlights = [

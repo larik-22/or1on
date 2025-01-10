@@ -1,3 +1,4 @@
+
 <script lang="ts">
 
 import BurgerBar from "./burgerBar/BurgerBar.svelte";

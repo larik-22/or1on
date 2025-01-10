@@ -40,7 +40,6 @@
                 return;
             }
 
-            // Make the API call to update the username
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/userDashboard/update-username`, {
                 method: "POST",
                 headers: {

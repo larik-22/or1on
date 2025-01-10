@@ -30,7 +30,6 @@
             return;
         }
 
-        // clear errors and set submitting state
         errors = {};
         isSubmitting = true;
 
@@ -41,7 +40,6 @@
                 return;
             }
 
-            // API call to update the password
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/userDashboard/update-password`, {
                 method: "POST",
                 headers: {
