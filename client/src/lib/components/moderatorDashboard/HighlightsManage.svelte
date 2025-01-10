@@ -17,14 +17,14 @@
   let currentRow: Row | null = null;
   let enabledPopup: boolean = $state(false);
   let editPopup: boolean = $state(false);
-  let editValue: string = "";
+  let editValue: string = $state("");
   let addPopup: boolean = $state(false);
  // let newHighlight = { id: 0, name: "", description: "", category: "" };
 
   // Reactive properties for adding a new highlight
-  let newName = "";
-  let newDescription = "";
-  let newCategory = "";
+  let newName = $state("");
+  let newDescription = $state("");
+  let newCategory = $state("");
 
   // to convert highlights data to TableType
   function dataToTable(data: typeof highlights): TableType {
@@ -37,7 +37,7 @@
   }
 
   let newTable: TableType = $state(dataToTable(highlights));
-  let customCss: string = "border-transparent w-[100%] h-[100%]";
+  // let customCss: string = "border-transparent w-[100%] h-[100%]";
 
   //delete highlight
   let deleteActionConfig: ActionConfig = {
@@ -134,14 +134,6 @@
       />
     {/if}
 
-    <!-- Edit text field popup -->
-    {#if editPopup}
-      <EditTextField
-              bind:enabled_popup={editPopup}
-              bind:commentValue={editValue}
-              on:confirmEdit={(e) => confirmEdit(e.detail)}
-      />
-    {/if}
 
     <!-- Add highlight popup -->
     {#if addPopup}
