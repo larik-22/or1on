@@ -2,7 +2,8 @@
     import { decodeToken, authToken } from "../lib/stores/auth";
     import MyHighlightWindow from "../lib/components/myHighlights/MyHighlightWindow.svelte";
 
-    //let currentUserId: string | null = null;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let currentUserId: string | null = null;
     //let myHighlights: any[] | undefined = $state(undefined);
 
     let myHighlights = [
