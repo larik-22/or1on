@@ -31,7 +31,7 @@
 
     let currentRow: Row | null = null;
     let enabledPopup: boolean = $state(false);
-    let popupText = "";
+    let popupText = $state("false");
     let isAccepting = false;
 
     // Convert suggestions data to TableType
