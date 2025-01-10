@@ -1,6 +1,7 @@
 stages:
   - lint_and_test
   - publish
+  - deploy
 
 lint_and_test:
   stage: lint_and_test
@@ -42,6 +43,29 @@ publish:
     - docker tag postgres:latest "$REGISTRY/$PROJECT_PATH/postgres:latest"
     - docker push "$REGISTRY/$PROJECT_PATH/postgres:latest"
 
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+      when: always
+
+  needs:
+    - job: lint_and_test
+      artifacts: false
+
+deploy:
+  image: ubuntu:latest
+  stage: deploy
+  before_script:
+    - apt-get -yq update
+    - apt-get -yqq install ssh
+    - install -m 600 -D /dev/null ~/.ssh/id_rsa
+    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
+    - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
+  script:
+    - ssh $SSH_USER@$SSH_HOST "cd $WORK_DIR && docker compose pull && docker compose up -d && exit"
+  after_script:
+    - rm -rf ~/.ssh
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
