@@ -28,7 +28,18 @@
 
     let UserBarItems: BarItem[] = $state([
         {
-            label: "My highlights"
+            label: "Tours",
+            overrideClick: true,
+            overrideFunction: () => {
+                page.redirect("/tours")
+            }
+        },
+        {
+            label: "My highlights",
+            overrideClick: true,
+            overrideFunction: () => {
+                page.redirect("/my-highlights")
+            }
         },
         {
             label: "My reviews"
