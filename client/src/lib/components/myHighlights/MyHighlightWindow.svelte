@@ -1,7 +1,7 @@
 <script lang="ts">
     import FilterDropdown from "../highlights/FilterDropdown.svelte";
 
-    const {myHighlights, onSelect} = $props<{
+    const { myHighlights, onSelect } = $props<{
         myHighlights: any[],
         onSelect: (id: string) => void
     }>();
@@ -14,8 +14,12 @@
     const filterOptions = $derived.by(() => {
         const categories = myHighlights
             .map((highlight) => highlight.is_approved)
-            .filter((category): category is string => category !== undefined);
-        return Array.from(new Set(categories));
+            .filter((category): category is boolean => category !== undefined);
+
+        // Map true/false to "Approved"/"Pending"
+        return Array.from(new Set(categories)).map((value) =>
+            value ? "Approved" : "Pending"
+        );
     });
 
     /**
@@ -24,9 +28,10 @@
     const applyFilter = (): any[] => {
         return currentFilter.length === 0
             ? myHighlights // show all if no filter
-            : myHighlights.filter((highlight) => currentFilter.includes(highlight.is_approved));
+            : myHighlights.filter((highlight) =>
+                currentFilter.includes(highlight.is_approved ? "Approved" : "Pending")
+            );
     };
-
 </script>
 
 <div class="w-full max-w-6xl bg-white p-8 rounded-lg shadow-md">
