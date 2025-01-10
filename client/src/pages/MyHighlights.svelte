@@ -32,7 +32,7 @@
             latitude: 52.251432,
             longitude: 6.158765,
             is_approved: true,
-            businessDescription: "Tickets: €8 for adults, €4 for kids.",
+            businessDescription: "Tickets: €80 for adults, €40 for kids.",
         },
         {
             name: "Gemeente Deewerventer",
