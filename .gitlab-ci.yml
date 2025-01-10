@@ -33,7 +33,7 @@ publish:
   before_script:
     - echo "$PAT" | docker login "$REGISTRY" -u "$GITLAB_USER_LOGIN" --password-stdin
   script:
-    - docker build ./client --file ./client/Dockerfile --tag "$REGISTRY/$PROJECT_PATH/or1on-client:latest"
+    - docker build --build-arg VITE_BACKEND_URL="${VITE_BACKEND_URL}" --build-arg VITE_GRASSHOPER_API_KEY="${VITE_GRASSHOPER_API_KEY}" --file ./client/Dockerfile --tag "$REGISTRY/$PROJECT_PATH/or1on-client:latest" ./client
     - docker push "$REGISTRY/$PROJECT_PATH/or1on-client:latest"
 
     - docker build ./server --file ./server/Dockerfile --tag "$REGISTRY/$PROJECT_PATH/or1on-server:latest"
