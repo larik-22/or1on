@@ -11,7 +11,6 @@
     import UserDashboard from "./pages/UserDashboard.svelte";
     import {Modals} from 'svelte-modals'
     import Navigation from "./lib/components/Navigation.svelte";
-    import TestHomepage from "./pages/TestHomepage.svelte";
     import SuggestHighlight from "./pages/SuggestHighlight.svelte";
     import UserFeedbacks from "./pages/UserFeedbacks.svelte";
     import UserManagement from "./lib/components/moderatorDashboard/UserManagement.svelte";
@@ -47,12 +46,6 @@
 
     router('/my-highlights', isLoggedIn, (ctx: Context) => {
         page = MyHighlights;
-        currentRoute = ctx.pathname;
-        params = ctx;
-    });
-
-    router('/test', (ctx: Context) => {
-        page = TestHomepage;
         currentRoute = ctx.pathname;
         params = ctx;
     });
