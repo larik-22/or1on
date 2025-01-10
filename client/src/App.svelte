@@ -11,7 +11,6 @@
     import UserDashboard from "./pages/UserDashboard.svelte";
     import { Modals } from 'svelte-modals'
     import Navigation from "./lib/components/Navigation.svelte";
-    import TestHomepage from "./pages/TestHomepage.svelte";
     import SuggestHighlight from "./pages/SuggestHighlight.svelte";
     import UserFeedbacks from "./pages/UserFeedbacks.svelte";
     import UserManagement from "./lib/components/moderatorDashboard/UserManagement.svelte";
@@ -20,6 +19,7 @@
     import LogOut from "./lib/components/userDashboard/LogOut.svelte";
     import Feedback from "./pages/Feedback.svelte";
     import Tours from "./pages/Tours.svelte";
+    import TourPage from "./pages/TourPage.svelte";
 
     let page: any;
     let params: Context;
@@ -37,8 +37,8 @@
         params = ctx;
     });
 
-    router('/test', (ctx: Context) => {
-        page = TestHomepage;
+    router("/tours/:id", (ctx: Context) => {
+        page = TourPage;
         currentRoute = ctx.pathname;
         params = ctx;
     });
