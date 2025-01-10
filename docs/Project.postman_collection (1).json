@@ -1,0 +1,700 @@
+{
+	"info": {
+		"_postman_id": "98c59ae9-335e-4c31-98dc-c544c47a8c8f",
+		"name": "Project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34916244"
+	},
+	"item": [
+		{
+			"name": "Creates a new user account",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"isAdmin\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/auth",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JWT token user upon successful authentication",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/auth/tokens",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"auth",
+						"tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Confirming user access to a protected route",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/test/protected",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"test",
+						"protected"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Confirming user no access to an admin-protected route.",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/test/adminprotected",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"test",
+						"adminprotected"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new admin account",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\",\n  \"isAdmin\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/auth",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JWT token admin upon successful authentication",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/auth/tokens",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"auth",
+						"tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Confirming admin access to a protected route",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 52cadc49-8029-4a47-ad84-f562d05b62ad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/test/protected",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"test",
+						"protected"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Confirming admin access to an admin-protected route.",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 52cadc49-8029-4a47-ad84-f562d05b62ad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/test/adminprotected",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"test",
+						"adminprotected"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetches list of all users accessible to admins",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetches one user accessible to admins",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/users/550e8400-e29b-41d4-a716-446655440000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"550e8400-e29b-41d4-a716-446655440000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletes a user accessible to admins",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/users/550e8400-e29b-41d4-a716-446655440000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"550e8400-e29b-41d4-a716-446655440000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetches all feedbacks from a highlight accessible to all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/feedbacks/highlight/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"feedbacks",
+						"highlight",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetches feedback from a user accessible to admins",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/feedbacks/user/550e8400-e29b-41d4-a716-446655440000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"feedbacks",
+						"user",
+						"550e8400-e29b-41d4-a716-446655440000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Approves feedback",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/feedbacks/5/approve",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"feedbacks",
+						"5",
+						"approve"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletes feedback accessible to logged in users",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/feedbacks/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"feedbacks",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetches all tours accessible to all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/tours",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"tours"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetches a tour accessible to all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/tours/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"tours",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetches highlights from a tour accessible to all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/tours/5/highlights",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"tours",
+						"5",
+						"highlights"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Updates a tour accessible to admins",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"someName\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/tours/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"tours",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletes a tour accessible to admins",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/tours/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"tours",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetches all highlights accessible to all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/highlights",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"highlights"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetches one highlight accessible to all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/highlights/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"highlights",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Approves a highlight suggestion accessible to admins",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/highlights/1/approve",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"highlights",
+						"1",
+						"approve"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Updates a highlight accessible to admins",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"something\",\r\n    \"description\": \"some description\",\r\n    \"category\": \"history\",\r\n    \"latitude\": 40.7128,\r\n    \"longitude\": -74.0060,\r\n    \"is_approved\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/highlights/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"highlights",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletes a highlight accessible to admins",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/highlights/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"highlights",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Creates a highlight accessible to logged in users",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"something\",\r\n    \"description\": \"some description\",\r\n    \"category\": \"history\",\r\n    \"latitude\": 40.7128,\r\n    \"longitude\": -74.0060,\r\n    \"is_approved\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/highlights",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"highlights"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

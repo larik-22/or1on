@@ -1,0 +1,24 @@
+stages:
+  - lint_and_test
+
+lint_and_test:
+  stage: lint_and_test
+  image: node:20
+  script:
+    - cd server
+    - npm install
+    - npm run lint
+    - npm run test
+    - cd ..
+    - cd client
+    - npm install --legacy-peer-deps
+    - npm run lint
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      when: always
