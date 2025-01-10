@@ -9,7 +9,7 @@
     import isAdmin from "./lib/middleware/isAdmin.js";
     import isLoggedIn from "./lib/middleware/loggedIn";
     import UserDashboard from "./pages/UserDashboard.svelte";
-    import { Modals } from 'svelte-modals'
+    import {Modals} from 'svelte-modals'
     import Navigation from "./lib/components/Navigation.svelte";
     import SuggestHighlight from "./pages/SuggestHighlight.svelte";
     import UserFeedbacks from "./pages/UserFeedbacks.svelte";
@@ -19,6 +19,7 @@
     import LogOut from "./lib/components/userDashboard/LogOut.svelte";
     import Feedback from "./pages/Feedback.svelte";
     import Tours from "./pages/Tours.svelte";
+    import MyHighlights from "./pages/MyHighlights.svelte";
     import TourPage from "./pages/TourPage.svelte";
 
     let page: any;
@@ -43,13 +44,19 @@
         params = ctx;
     });
 
+    router('/my-highlights', isLoggedIn, (ctx: Context) => {
+        page = MyHighlights;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    });
+
     router('/moderator-dashboard', isAdmin, (ctx) => {
         page = ModeratorDashboard;
         currentRoute = ctx.pathname;
         params = ctx;
     });
 
-    router('/user-dashboard', (ctx) => {
+    router('/user-dashboard', isLoggedIn, (ctx) => {
         page = UserDashboard;
         currentRoute = ctx.pathname;
         params = ctx;
@@ -123,12 +130,12 @@
 <main>
 
     <div class="flex">
-        <Navigation currentRoute="{currentRoute}" bind:currentPage={page} ></Navigation>
+        <Navigation currentRoute="{currentRoute}" bind:currentPage={page}></Navigation>
         <svelte:component this={page} {params}/>
     </div>
 
     <Modals>
-        {#snippet backdrop({ close })}
+        {#snippet backdrop({close})}
         <div
                 role="button"
                 tabindex="0"
