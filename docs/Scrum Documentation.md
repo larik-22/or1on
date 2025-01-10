@@ -312,3 +312,31 @@ Attendees: Rafael, Ilarion, Ignat, Jan, Sarina, Robert;
 Absentees: Petko, Botond;
 
 ### 2nd Meeting (8/01/2024)
+
+Meeting Notes:
+- Rafael: Assigned to ORN-087
+- Ilarion: Assigned to ORN-080
+- Ignat: Assigned to ORN-082
+- Jan: Assigned to ORN-081 and finishing ORN-020
+- Robert: Doing hotfixes and assigned to ORN-084
+- Botond: Assigned to ORN-089
+- Sarina: Continue working on old issues. 
+- Petko: Assigned to ORN-083
+
+Attendees: Rafael, Ilarion, Ignat, Jan, Sarina, Robert;
+Absentees: Petko, Botond;
+
+### 3rd Meeting (10/01/2024)
+
+Meeting Notes:
+- Rafael: Done with ORN-087.
+- Ilarion: Done with ORN-080. 
+- Ignat: Progress on deployment
+- Jan: Done with ORN-081 and ORN-020. Assigned to ORN-088
+- Robert: Will finish by the end of the day. 
+- Botond: Assigned to ORN-086. Needs testing to finish ORN-089
+- Sarina: Done with ORN-018.
+- Petko: Done with ORN-083.
+
+Attendees: Rafael, Ilarion, Ignat, Jan, Sarina, Robert, Petko, Botond;
+Absentees: None;
