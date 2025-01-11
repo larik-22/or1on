@@ -19,31 +19,34 @@ import userDashboard from "./routes/userDashboard.js";
  */
 export const createApp = (em: EntityManager): Hono => {
     const app = new Hono();
-    app.use('*', async (ctx, next) => {
+    const api = new Hono();
+    api.use('*', async (ctx, next) => {
         ctx.set('em' as 'jwtPayload', em);
         await next();
     });
 
-    app.use('*', cors({
+    api.use('*', cors({
         origin: '*',
         allowHeaders: ['Origin', 'Content-Type', 'Authorization'],
         allowMethods: ['GET', 'OPTIONS', 'POST', 'PUT', 'DELETE'],
         credentials: true,
     }));
 
-    app.route('/auth', auth);
-    app.route('/test', test);
-    app.route('/map', map);
-    app.route('/tours', tours);
-    app.route('/users', users);
-    app.route('/feedbacks', feedbacks);
-    app.route('/highlights', highlights);
-    app.route('/userDashboard', userDashboard);
+    api.route('/auth', auth);
+    api.route('/test', test);
+    api.route('/map', map);
+    api.route('/tours', tours);
+    api.route('/users', users);
+    api.route('/feedbacks', feedbacks);
+    api.route('/highlights', highlights);
+    api.route('/userDashboard', userDashboard);
 
-    app.get('/', (c) => {
+    app.route('/api', api);
+
+    api.get('/', (c) => {
         logger.info('Received GET request on /');
         return c.text('Hello Hono!');
     });
 
-    return app;
+    return api;
 };
