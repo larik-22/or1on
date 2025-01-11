@@ -43,10 +43,10 @@ export const createApp = (em: EntityManager): Hono => {
 
     app.route('/api', api);
 
-    api.get('/', (c) => {
+    app.get('/', (c) => {
         logger.info('Received GET request on /');
         return c.text('Hello Hono!');
     });
 
-    return api;
+    return app;
 };
