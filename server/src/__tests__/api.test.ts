@@ -2148,3 +2148,96 @@ describe('GET /api/:id/map/highlights', () => {
         expect(body.error.message).toBe('Internal error');
     });
 });
+
+
+describe ('PUT /users/:id/trust', () => {
+    it('should return 400 if user is not found', async () => {
+        const admin = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+            verified: true
+        };
+
+        const user = {
+            email: 'email@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553536',
+            verified: false
+        }
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, admin);
+        const createdUser = await createUser(em, user);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: admin.password
+        });
+        em.nativeUpdate = vi.fn(async () => 1);
+        const response = await app.request(`/api/users/${createdUser.email}/trust`, {method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(400);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('User does not exist');
+    });
+
+    it('should return 200 if user is trusted', async () => {
+        const admin = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+            verified: true
+        };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, admin);
+
+        const token = await generateToken({
+            ...createdAdmin,
+            password: admin.password
+        });
+        em.nativeUpdate = vi.fn(async () => 1);
+        const response = await app.request(
+            `/api/users/${createdAdmin.email}/trust`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(200);
+    });
+
+    it('should return 403 if user is not admin', async () => {
+        const admin = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+            verified: true
+        };
+
+        const user = {
+            email: 'email@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553536',
+            verified: false
+        }
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, admin);
+        const createdUser = await createUser(em, user);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: admin.password
+        });
+        em.nativeUpdate = vi.fn(async () => 1);
+        const response = await app.request(`api/users/${createdUser.email}/trust`, {method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(403);
+
+    });
+
+})
