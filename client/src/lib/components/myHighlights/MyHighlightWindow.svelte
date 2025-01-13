@@ -51,13 +51,14 @@
             {#each applyFilter() as highlight }
                 <button
                         onclick={() => onSelect(highlight.id)}
+                        class="flex justify-stretch items-stretch"
                 >
-                    <div class="bg-white p-4 mb-4 rounded-lg shadow-md w-[80%] max-w-lg">
+                    <div class="bg-white py-4 px-3 mb-4 rounded-lg shadow-md w-[80%] max-w-lg flex flex-col justify-start text-left min-h-[12rem]">
                         <h3 class="text-xl font-semibold text-gray-800">{highlight.name}</h3>
                         <p class="text-sm text-gray-600">{highlight.description}</p>
                         <p class="text-sm text-gray-500">Category: {highlight.category}</p>
                         <p class="text-sm text-gray-500">Business Info: {highlight.businessDescription}</p>
-                        <p class="text-sm">
+                        <p class="text-sm mt-auto">
                             Status:
                             {#if highlight.is_approved}
                                 <span class="text-green-500">Approved</span>
