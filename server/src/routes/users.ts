@@ -2,7 +2,12 @@ import {Hono} from "hono";
 import { createErrorResponse } from "../errors/error.js";
 import dotenv from "dotenv";
 import {EntityManager} from "@mikro-orm/core";
-import {getAllUsers, getUserById, deleteUser, getUserByEmail} from "../controllers/userController.js";
+import {
+    getAllUsers,
+    getUserById,
+    deleteUser,
+    getUserByEmail
+} from "../controllers/userController.js";
 import { isAdmin } from "../middleware/isAdmin.js";
 import logger from "../utils/logger.js";
 import {isLoggedIn} from "../middleware/isLoggedIn.js";
@@ -66,13 +71,12 @@ users.get('/:id', isLoggedIn, isAdmin, async (ctx) => {
 users.get('/:id/feedbacks', isLoggedIn, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtPayload') as EntityManager;
-        const userPayload = ctx.get('em' as 'jwtPayload') as User;
+        const userPayload = ctx.get('jwtPayload') as User;
         const {id} = ctx.req.param();
 
         if (!validate(id)){
             return ctx.json(createErrorResponse(400, 'Invalid userId parameter'), 400)
         }
-
         const user = await getUserByEmail(em, userPayload.email)
 
         if (user === null){
