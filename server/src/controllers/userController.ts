@@ -91,7 +91,8 @@ export const createUser = async (
             email: email,
             password: hashedPassword,
             isAdmin: isAdmin,
-            username: username
+            username: username,
+            verified: isAdmin
         });
 
     await em.persistAndFlush(newUser);
@@ -100,7 +101,8 @@ export const createUser = async (
         id: newUser.id,
         email: newUser.email,
         isAdmin: newUser.isAdmin,
-        username: newUser.username
+        username: newUser.username,
+        verified: newUser.verified
     };
     } catch (error) {
         logger.error('Failed to create user: ' + error);
@@ -197,3 +199,29 @@ export const updateUserPassword = async (
         throw error;
     }
 };
+
+
+
+/**
+ * Make a user trusted
+ * @param em
+ * @param userEmail
+ * @returns {Promise<{ success: boolean; message: string }>}
+ */
+export const makeUserVerified = async (
+    em: EntityManager,
+    userEmail: string
+): Promise<void> => {
+    try {
+        const user = await getUserByEmail(em, userEmail);
+        user.verified = true;
+        await em.persistAndFlush(user);
+
+        logger.info(`User ${userEmail} is now trusted`);
+    } catch (error) {
+        logger.error(`Failed to make user trusted: ${error}`);
+        throw error;
+    }
+};
+
+
