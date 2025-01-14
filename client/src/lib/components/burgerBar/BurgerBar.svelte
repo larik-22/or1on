@@ -41,9 +41,10 @@
 </script>
 
 
-<main>
-    <div class="h-lvh min-w-[{MinWidth}]  w-[{Width}] bg-gray-50 shadow-md border-r-[1px] border-solid border-gray-300 overflow-hidden">
-        <AdditionalComponent/>
+<main class="">
+    <div class="h-lvh min-w-[{MinWidth}]  w-[{Width}] bg-gray-50 shadow-md border-r-[1px] border-solid border-gray-300 overflow-hidden max-h-[100vh] overflow-y-scroll">
+        <AdditionalComponent Width={Width}/>
+
         <div class="w-[100%] h-fit pt-[15px] pb-[15px] shadow-md bg-[#f9fafb] text-center content-center ">{Location}</div>
         <ul class="pt-[100px]">
             {#each BarItems as item, i}

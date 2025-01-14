@@ -11,10 +11,12 @@
 
     let {
         currentRoute,
-        currentPage = $bindable(Homepage)
+        currentPage = $bindable(Homepage),
+        barWidth = $bindable()
     }: {
         currentRoute: string;
         currentPage: any;
+        barWidth: string;
     } = $props()
 
     let CurrentLocation: string = $state("Home")
@@ -155,11 +157,11 @@
         }
     ])
 
-
     $effect(() => {
         if ($isUserLoggedIn) {
-            switch (currentRoute) {
-                case "/":
+
+            switch (true) {
+                case currentRoute === "/":
                     if ($isUserAdmin) {
                         BarItems = AdminBarItems;
                         AdditionalComponent = UserIndicator
@@ -171,18 +173,18 @@
                     }
                     break;
 
-                case "/test":
+                case currentRoute === "/test":
                     BarItems = []
                     CurrentLocation = "Test Page PLS WORK MAN"
                     break;
 
-                case "/moderator-dashboard":
+                case currentRoute === "/moderator-dashboard":
                     BarItems = AdminDashboardBarItems;
                     CurrentLocation = "Moderator Dashboard"
                     AdditionalComponent = UserIndicator
                     break;
 
-                case "/user-dashboard":
+                case currentRoute === "/user-dashboard":
                     if ($isUserAdmin) {
                         page.redirect("/")
                     } else {
@@ -192,13 +194,13 @@
                     }
                     break;
 
-                case "/user-management":
+                case currentRoute === "/user-management":
                     CurrentLocation = "User Management"
                     BarItems = AdminDashboardBarItems;
                     AdditionalComponent = UserIndicator
                     break;
 
-                case "/feedbacks":
+                case currentRoute === "/feedbacks":
                     if ($isUserAdmin) {
                         page.redirect("/")
                     } else {
@@ -208,7 +210,7 @@
                     }
                     break;
 
-                case "/suggest-highlight":
+                case currentRoute === "/suggest-highlight":
                     if ($isUserAdmin) {
                         page.redirect("/")
                     } else {
@@ -217,8 +219,17 @@
                         AdditionalComponent = UserIndicator
                     }
                     break;
-
-                case "/change-username":
+                case  currentRoute === "/tours" || /^\/tours\/\d+$/.test(currentRoute):   // regex.test(currentRouter)
+                    if ($isUserAdmin) {
+                        page.redirect("/")
+                    }
+                    else{
+                        BarItems = UserBarItems;
+                        CurrentLocation = "Tours"
+                        AdditionalComponent = UserIndicator
+                    }
+                    break;
+                case currentRoute === "/change-username":
                     if ($isUserAdmin) {
                         page.redirect("/")
                     }
@@ -228,7 +239,7 @@
                         AdditionalComponent = UserIndicator
                     }
                     break;
-                case "/change-password":
+                case currentRoute === "/change-password":
                     if ($isUserAdmin) {
                         page.redirect("/")
                     }
@@ -238,7 +249,7 @@
                         AdditionalComponent = UserIndicator
                     }
                     break;
-                case "/logout":
+                case currentRoute === "/logout":
                     if ($isUserAdmin) {
                         page.redirect("/")
                     }
@@ -248,7 +259,7 @@
                         AdditionalComponent = UserIndicator
                     }
                     break;
-                case "/feedbacks-management":
+                case currentRoute === "/feedbacks-management":
                     BarItems = AdminDashboardBarItems;
                     CurrentLocation = "Feedbacks Management"
                     AdditionalComponent = UserIndicator
@@ -279,6 +290,6 @@
 
 <main class="h-fit w-fit">
     {#key currentPage}
-        <BurgerBar Location={CurrentLocation} BarItems={BarItems} AdditionalComponent={AdditionalComponent}/>
+        <BurgerBar Location={CurrentLocation} Width={barWidth} BarItems={BarItems} AdditionalComponent={AdditionalComponent}/>
     {/key}
 </main>

@@ -19,7 +19,7 @@
     if (userPayload !== null) {
         userId = userPayload.id;
     }
-    const feedbackUrl = `${import.meta.env.VITE_BACKEND_URL}users/${userId}/feedbacks`;
+    const feedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/users/${userId}/feedbacks`;
 
     /* eslint-disable @typescript-eslint/no-empty-object-type */
     async function fetchUserFeedbacks(): Promise<{}[]> {
