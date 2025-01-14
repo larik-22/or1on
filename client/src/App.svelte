@@ -1,7 +1,6 @@
 <script lang="ts">
     import router from 'page';
     import Homepage from "./pages/Homepage.svelte";
-    import ModeratorDashboard from "./pages/ModeratorDashboard.svelte";
     import Register from "./pages/Register.svelte";
     import Login from "./pages/Login.svelte";
     import type {Context} from 'page';
@@ -21,6 +20,7 @@
     import Tours from "./pages/Tours.svelte";
     import MyHighlights from "./pages/MyHighlights.svelte";
     import TourPage from "./pages/TourPage.svelte";
+    import ToursManage from "./lib/components/moderatorDashboard/ToursManage.svelte";
 
     let page: any = $state(Homepage);
     let params: Context = $state();
@@ -57,7 +57,6 @@
     });
 
     router('/moderator-dashboard', isAdmin, (ctx) => {
-        page = ModeratorDashboard;
         currentRoute = ctx.pathname;
         params = ctx;
     });
@@ -127,6 +126,12 @@
         currentRoute = ctx.pathname;
         params = ctx;
     });
+
+    router('/manage-tours', isLoggedIn, isAdmin, (ctx) => {
+        page = ToursManage;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    })
 
 
     router.start();

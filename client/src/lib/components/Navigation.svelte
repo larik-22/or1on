@@ -1,4 +1,3 @@
-
 <script lang="ts">
 
     import BurgerBar from "./burgerBar/BurgerBar.svelte";
@@ -17,10 +16,10 @@
         currentRoute: string;
         currentPage: any;
         barWidth: string;
-    } = $props()
+    } = $props();
 
-    let CurrentLocation: string = $state("Home")
-    let AdditionalComponent: any = $state("")
+    let CurrentLocation: string = $state("Home");
+    let AdditionalComponent: any = $state("");
 
     let BarItems: BarItem[] = $state([
         {
@@ -34,14 +33,14 @@
             label: "Tours",
             overrideClick: true,
             overrideFunction: () => {
-                page.redirect("/tours")
+                page.redirect("/tours");
             }
         },
         {
             label: "My highlights",
             overrideClick: true,
             overrideFunction: () => {
-                page.redirect("/my-highlights")
+                page.redirect("/my-highlights");
             }
         },
         {
@@ -51,40 +50,40 @@
             label: "My feedbacks",
             overrideClick: true,
             overrideFunction: () => {
-                page.redirect("/feedbacks")
+                page.redirect("/feedbacks");
             }
         },
         {
             label: "Suggest highlight",
             overrideClick: true,
             overrideFunction: () => {
-                page.redirect("/suggest-highlight")
+                page.redirect("/suggest-highlight");
             }
         },
         {
             label: "User dashboard",
             overrideClick: true,
             overrideFunction: () => {
-                page.redirect("/user-dashboard")
+                page.redirect("/user-dashboard");
             }
         },
         {
             label: "Test Path",
             overrideClick: true,
             overrideFunction: () => {
-                page.redirect("/test")
+                page.redirect("/test");
             }
         },
-    ])
+    ]);
     let AdminBarItems: BarItem[] = $state([
         {
             label: "Moderator dashboard",
             overrideClick: true,
             overrideFunction: () => {
-                page.redirect("/moderator-dashboard")
+                page.redirect("/moderator-dashboard");
             }
         },
-    ])
+    ]);
 
     let AdminDashboardBarItems: BarItem[] = $state([
         {
@@ -93,7 +92,7 @@
                 {
                     label: "Manage",
                     action: () => {
-                        page.redirect("/user-management")
+                        page.redirect("/user-management");
                     }
                 }
             ]
@@ -104,19 +103,19 @@
                 {
                     label: "Manage",
                     action: () => {
-                        console.log("Hi")
+                        console.log("Hi");
                     }
                 },
                 {
                     label: "Suggestions",
                     action: () => {
-                        console.log("Hi")
+                        console.log("Hi");
                     }
                 },
                 {
                     label: "Feedback",
                     action: () => {
-                       page.redirect("/feedbacks-management")
+                        page.redirect("/feedbacks-management");
                     }
                 }
             ]
@@ -127,35 +126,35 @@
                 {
                     label: "Manage",
                     action: () => {
-                        console.log("Hi")
+                        console.log("Hi");
                     }
                 }
             ]
         }
-    ])
+    ]);
     let UserDashboardBarItems: BarItem[] = $state([
         {
             label: "Change Password",
             overrideClick: true,
             overrideFunction: () => {
-                page.redirect("change-password")
+                page.redirect("change-password");
             }
         },
         {
             label: "Change Username",
             overrideClick: true,
             overrideFunction: () => {
-                page.redirect("change-username")
+                page.redirect("change-username");
             }
         },
         {
             label: "Log Out",
             overrideClick: true,
             overrideFunction: () => {
-                page.redirect("logout")
+                page.redirect("logout");
             }
         }
-    ])
+    ]);
 
     $effect(() => {
         if ($isUserLoggedIn) {
@@ -164,105 +163,109 @@
                 case currentRoute === "/":
                     if ($isUserAdmin) {
                         BarItems = AdminBarItems;
-                        AdditionalComponent = UserIndicator
-                        CurrentLocation = "Home"
+                        AdditionalComponent = UserIndicator;
+                        CurrentLocation = "Home";
                     } else {
                         BarItems = UserBarItems;
-                        AdditionalComponent = UserIndicator
-                        CurrentLocation = "Home"
+                        AdditionalComponent = UserIndicator;
+                        CurrentLocation = "Home";
                     }
                     break;
 
                 case currentRoute === "/test":
-                    BarItems = []
-                    CurrentLocation = "Test Page PLS WORK MAN"
+                    BarItems = [];
+                    CurrentLocation = "Test Page PLS WORK MAN";
                     break;
 
                 case currentRoute === "/moderator-dashboard":
                     BarItems = AdminDashboardBarItems;
-                    CurrentLocation = "Moderator Dashboard"
-                    AdditionalComponent = UserIndicator
+                    CurrentLocation = "Moderator Dashboard";
+                    AdditionalComponent = UserIndicator;
                     break;
-
+                case "/my-highlights":
+                    if ($isUserAdmin) {
+                        page.redirect("/");
+                    } else {
+                        BarItems = UserBarItems;
+                        CurrentLocation = "My highlights";
+                        AdditionalComponent = UserIndicator;
+                    }
+                    break;
                 case currentRoute === "/user-dashboard":
                     if ($isUserAdmin) {
-                        page.redirect("/")
+                        page.redirect("/");
                     } else {
                         BarItems = UserDashboardBarItems;
-                        CurrentLocation = "User Dashboard"
-                        AdditionalComponent = UserIndicator
+                        CurrentLocation = "User Dashboard";
+                        AdditionalComponent = UserIndicator;
                     }
                     break;
 
                 case currentRoute === "/user-management":
-                    CurrentLocation = "User Management"
+                    CurrentLocation = "User Management";
                     BarItems = AdminDashboardBarItems;
-                    AdditionalComponent = UserIndicator
+                    AdditionalComponent = UserIndicator;
                     break;
 
                 case currentRoute === "/feedbacks":
                     if ($isUserAdmin) {
-                        page.redirect("/")
+                        page.redirect("/");
                     } else {
-                        CurrentLocation = "My Feedbacks"
+                        CurrentLocation = "My Feedbacks";
                         BarItems = UserBarItems;
-                        AdditionalComponent = UserIndicator
+                        AdditionalComponent = UserIndicator;
                     }
                     break;
 
                 case currentRoute === "/suggest-highlight":
                     if ($isUserAdmin) {
-                        page.redirect("/")
+                        page.redirect("/");
                     } else {
-                        CurrentLocation = "Suggest Highlight"
+                        CurrentLocation = "Suggest Highlight";
                         BarItems = UserBarItems;
-                        AdditionalComponent = UserIndicator
+                        AdditionalComponent = UserIndicator;
                     }
                     break;
                 case  currentRoute === "/tours" || /^\/tours\/\d+$/.test(currentRoute):   // regex.test(currentRouter)
                     if ($isUserAdmin) {
-                        page.redirect("/")
-                    }
-                    else{
+                        page.redirect("/");
+                    } else {
                         BarItems = UserBarItems;
-                        CurrentLocation = "Tours"
-                        AdditionalComponent = UserIndicator
+                        CurrentLocation = "Tours";
+                        AdditionalComponent = UserIndicator;
                     }
                     break;
                 case currentRoute === "/change-username":
                     if ($isUserAdmin) {
-                        page.redirect("/")
-                    }
-                    else{
+                        page.redirect("/");
+                    } else {
                         BarItems = UserDashboardBarItems;
-                        CurrentLocation = "User Dashboard"
-                        AdditionalComponent = UserIndicator
+                        CurrentLocation = "User Dashboard";
+                        AdditionalComponent = UserIndicator;
                     }
                     break;
                 case currentRoute === "/change-password":
                     if ($isUserAdmin) {
-                        page.redirect("/")
-                    }
-                    else{
+                        page.redirect("/");
+                    } else {
                         BarItems = UserDashboardBarItems;
-                        CurrentLocation = "User Dashboard"
-                        AdditionalComponent = UserIndicator
+                        CurrentLocation = "User Dashboard";
+                        AdditionalComponent = UserIndicator;
                     }
                     break;
                 case currentRoute === "/logout":
                     if ($isUserAdmin) {
-                        page.redirect("/")
-                    }
-                    else{
+                        page.redirect("/");
+                    } else {
                         BarItems = UserDashboardBarItems;
-                        CurrentLocation = "User Dashboard"
-                        AdditionalComponent = UserIndicator
+                        CurrentLocation = "User Dashboard";
+                        AdditionalComponent = UserIndicator;
                     }
                     break;
                 case currentRoute === "/feedbacks-management":
                     BarItems = AdminDashboardBarItems;
-                    CurrentLocation = "Feedbacks Management"
-                    AdditionalComponent = UserIndicator
+                    CurrentLocation = "Feedbacks Management";
+                    AdditionalComponent = UserIndicator;
                     break;
             }
         } else {
@@ -271,7 +274,7 @@
                     label: "Login",
                     overrideClick: true,
                     overrideFunction: () => {
-                        page.redirect("/login")
+                        page.redirect("/login");
                     }
 
                 },
@@ -279,17 +282,18 @@
                     label: "Sign Up",
                     overrideClick: true,
                     overrideFunction: () => {
-                        page.redirect("/register")
+                        page.redirect("/register");
                     }
 
                 }
-            ]
+            ];
         }
-    })
+    });
 </script>
 
 <main class="h-fit w-fit">
     {#key currentPage}
-        <BurgerBar Location={CurrentLocation} Width={barWidth} BarItems={BarItems} AdditionalComponent={AdditionalComponent}/>
+        <BurgerBar Location={CurrentLocation} Width={barWidth} BarItems={BarItems}
+                   AdditionalComponent={AdditionalComponent}/>
     {/key}
 </main>
