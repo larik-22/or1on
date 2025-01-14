@@ -12,7 +12,8 @@ import {getHighlightById} from "./highlightController.js";
  * @returns {Promise<Feedback[] | null>} A promise resolving to a list of feedbacks if found,
  * otherwise null.
  */
-export const getFeedbackByUserId = async (em: EntityManager, userId: string): Promise<Feedback[]> => {
+export const getFeedbackByUserId = async (em: EntityManager, userId: string):
+    Promise<Feedback[]> => {
     try {
         return await em.find(Feedback, {user: {id: userId}});
     } catch (error) {
@@ -25,7 +26,7 @@ export const getFeedbackByUserId = async (em: EntityManager, userId: string): Pr
  * Fetches all feedback that need to be approved
  *
  * @param em - The MikroORM EntityManager instance.
- * @returns {Promise<Feedback[] | null>} A promise resolving to a list of feedbacks for approval if found,
+ * @returns {Promise<Feedback[] | null>} A promise resolving list of feedbacks for approval if found
  * */
 export const getFeedbacksForApproval = async (em: EntityManager):
     Promise<Feedback[] | null> => {
