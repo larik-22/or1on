@@ -12,12 +12,30 @@ import {getHighlightById} from "./highlightController.js";
  * @returns {Promise<Feedback[] | null>} A promise resolving to a list of feedbacks if found,
  * otherwise null.
  */
-export const getFeedbackByUserId = async (em: EntityManager, userId: string):
-    Promise<Feedback[] | null> => {
+export const getFeedbackByUserId = async (em: EntityManager, userId: string): Promise<Feedback[]> => {
     try {
         return await em.find(Feedback, {user: {id: userId}});
-    } catch (error){
-        logger.error('Failed to fetch feedback where user id: ' + userId + ' error: ' + error)
+    } catch (error) {
+        logger.error(`Failed to fetch feedback for user ID: ${userId}. Error: ${error}`);
+        throw new Error('Error fetching feedbacks for user.');
+    }
+};
+
+/**
+ * Fetches all feedback that need to be approved
+ *
+ * @param em - The MikroORM EntityManager instance.
+ * @returns {Promise<Feedback[] | null>} A promise resolving to a list of feedbacks for approval if found,
+ * */
+export const getFeedbacksForApproval = async (em: EntityManager):
+    Promise<Feedback[] | null> => {
+    try {
+        return await em.find(
+            Feedback, {is_approved: false}
+        )
+    } catch (error) {
+        logger.error('Failed to fetch feedback feedbacks for approval' + error);
+        return null;
     }
 };
 
@@ -33,9 +51,9 @@ export const getFeedbackByHighlight = async (em: EntityManager, id: number):
     Promise<Feedback[] | null> => {
     try {
         const feedbacks = await em.find(
-            Feedback, {highlight: {id: id}}, { populate: ['user', 'highlight'] }
+            Feedback, {highlight: {id: id}}, {populate: ['user', 'highlight']}
         );
-        if (feedbacks.length === 0){
+        if (feedbacks.length === 0) {
             return null
         }
         return feedbacks
@@ -54,7 +72,7 @@ export const getFeedbackByHighlight = async (em: EntityManager, id: number):
  */
 export const approveFeedback = async (em: EntityManager, id: number): Promise<void> => {
     try {
-        await em.nativeUpdate(Feedback, { id: id }, { is_approved: true});
+        await em.nativeUpdate(Feedback, {id: id}, {is_approved: true});
         await em.flush();
         logger.info('Feedback updated successfully!');
     } catch (error) {
@@ -100,7 +118,7 @@ export const createFeedback = async (
     try {
         const highlight = await getHighlightById(em, highlightId)
 
-        if (!highlight){
+        if (!highlight) {
             throw new Error('Highlight not found');
         }
 
@@ -119,4 +137,3 @@ export const createFeedback = async (
         );
     }
 };
-

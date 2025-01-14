@@ -1,4 +1,4 @@
-import { MikroORM } from '@mikro-orm/core';
+import {MikroORM} from '@mikro-orm/core';
 import mikroConfig from '../../mikro-orm.config.js'
 import {Feedback} from "../models/feedback.js";
 import {User} from "../models/user.js";
@@ -15,84 +15,84 @@ import {User} from "../models/user.js";
     const feedbacks = [
         {
             tour: 1,
-            user: user1.id ,
+            user: user1.id,
             rating: 5,
             comment: 'Great Tour',
             is_approved: true
         },
         {
             tour: 1,
-            user: user2.id ,
+            user: user2.id,
             rating: 4,
             comment: 'almost perfect tour',
             is_approved: true
         },
         {
             tour: 1,
-            user: user3.id ,
+            user: user3.id,
             rating: 5,
             comment: 'Great tour',
             is_approved: true
         },
         {
             tour: 1,
-            user: admin.id ,
+            user: admin.id,
             rating: 5,
             comment: 'best tour',
             is_approved: true
         },
         {
             tour: 2,
-            user: user1.id ,
+            user: user1.id,
             rating: 5,
             comment: 'Great Tour',
             is_approved: true
         },
         {
             tour: 2,
-            user: user2.id ,
+            user: user2.id,
             rating: 4,
             comment: 'almost perfect tour',
             is_approved: true
         },
         {
             tour: 2,
-            user: user3.id ,
+            user: user3.id,
             rating: 5,
             comment: 'Great tour',
             is_approved: true
         },
         {
             tour: 2,
-            user: admin.id ,
+            user: admin.id,
             rating: 5,
             comment: 'best tour',
             is_approved: true
         },
         {
             tour: 3,
-            user: user1.id ,
+            user: user1.id,
             rating: 5,
             comment: 'Great Tour',
             is_approved: true
         },
         {
             tour: 3,
-            user: user2.id ,
+            user: user2.id,
             rating: 4,
             comment: 'almost perfect tour',
             is_approved: true
         },
         {
             tour: 3,
-            user: user3.id ,
+            user: user3.id,
             rating: 5,
             comment: 'Great tour',
             is_approved: true
         },
         {
             tour: 3,
-            user: admin.id ,
+            user: admin.id,
             rating: 5,
             comment: 'best tour',
             is_approved: true
@@ -103,28 +103,28 @@ import {User} from "../models/user.js";
         * */
         {
             highlight: 1,
-            user: user1.id ,
+            user: user1.id,
             rating: 5,
             comment: 'Greatest place',
             is_approved: true
         },
         {
             highlight: 1,
-            user: user2.id ,
+            user: user2.id,
             rating: 5,
             comment: 'Great place',
             is_approved: true
         },
         {
             highlight: 1,
-            user: user3.id ,
+            user: user3.id,
             rating: 2,
             comment: 'not that Great',
             is_approved: true
         },
         {
             highlight: 1,
-            user: admin.id ,
+            user: admin.id,
             rating: 5,
             comment: 'best place',
             is_approved: true
@@ -134,28 +134,28 @@ import {User} from "../models/user.js";
         * */
         {
             highlight: 2,
-            user: user1.id ,
+            user: user1.id,
             rating: 5,
             comment: 'Greatest place',
             is_approved: true
         },
         {
             highlight: 2,
-            user: user2.id ,
+            user: user2.id,
             rating: 5,
             comment: 'Great place',
             is_approved: true
         },
         {
             highlight: 2,
-            user: user3.id ,
+            user: user3.id,
             rating: 2,
             comment: 'not that Great',
             is_approved: true
         },
         {
             highlight: 2,
-            user: admin.id ,
+            user: admin.id,
             rating: 5,
             comment: 'best place',
             is_approved: true
@@ -166,28 +166,28 @@ import {User} from "../models/user.js";
         * */
         {
             highlight: 3,
-            user: user1.id ,
+            user: user1.id,
             rating: 5,
             comment: 'Greatest place',
             is_approved: true
         },
         {
             highlight: 3,
-            user: user2.id ,
+            user: user2.id,
             rating: 5,
             comment: 'Great place',
             is_approved: true
         },
         {
             highlight: 3,
-            user: user3.id ,
+            user: user3.id,
             rating: 2,
             comment: 'not that Great',
             is_approved: true
         },
         {
             highlight: 3,
-            user: admin.id ,
+            user: admin.id,
             rating: 5,
             comment: 'best place',
             is_approved: true
@@ -198,28 +198,28 @@ import {User} from "../models/user.js";
         * */
         {
             highlight: 4,
-            user: user1.id ,
+            user: user1.id,
             rating: 5,
             comment: 'Greatest place',
             is_approved: true
         },
         {
             highlight: 4,
-            user: user2.id ,
+            user: user2.id,
             rating: 5,
             comment: 'Great place',
             is_approved: true
         },
         {
             highlight: 4,
-            user: user3.id ,
+            user: user3.id,
             rating: 2,
             comment: 'not that Great',
             is_approved: true
         },
         {
             highlight: 4,
-            user: admin.id ,
+            user: admin.id,
             rating: 5,
             comment: 'best place',
             is_approved: true
@@ -230,28 +230,28 @@ import {User} from "../models/user.js";
         * */
         {
             highlight: 5,
-            user: user1.id ,
+            user: user1.id,
             rating: 5,
             comment: 'Greatest place',
             is_approved: true
         },
         {
             highlight: 5,
-            user: user2.id ,
+            user: user2.id,
             rating: 5,
             comment: 'Great place',
             is_approved: true
         },
         {
             highlight: 5,
-            user: user3.id ,
+            user: user3.id,
             rating: 2,
             comment: 'not that Great',
             is_approved: true
         },
         {
             highlight: 5,
-            user: admin.id ,
+            user: admin.id,
             rating: 5,
             comment: 'best place',
             is_approved: true
@@ -262,34 +262,39 @@ import {User} from "../models/user.js";
         * */
         {
             highlight: 6,
-            user: user1.id ,
+            user: user1.id,
             rating: 5,
             comment: 'Greatest place',
             is_approved: true
         },
         {
             highlight: 6,
-            user: user2.id ,
+            user: user2.id,
             rating: 5,
             comment: 'Great place',
             is_approved: true
         },
         {
             highlight: 6,
-            user: user3.id ,
+            user: user3.id,
             rating: 2,
             comment: 'not that Great',
             is_approved: true
         },
         {
             highlight: 6,
-            user: admin.id ,
+            user: admin.id,
             rating: 5,
             comment: 'best place',
             is_approved: true
         },
-
-
+        {
+            highlight: 6,
+            user: admin.id,
+            rating: 2,
+            comment: 'very good place',
+            is_approved: false
+        },
     ];
 
     for (const feedbackData of feedbacks) {
