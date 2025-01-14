@@ -2,7 +2,7 @@ import {describe, it, expect, vi, beforeEach, afterEach} from 'vitest';
 import { generateToken } from '../utils/jwt.js';
 import { getAllUsers, getUserById, deleteUser } from '../controllers/userController.js';
 import { createUser, getUserByEmail } from '../controllers/userController.js';
-import { deleteFeedback } from '../controllers/feedbackController.js'
+import {deleteFeedback, getFeedbacksForApproval} from '../controllers/feedbackController.js'
 import { getFeedbackByUserId, getFeedbackByHighlight } from '../controllers/feedbackController.js'
 import { createTour, updateTour, deleteTour } from "../controllers/tourController.js";
 import { getAllTours, getTourById, getHighlightsByTour } from "../controllers/tourController.js";
@@ -2147,6 +2147,64 @@ describe('GET /api/:id/map/highlights', () => {
         expect(body.error.code).toBe(500);
         expect(body.error.message).toBe('Internal error');
     });
+
+    //HERE
+    describe('GET /approval', () => {
+        it('should fetch all feedbacks for approval', async () => {
+            const expectedFeedbacks = [
+                {
+                    id: 1,
+                    highlight: { id: 1, name: 'Highlight 1' },
+                    user: { id: '1', username: 'user1@example.com' },
+                    rating: 5,
+                    comment: 'Great feedback!',
+                    isApproved: false,
+                },
+            ];
+
+            const mockFeedbacks = [
+                {
+                    id: 1,
+                    highlight: { id: 1, name: 'Highlight 1' },
+                    user: { id: '1', username: 'user1@example.com' },
+                    rating: 5,
+                    comment: 'Great feedback!',
+                    isApproved: false,
+                },
+            ];
+
+            vi.mocked(getFeedbacksForApproval).mockResolvedValueOnce(mockFeedbacks);
+
+            const response = await app.request('/approval', { method: 'GET' });
+
+            expect(response.status).toBe(200);
+            const responseBody = await response.json();
+            expect(responseBody.feedbacks).toEqual(expectedFeedbacks);
+        });
+
+        it('should return 404 when no feedbacks are found for approval', async () => {
+            vi.mocked(getFeedbacksForApproval).mockResolvedValueOnce([]);
+
+            const response = await app.request('/approval', { method: 'GET' });
+
+            expect(response.status).toBe(404);
+            const responseBody = await response.json();
+            expect(responseBody.message).toBe('No feedbacks found for approval');
+        });
+
+        it('should return 500 on internal error', async () => {
+            vi.mocked(getFeedbacksForApproval).mockRejectedValueOnce(new Error('Database error'));
+
+            const response = await app.request('/approval', { method: 'GET' });
+
+            expect(response.status).toBe(500);
+            const responseBody = await response.json();
+            expect(responseBody.error.code).toBe(500);
+            expect(responseBody.error.message).toBe('Internal error');
+        });
+    });
+
+
 });
 
 
