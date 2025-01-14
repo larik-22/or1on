@@ -2,11 +2,13 @@ import {Hono} from "hono";
 import { createErrorResponse } from "../errors/error.js";
 import dotenv from "dotenv";
 import {EntityManager} from "@mikro-orm/core";
-import {getAllUsers,
+import {
+    getAllUsers,
     getUserById,
     deleteUser,
     makeUserVerified,
-    getUserByEmail} from "../controllers/userController.js";
+    getUserByEmail
+} from "../controllers/userController.js";
 import { isAdmin } from "../middleware/isAdmin.js";
 import logger from "../utils/logger.js";
 import {isLoggedIn} from "../middleware/isLoggedIn.js";
