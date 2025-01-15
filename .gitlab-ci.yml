@@ -1,5 +1,7 @@
 stages:
   - lint_and_test
+  - publish
+  - deploy
 
 lint_and_test:
   stage: lint_and_test
@@ -21,4 +23,51 @@ lint_and_test:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
       when: always
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+      when: always
+
+publish:
+  stage: publish
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - echo "$PAT" | docker login "$REGISTRY" -u "$GITLAB_USER_LOGIN" --password-stdin
+  script:
+    - docker build --build-arg VITE_BACKEND_URL="${VITE_BACKEND_URL}" --build-arg VITE_GRASSHOPER_API_KEY="${VITE_GRASSHOPER_API_KEY}" --file ./client/Dockerfile --tag "$REGISTRY/$PROJECT_PATH/or1on-client:latest" ./client
+    - docker push "$REGISTRY/$PROJECT_PATH/or1on-client:latest"
+
+    - docker build ./server --file ./server/Dockerfile --tag "$REGISTRY/$PROJECT_PATH/or1on-server:latest"
+    - docker push "$REGISTRY/$PROJECT_PATH/or1on-server:latest"
+
+    - docker pull postgres:latest
+    - docker tag postgres:latest "$REGISTRY/$PROJECT_PATH/postgres:latest"
+    - docker push "$REGISTRY/$PROJECT_PATH/postgres:latest"
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+      when: always
+
+  needs:
+    - job: lint_and_test
+      artifacts: false
+
+deploy:
+  image: ubuntu:latest
+  stage: deploy
+  before_script:
+    - apt-get -yq update
+    - apt-get -yqq install ssh
+    - install -m 600 -D /dev/null ~/.ssh/id_rsa
+    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
+    - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
+  script:
+    - ssh $SSH_USER@$SSH_HOST "cd $WORK_DIR && docker compose pull && docker compose up -d && exit"
+  after_script:
+    - rm -rf ~/.ssh
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "develop"'
       when: always
