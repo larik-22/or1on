@@ -170,7 +170,7 @@
             <Navigation barWidth='15vw' currentRoute={currentRoute} bind:currentPage={page}></Navigation>
         {/if}
 
-
+        //eslint-disable-next-line
         <svelte:component this={page} {params}/>
     </div>
 
