@@ -2,7 +2,7 @@ import {describe, it, expect, vi, beforeEach, afterEach} from 'vitest';
 import { generateToken } from '../utils/jwt.js';
 import { getAllUsers, getUserById, deleteUser } from '../controllers/userController.js';
 import { createUser, getUserByEmail } from '../controllers/userController.js';
-import {deleteFeedback, getFeedbacksForApproval} from '../controllers/feedbackController.js'
+import { deleteFeedback } from '../controllers/feedbackController.js'
 import { getFeedbackByUserId, getFeedbackByHighlight } from '../controllers/feedbackController.js'
 import { createTour, updateTour, deleteTour } from "../controllers/tourController.js";
 import { getAllTours, getTourById, getHighlightsByTour } from "../controllers/tourController.js";
@@ -1990,7 +1990,7 @@ describe('POST /api/highlights/:id/feedbacks', () => {
         });
 
         const invalidFeedbackData = {
-            rating: 'notANumber', // Invalid rating type
+            rating: 'notANumber',
             feedbackMessage: 'Great highlight!',
         };
 
@@ -2149,168 +2149,6 @@ describe('GET /api/:id/map/highlights', () => {
     });
 });
 
-//HERE
-describe('GET /api/feedbacks/approval', () => {
-    it('should fetch all feedbacks for approval', async () => {
-        const adminUser = {
-            email: 'admin@example.com',
-            password: 'password123',
-            isAdmin: true,
-            username: '880005553535',
-        };
-        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
-        const createdAdmin = await createUser(em, adminUser);
-        const token = await generateToken({
-            ...createdAdmin,
-            password: adminUser.password
-        });
-
-        const mockFeedbacks = [
-            {
-                id: 1,
-                highlight: { id: 1, name: 'Highlight 1' },
-                user: { id: '1', username: 'user1@example.com' },
-                rating: 5,
-                comment: 'Great feedback!',
-                isApproved: false,
-            },
-        ];
-
-        em.findOne = vi.fn(async () => ({
-
-            highlights: {
-                getItems:
-                    () => [{
-                        id: 1,
-                        highlight: { id: 1, name: 'Highlight 1' },
-                        user: { id: '1', username: 'user1@example.com' },
-                        rating: 5,
-                        comment: 'Great feedback!',
-                        isApproved: false,
-                    },]
-            }
-        }));
-
-        const response = await app.request('/api/feedbacks/approval', {method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
-
-        expect(response.status).toBe(200);
-        expect(JSON.parse(await response.text())).toEqual({
-            feedbacks: expect.any(Array)
-        });
-    });
-
-    it('should return 404 when no feedbacks are found for approval', async () => {
-        em.findOne = vi.fn(async () => ({
-            feedbacks: {
-                getItems: () => [],
-            },
-        }));
-
-        const response = await app.request('/api/feedbacks/approval', { method: 'GET' }, mockEnv);
-
-        expect(response.status).toBe(404);
-        const responseBody = await response.json();
-        expect(responseBody.message).toBe('No feedbacks found for approval');
-    });
-
-    it('should return 500 on internal error', async () => {
-        em.findOne = vi.fn(async () => {
-            throw new Error('Database error');
-        });
-
-        const response = await app.request('/api/feedbacks/approval', { method: 'GET' }, mockEnv);
-
-        expect(response.status).toBe(500);
-        const responseBody = await response.json();
-        expect(responseBody.error.code).toBe(500);
-        expect(responseBody.error.message).toBe('Internal error');
-    });
-});
-
-
-//HERE
-describe('GET /api/feedbacks/approval', () => {
-    it('should fetch all feedbacks for approval', async () => {
-        const adminUser = {
-            email: 'admin@example.com',
-            password: 'password123',
-            isAdmin: true,
-            username: '880005553535',
-        };
-        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
-        const createdAdmin = await createUser(em, adminUser);
-        const token = await generateToken({
-            ...createdAdmin,
-            password: adminUser.password
-        });
-
-        const mockFeedbacks = [
-            {
-                id: 1,
-                highlight: { id: 1, name: 'Highlight 1' },
-                user: { id: '1', username: 'user1@example.com' },
-                rating: 5,
-                comment: 'Great feedback!',
-                isApproved: false,
-            },
-        ];
-
-        em.findOne = vi.fn(async () => ({
-
-            highlights: {
-                getItems:
-                    () => [{
-                        id: 1,
-                        highlight: { id: 1, name: 'Highlight 1' },
-                        user: { id: '1', username: 'user1@example.com' },
-                        rating: 5,
-                        comment: 'Great feedback!',
-                        isApproved: false,
-                    },]
-            }
-        }));
-
-        const response = await app.request('/api/feedbacks/approval', {method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
-
-        expect(response.status).toBe(200);
-        expect(JSON.parse(await response.text())).toEqual({
-            feedbacks: expect.any(Array)
-        });
-    });
-
-    it('should return 404 when no feedbacks are found for approval', async () => {
-        em.findOne = vi.fn(async () => ({
-            feedbacks: {
-                getItems: () => [],
-            },
-        }));
-
-        const response = await app.request('/api/feedbacks/approval', { method: 'GET' }, mockEnv);
-
-        expect(response.status).toBe(404);
-        const responseBody = await response.json();
-        expect(responseBody.message).toBe('No feedbacks found for approval');
-    });
-
-    it('should return 500 on internal error', async () => {
-        em.findOne = vi.fn(async () => {
-            throw new Error('Database error');
-        });
-
-        const response = await app.request('/api/feedbacks/approval', { method: 'GET' }, mockEnv);
-
-        expect(response.status).toBe(500);
-        const responseBody = await response.json();
-        expect(responseBody.error.code).toBe(500);
-        expect(responseBody.error.message).toBe('Internal error');
-    });
-});
-
-
-});
-
 
 describe ('PUT /users/:id/trust', () => {
     it('should return 400 if user is not found', async () => {
@@ -2403,3 +2241,99 @@ describe ('PUT /users/:id/trust', () => {
     });
 
 })
+describe('GET /api/feedbacks/approval', () => {
+    it('should return a list of feedbacks for approval for admin users', async () => {
+        const admin = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+        };
+
+        const feedbacks = [
+            {
+                id: 15,
+                tour: 3,
+                highlight: null,
+                user: "f9a87494-9003-435e-a576-b72b693d2190",
+                rating: 5,
+                comment: "awesome",
+                is_approved: false
+            },
+            {
+                id: 22,
+                tour: 5,
+                highlight: null,
+                user: "80215af7-5e2d-4058-b3e8-7ecbc508af92",
+                rating: 2,
+                comment: "trash",
+                is_approved: false
+            }
+        ];
+
+        em.find = vi.fn().mockResolvedValue(feedbacks);
+
+        const token = await generateToken(admin);
+
+        const response = await app.request('/api/feedbacks/approval', {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.feedbacks).toEqual(feedbacks);
+    });
+});
+describe('GET /api/feedbacks/user/:id', () => {
+    it('should return a list of feedbacks for a specific user', async () => {
+        const user = {
+            id: 'f9a87494-9003-435e-a576-b72b693d2190',
+            email: 'user@example.com',
+            isAdmin: false
+        };
+        const token = await generateToken(user);
+
+        const feedbacks = [
+            {
+                id: 15,
+                tour: 3,
+                highlight: null,
+                user: "f9a87494-9003-435e-a576-b72b693d2190",
+                rating: 5,
+                comment: "awesome",
+                is_approved: false
+            }
+        ];
+
+        em.find = vi.fn().mockResolvedValue(feedbacks);
+
+        const response = await app.request(`/api/feedbacks/user/${user.id}`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.feedbacks).toEqual(feedbacks);
+    });
+
+    it('should return 404 if no feedbacks are found', async () => {
+        const user = {
+            id: '80215af7-5e2d-4058-b3e8-7ecbc508af92',
+            email: 'user2@example.com',
+            isAdmin: false
+        };
+        const token = await generateToken(user);
+
+        em.find = vi.fn().mockResolvedValue([]);
+
+        const response = await app.request(`/api/feedbacks/user/${user.id}`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        expect(response.status).toBe(404);
+        const responseBody = await response.json();
+        expect(responseBody.message).toBe('No feedbacks found for this user');
+    });
+});
