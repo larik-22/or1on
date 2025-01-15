@@ -94,14 +94,14 @@
 				{
 					label: "Manage",
 					action: () => {
-						console.log("Hi")
+						page.redirect("/manage-highlights")
 
 					}
 				},
 				{
 					label: "Suggestions",
 					action: () => {
-						console.log("Hi")
+						page.redirect("/manage-suggestions")
 					}
 				},
 				{

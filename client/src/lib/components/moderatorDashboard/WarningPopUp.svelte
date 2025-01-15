@@ -13,42 +13,43 @@
 </script>
 
 {#if enabled_popup}
-	<main class="bg-[#00000033] h-[100%] w-[100%] absolute left-[0]">
-
-		<div class="h-[400px] w-[700px] bg-white shadow-md rounded-[5px] absolute left-[40vw] right-[0vw] top-[30vh] grid">
-			<!--Close button-->
-			<button onclick="{()=>{
+	<main class="bg-black bg-opacity-50 h-full w-full fixed inset-0 flex items-center justify-center">
+		<div class="bg-white shadow-lg rounded-lg w-[400px] p-6 relative">
+			<!-- Close button -->
+			<button
+					onclick={() => {
 					enabled_popup = false;
-			}}" class="text-[40px] absolute right-[0] pr-[30px]">x
+				}}
+					class="absolute top-4 right-4 text-gray-600 hover:text-gray-800 text-xl"
+			>
+				&times;
 			</button>
 
-			<!--Warning text-->
-			<div class="flex h-[100%] w-[100%] justify-center items-center">
-				<p class="h-fit w-fit">{popupText}</p>
+			<!-- Warning text -->
+			<div class="text-center mb-6">
+				<p class="text-lg font-semibold text-gray-800">{popupText}</p>
 			</div>
 
-			<!--Yes and No buttons-->
-			<div class="flex justify-center items-end gap-[80px] pb-[30px]">
-
-
-				<div class="h-[60px] w-[200px] bg-blue-500 text-center content-center text-[25px] rounded-[4px]">
-					<button class="w-[100%] h-[100%]" onclick={()=>{
-                        onConfirmFunction();
-                        enabled_popup = false
-                    }}>Yes
-					</button>
-				</div>
-
-				<div class="h-[60px] w-[200px] bg-red-500 text-center content-center text-[25px] rounded-[4px]">
-					<button class="w-[100%] h-[100%]" onclick="{()=>{
-					enabled_popup = false;
-				}}">No
-					</button>
-				</div>
-
-
+			<!-- Yes and No buttons -->
+			<div class="flex justify-center gap-6">
+				<button
+						class="px-6 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+						onclick={() => {
+						onConfirmFunction();
+						enabled_popup = false;
+					}}
+				>
+					Yes
+				</button>
+				<button
+						class="px-6 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+						onclick={() => {
+						enabled_popup = false;
+					}}
+				>
+					No
+				</button>
 			</div>
 		</div>
-
 	</main>
 {/if}

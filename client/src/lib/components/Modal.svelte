@@ -85,7 +85,6 @@
 
 <style>
     main {
-        height: 100vh;
         background-color: #f8f9fa;
         display: flex;
         align-items: center;
