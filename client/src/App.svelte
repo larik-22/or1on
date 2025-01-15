@@ -21,10 +21,18 @@
     import MyHighlights from "./pages/MyHighlights.svelte";
     import TourPage from "./pages/TourPage.svelte";
     import ToursManage from "./lib/components/moderatorDashboard/ToursManage.svelte";
+    import HighlightsManage from "./lib/components/moderatorDashboard/HighlightsManage.svelte";
+    import HighlightSuggestion from "./lib/components/moderatorDashboard/HighlightSuggestion.svelte";
 
-    let page: any;
-    let params: Context;
-    let currentRoute: string;
+    let page: any = $state(Homepage);
+    let params: Context = $state();
+    let currentRoute: string = $state("/");
+
+
+    let showSideBar: boolean = $state(false);
+    let buttonText: string = $state("+");
+    let timer: number = $state(0);
+    let innerWidth: number = $state(window.innerWidth);
 
     router('/', (ctx: Context) => {
         page = Homepage;
@@ -85,41 +93,42 @@
         params = ctx;
     });
 
+
     router('/feedbacks', isLoggedIn, (ctx) => {
         page = UserFeedbacks;
         currentRoute = ctx.pathname;
         params = ctx;
-    })
+    });
 
     router('/user-management', isLoggedIn, isAdmin, (ctx) => {
         page = UserManagement;
         currentRoute = ctx.pathname;
         params = ctx;
-    })
+    });
 
     router('/change-password', isLoggedIn, (ctx) => {
         page = ChangePassword;
         currentRoute = ctx.pathname;
         params = ctx;
-    })
+    });
 
     router('/change-username', isLoggedIn, (ctx) => {
         page = ChangeUsername;
         currentRoute = ctx.pathname;
         params = ctx;
-    })
+    });
 
     router('/logout', isLoggedIn, (ctx) => {
         page = LogOut;
         currentRoute = ctx.pathname;
         params = ctx;
-    })
+    });
 
     router('/feedbacks-management', isLoggedIn, isAdmin, (ctx) => {
         page = Feedback;
         currentRoute = ctx.pathname;
         params = ctx;
-    })
+    });
 
     router('/manage-tours', isLoggedIn, isAdmin, (ctx) => {
         page = ToursManage;
@@ -127,15 +136,59 @@
         params = ctx;
     })
 
+    router('/manage-highlights', isLoggedIn, isAdmin, (ctx) => {
+        page = HighlightsManage;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    })
+
+    router('/manage-suggestions', isLoggedIn, isAdmin, (ctx) => {
+        page = HighlightSuggestion;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    })
+
+
+
+
 
     router.start();
+
 </script>
 
+<svelte:window bind:innerWidth={innerWidth}/>
 
 <main>
 
     <div class="flex">
-        <Navigation currentRoute="{currentRoute}" bind:currentPage={page}></Navigation>
+        {#if innerWidth < 640}
+            <div class="sm:block hidden" class:showSideBar={showSideBar}>
+                <Navigation FullWidth={true} currentRoute={currentRoute} bind:currentPage={page}></Navigation>
+            </div>
+            <button type="button"
+                    class="absolute right-5 top-[3vh] z-[999] text-[30px] text-[black] bg-gray-50 pl-[15px] pr-[15px] rounded-[5px] sm:hidden"
+                    onclick={()=>{
+
+                clearTimeout(timer);
+                timer = setTimeout(()=>{
+                    showSideBar = !showSideBar;
+                    switch (buttonText) {
+                        case "+" :
+                            buttonText = "x";
+                            break;
+                        case "x" :
+                            buttonText = "+";
+                            break;
+                    }
+                },50)
+
+
+        }}>{buttonText}</button>
+        {:else}
+            <Navigation FullWidth={false} currentRoute={currentRoute} bind:currentPage={page}></Navigation>
+        {/if}
+
+<!--        eslint-disable-next-line-->
         <svelte:component this={page} {params}/>
     </div>
 
@@ -145,15 +198,24 @@
                 role="button"
                 tabindex="0"
                 class="fixed inset-0 z-[999]"
-                on:click={() => close()}
-                on:keypress={(e) => {
+                onclick={() => close()}
+                onkeypress={(e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       close();
     }
-  }}
-        >
+  }}>
         </div>
         {/snippet}
     </Modals>
 </main>
+
+<style>
+    .showSideBar {
+        display: block;
+        position: absolute;
+        z-index: 900;
+    }
+
+
+</style>
 

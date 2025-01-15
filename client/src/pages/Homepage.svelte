@@ -146,4 +146,9 @@
 	</Map>
 </div>
 
-
+<style>
+ :global(.leaflet-top , .leaflet-bottom){
+		z-index: 800 !important;
+		position: absolute !important;
+	}
+</style>
