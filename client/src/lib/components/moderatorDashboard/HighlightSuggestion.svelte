@@ -9,12 +9,25 @@
 
 
     // State variables
-    let suggestions = [];
-    let newTable: TableType = { columns: [], rows: [] };
-    let currentRow: Row | null = null;
-    let enabledPopup = false;
-    let popupText = "";
-    let isAccepting = false;
+    let suggestions: Suggestion[] = $state([]);
+    let newTable: TableType = $state({ columns: [], rows: [] });
+    let currentRow: Row | null = $state(null);
+    let enabledPopup: boolean = $state(false);
+    let popupText: string = $state("");
+    let isAccepting: boolean = $state(false);
+
+    // Suggestion Type Definition
+    type Suggestion = {
+        id: number;
+        name: string;
+        description: string;
+        category: string;
+        latitude: number | null;
+        longitude: number | null;
+        is_approved: boolean;
+        businessDescription: string | null;
+        suggestedBy?: { username: string };
+    };
 
     // Fetch suggestions from the backend
     async function fetchSuggestions() {
@@ -24,8 +37,12 @@
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             });
-            const data = await response.json();
-            suggestions = data.highlights.filter((highlight) => !highlight.is_approved); // Only unapproved highlights
+
+            // type fetch data
+            const data: { highlights: Suggestion[] } = await response.json();
+
+            // filter highlights with correct type
+            suggestions = (data.highlights || []).filter((highlight: Suggestion) => !highlight.is_approved);
             newTable = dataToTable(suggestions);
         } catch (error) {
             console.error("Failed to fetch suggestions:", error);
@@ -33,13 +50,17 @@
     }
 
     // Convert suggestions to TableType
-    function dataToTable(data) {
+    function dataToTable(data: Suggestion[]) {
+        data.sort((a, b) => a.id - b.id); // sort highlights by id in ascending order
+
         const columns = [
             "ID",
             "Name",
             "Description",
             "Business Description",
             "Category",
+            "Latitude",
+            "Longitude",
             "Suggested By",
             "Approved State",
         ];
@@ -50,6 +71,8 @@
                 highlight.description,
                 highlight.businessDescription || "none",
                 highlight.category,
+                highlight.latitude?.toFixed(6) || "N/A",
+                highlight.longitude?.toFixed(6) || "N/A",
                 highlight.suggestedBy?.username || "Unknown",
                 highlight.is_approved ? "Approved" : "Pending",
             ],
@@ -71,7 +94,7 @@
 
             if (response.ok) {
                 console.log(`Approved suggestion ID: ${id}`);
-                await fetchSuggestions(); // Refresh data
+                await fetchSuggestions(); // refresh
             } else {
                 console.error(`Failed to approve suggestion ID: ${id}`);
             }
