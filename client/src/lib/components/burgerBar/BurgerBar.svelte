@@ -18,13 +18,13 @@
     let {
         BarItems = [],
         Location = "",
-        Width = "15vw",
+        FullWidth = false,
         MinWidth = "320px",
         AdditionalComponent,
     }: {
         BarItems: BarItem[],
         Location: string
-        Width?: string
+        FullWidth?: boolean
         MinWidth?: string
         AdditionalComponent?: typeof SvelteComponent
     } = $props();
@@ -41,9 +41,10 @@
 </script>
 
 
-<main>
-    <div class="h-lvh min-w-[{MinWidth}]  w-[{Width}] bg-gray-50 shadow-md border-r-[1px] border-solid border-gray-300 overflow-hidden">
-        <AdditionalComponent/>
+<main class="">
+    <div class="h-lvh min-w-[{MinWidth}] bg-gray-50 shadow-md border-r-[1px] border-solid border-gray-300 overflow-hidden max-h-[100vh] overflow-y-scroll" class:fullBar={FullWidth} class:nonFullBar={!FullWidth}>
+        <AdditionalComponent Width={FullWidth}/>
+
         <div class="w-[100%] h-fit pt-[15px] pb-[15px] shadow-md bg-[#f9fafb] text-center content-center ">{Location}</div>
         <ul class="pt-[100px]">
             {#each BarItems as item, i}
@@ -56,3 +57,13 @@
         <BurgerBarItem Item={homeButton} paddingTop="pt-[10vh]"/>
     </div>
 </main>
+
+
+<style>
+    .fullBar{
+        width: 100vw
+    }
+    .nonFullBar{
+        width: 15vw
+    }
+</style>
