@@ -69,7 +69,7 @@ import bcrypt from "bcryptjs";
         {
             id: randomUUID(),
             username: 'dummyUser5',
-            email: 'user3@dummy.com',
+            email: 'user5@dummy.com',
             password: await bcrypt.hash('Password8',10),
             isAdmin: false,
             verified: true
@@ -77,7 +77,7 @@ import bcrypt from "bcryptjs";
         {
             id: randomUUID(),
             username: 'dummyUser6',
-            email: 'user3@dummy.com',
+            email: 'user6@dummy.com',
             password: await bcrypt.hash('Password9',10),
             isAdmin: false,
             verified: false
@@ -85,7 +85,7 @@ import bcrypt from "bcryptjs";
         {
             id: randomUUID(),
             username: 'dummyUser7',
-            email: 'user3@dummy.com',
+            email: 'user7@dummy.com',
             password: await bcrypt.hash('Password10',10),
             isAdmin: false,
             verified: false
@@ -93,7 +93,7 @@ import bcrypt from "bcryptjs";
         {
             id: randomUUID(),
             username: 'dummyUser8',
-            email: 'user3@dummy.com',
+            email: 'user8@dummy.com',
             password: await bcrypt.hash('Password11',10),
             isAdmin: false,
             verified: false
@@ -101,7 +101,7 @@ import bcrypt from "bcryptjs";
         {
             id: randomUUID(),
             username: 'dummyUser9',
-            email: 'user3@dummy.com',
+            email: 'user9@dummy.com',
             password: await bcrypt.hash('Password12',10),
             isAdmin: false,
             verified: true
@@ -109,7 +109,7 @@ import bcrypt from "bcryptjs";
         {
             id: randomUUID(),
             username: 'dummyUser10',
-            email: 'user3@dummy.com',
+            email: 'user10@dummy.com',
             password: await bcrypt.hash('Password13',10),
             isAdmin: false,
             verified: false
@@ -117,7 +117,7 @@ import bcrypt from "bcryptjs";
         {
             id: randomUUID(),
             username: 'dummyUser11',
-            email: 'user3@dummy.com',
+            email: 'user11@dummy.com',
             password: await bcrypt.hash('Password14',10),
             isAdmin: false,
             verified: false
