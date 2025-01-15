@@ -2054,7 +2054,6 @@ describe('POST /api/highlights/:id/feedbacks', () => {
         expect(responseBody.error.message).toBe('Unauthorized');
     });
 });
-
 describe('GET /api/:id/map/highlights', () => {
     it('should successfully return highlights', async () => {
         const mockGeoJSON = {
@@ -2149,6 +2148,86 @@ describe('GET /api/:id/map/highlights', () => {
         expect(body.error.message).toBe('Internal error');
     });
 });
+
+//HERE
+describe('GET /api/feedbacks/approval', () => {
+    it('should fetch all feedbacks for approval', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+
+        const mockFeedbacks = [
+            {
+                id: 1,
+                highlight: { id: 1, name: 'Highlight 1' },
+                user: { id: '1', username: 'user1@example.com' },
+                rating: 5,
+                comment: 'Great feedback!',
+                isApproved: false,
+            },
+        ];
+
+        em.findOne = vi.fn(async () => ({
+
+            highlights: {
+                getItems:
+                    () => [{
+                        id: 1,
+                        highlight: { id: 1, name: 'Highlight 1' },
+                        user: { id: '1', username: 'user1@example.com' },
+                        rating: 5,
+                        comment: 'Great feedback!',
+                        isApproved: false,
+                    },]
+            }
+        }));
+
+        const response = await app.request('/api/feedbacks/approval', {method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(200);
+        expect(JSON.parse(await response.text())).toEqual({
+            feedbacks: expect.any(Array)
+        });
+    });
+
+    it('should return 404 when no feedbacks are found for approval', async () => {
+        em.findOne = vi.fn(async () => ({
+            feedbacks: {
+                getItems: () => [],
+            },
+        }));
+
+        const response = await app.request('/api/feedbacks/approval', { method: 'GET' }, mockEnv);
+
+        expect(response.status).toBe(404);
+        const responseBody = await response.json();
+        expect(responseBody.message).toBe('No feedbacks found for approval');
+    });
+
+    it('should return 500 on internal error', async () => {
+        em.findOne = vi.fn(async () => {
+            throw new Error('Database error');
+        });
+
+        const response = await app.request('/api/feedbacks/approval', { method: 'GET' }, mockEnv);
+
+        expect(response.status).toBe(500);
+        const responseBody = await response.json();
+        expect(responseBody.error.code).toBe(500);
+        expect(responseBody.error.message).toBe('Internal error');
+    });
+});
+
 
 //HERE
 describe('GET /api/feedbacks/approval', () => {
