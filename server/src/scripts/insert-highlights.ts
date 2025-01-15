@@ -131,6 +131,322 @@ import mikroConfig from '../../mikro-orm.config.js';
             longitude: 6.160778624008953,
             is_approved: true,
             businessDescription: 'Free entrance',
+        },
+        {
+            name: "De Brink Square",
+            description: "A historic market square surrounded by medieval buildings.",
+            category: "Historical",
+            latitude: 52.2510,
+            longitude: 6.1600,
+            is_approved: true,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "Jordenshof",
+            description: "Description for Jordenshof.",
+            category: "Historical",
+            latitude: 52.25272798380772,
+            longitude: 6.157872455371526,
+            is_approved: true,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "Etty Hillesum Centrum",
+            description: "A museum and cultural center dedicated to the life of Etty Hillesum.",
+            category: "Museum",
+            latitude: 52.25269438951543,
+            longitude: 6.161689875286357,
+            is_approved: true,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "De Proosdij",
+            description: "The oldest stone house in the Netherlands, dating back to around 1130.",
+            category: "Historical",
+            latitude: 52.252901548019956,
+            longitude: 6.155591554477714,
+            is_approved: false,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "Stadsarchief en Athenaeumbibliotheek",
+            description: "The oldest scientific library in the Netherlands, founded in 1560.",
+            category: "Education",
+            latitude: 52.25330150652446,
+            longitude: 6.152684713653483,
+            is_approved: false,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "ICT Netherlands",
+            description: "A center for technological innovation.",
+            category: "IT Company",
+            latitude: 52.24285804325164,
+            longitude: 6.171884222817136,
+            is_approved: true,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "Nieuwe Plantsoen",
+            description: "A green park area ideal for walks and relaxation.",
+            category: "Nature",
+            latitude: 52.26665930160365,
+            longitude: 6.150674392136583,
+            is_approved: true,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "Bergkwartier",
+            description: "A historic district with medieval streets and architecture.",
+            category: "Historical",
+            latitude: 52.25236197758664,
+            longitude: 6.16287716574532,
+            is_approved: true,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "St. Nicholas Church",
+            description: "A Gothic church with a rich history, now serving as a bookstore.",
+            category: "Historical",
+            latitude: 52.25206313126121,
+            longitude:  6.163188301996035,
+            is_approved: true,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "De Adelaarshorst Stadium",
+            description: "Home stadium of the Go Ahead Eagles football club.",
+            category: "Entertainment",
+            latitude: 52.26003156278169,
+            longitude: 6.172683386061763,
+            is_approved: false,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "Bierencafé de Heks",
+            description: "A popular pub known for its wide selection of beers.",
+            category: "Pub",
+            latitude: 52.25102235610859,
+            longitude:  6.159399697699012,
+            is_approved: true,
+            businessDescription: 'Free drinks'
+        },
+        {
+            name: "Worpplantsoen Park",
+            description: "The oldest public park in the Netherlands, offering scenic views.",
+            category: "Nature",
+            latitude: 52.24960455814152,
+            longitude: 6.148243883433722,
+            is_approved: true,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "Filmhuis De Keizer",
+            description: "An independent cinema showcasing a range of international films.",
+            category: "Entertainment",
+            latitude: 52.25332528394313,
+            longitude: 6.165616136880615,
+            is_approved: true,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "Theater Aan De Lijn",
+            description: "Description of Theater Aan De Lijn",
+            category: "Architecture",
+            latitude: 52.2600072939816,
+            longitude: 6.165517653352023,
+            is_approved: true,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "Botemarkt",
+            description: "A 19th-century market hall where butter was once sold.",
+            category: "Historic",
+            latitude: 52.26455524216268,
+            longitude: 6.155366832064887,
+            is_approved: true,
+            businessDescription: 'Free entrance'
+        },
+        {
+            name: "Escape Room Deventer",
+            description: "Provides immersive escape room experiences for groups.",
+            category: "Entertainment",
+            latitude: 52.24592247195486,
+            longitude: 6.166523849951872,
+            is_approved: false,
+            businessDescription: 'Free drinks'
+        },
+        {
+            name: "Deventer Buitensociëteit & Bowling",
+            description: "Offers bowling alleys, arcade games, and a bar.",
+            category: "Entertainment",
+            latitude: 52.24735995371199,
+            longitude:  6.148649633420082,
+            is_approved: false,
+            businessDescription: 'Free drinks'
+        },
+        {
+            name: "Blues Rock Cafe Midtown",
+            description: "A quaint pub with great atmosphere and boardgames.",
+            category: "Pub",
+            latitude: 52.25295773475535,
+            longitude: 6.16078103084258,
+            is_approved: false,
+            businessDescription: 'Free drinks'
+        },
+        {
+            name: "Broederenkerk",
+            description: "A Gothic and neo-Gothic style church with a rich history.",
+            category: "Architecture",
+            latitude: 52.25457680948102,
+            longitude: 6.156887805134106,
+            is_approved: false,
+            businessDescription: 'Free entry'
+        },
+        {
+            name: "Taalhuis Deventer",
+            description: "Specializes in language courses for international students.",
+            category: "Education",
+            latitude: 52.26828185381255,
+            longitude: 6.163519142480258,
+            is_approved: false,
+            businessDescription: 'Free entry'
+        },
+        {
+            name: "Museum EICAS",
+            description: "A museum that highlights modern art.",
+            category: "Museum",
+            latitude: 52.252606800122294,
+            longitude: 6.154415400152726,
+            is_approved: false,
+            businessDescription: 'Free entry'
+        },
+        {
+            name:'Zandweteringpark',
+            description: 'Description for Zandweteringpark',
+            category: 'Nature',
+            latitude:52.276282884300976,
+            longitude: 6.164766863959682,
+            is_approved: true,
+            businessDescription: 'Free entrance',
+        },
+        {
+            name:'Koningskerk',
+            description: 'Description for Koningskerk',
+            category: 'Architecture',
+            latitude:52.266934069595976,
+            longitude:  6.150819376858662,
+            is_approved: false,
+            businessDescription: 'Free entrance',
+        },
+        {
+            name: "Beer and Dans café Persee",
+            description: "A popular pub known for its wide selection of beers.",
+            category: "Pub",
+            latitude: 52.251666816837556,
+            longitude: 6.1606384071894045,
+            is_approved: true,
+            businessDescription: 'Free drinks'
+        },
+        {
+            name: "Mall Boreel",
+            description: "A modern shopping mall with a variety of shops, including fashion," +
+                " electronics, and dining options.",
+            category: "Other",
+            latitude: 52.25351962990873,
+            longitude: 6.165593600330209,
+            is_approved: true,
+            businessDescription: 'Free entry'
+        },
+        {
+            name:'The monastery garden Deventer',
+            description: 'A calm quaint garden where you can sit down and enjoy nature.',
+            category: 'Nature',
+            latitude: 52.253411894892,
+            longitude: 6.153508469475252,
+            is_approved: false,
+            businessDescription: 'Free entrance',
+        },
+        {
+            name: "Geert Groote Huis",
+            description: "A museum that highlights the most important citizen of Deventer.",
+            category: "Museum",
+            latitude: 52.2537478780058,
+            longitude: 6.156186738785399,
+            is_approved: false,
+            businessDescription: 'Free entry'
+        },
+        {
+            name: "Kunstenlab",
+            description: "A museum that highlights contemporary art.",
+            category: "Museum",
+            latitude: 52.247473890363366,
+            longitude: 6.169444330854956,
+            is_approved: false,
+            businessDescription: 'Free entry'
+        },
+        {
+            name: "Deventer Paintball",
+            description: "Offers a fun time with friends.",
+            category: "Entertainment",
+            latitude: 52.238254718515826,
+            longitude: 6.205063483587643,
+            is_approved: true,
+            businessDescription: 'Free drinks'
+        },
+        {
+            name: "Forsaken escape room",
+            description: "Provides immersive escape room experiences for groups.",
+            category: "Entertainment",
+            latitude: 52.24410832132245,
+            longitude: 6.167194430229893,
+            is_approved: false,
+            businessDescription: 'Free drinks'
+        },
+        {
+            name: "Bar Bistro Loev Deventer",
+            description: "A popular pub.",
+            category: "Pub",
+            latitude: 52.251125780857066,
+            longitude: 6.159791238644593,
+            is_approved: true,
+            businessDescription: 'Free drinks'
+        },
+        {
+            name: "The Flower Garden",
+            description: "A popular pub.",
+            category: "Pub",
+            latitude: 52.252416415753906,
+            longitude: 6.159185059382293,
+            is_approved: true,
+            businessDescription: 'Free drinks'
+        },
+        {
+            name: "Walhalla Deventer",
+            description: "A popular pub with live music.",
+            category: "Pub",
+            latitude: 52.25081219923861,
+            longitude: 6.161204813511941,
+            is_approved: false,
+            businessDescription: 'Free drinks'
+        },
+        {
+            name: "ZUS. Bar-Kitchen Deventer",
+            description: "A popular pub with fresh made food.",
+            category: "Pub",
+            latitude: 52.25133255115281,
+            longitude: 6.160402842348176,
+            is_approved: false,
+            businessDescription: 'Free drinks'
+        },
+        {
+            name: "Bar & keuken De buren van Schimmelpenninck",
+            description: "A popular pub with fresh made food.",
+            category: "Pub",
+            latitude: 52.25230134733096,
+            longitude: 6.161089487866994,
+            is_approved: true,
+            businessDescription: 'Free drinks'
         }
     ];
 
