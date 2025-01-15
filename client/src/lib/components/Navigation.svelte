@@ -8,15 +8,15 @@
     import Homepage from "../../pages/Homepage.svelte";
     import UserIndicator from "./userDashboard/UserIndicator.svelte";
 
-    let {
-        currentRoute,
-        currentPage = $bindable(Homepage),
-        barWidth = $bindable()
-    }: {
-        currentRoute: string;
-        currentPage: any;
-        barWidth: string;
-    } = $props();
+	let {
+		currentRoute,
+		currentPage = $bindable(Homepage),
+		FullWidth = $bindable()
+	}: {
+		currentRoute: string;
+		currentPage: any;
+		FullWidth: boolean;
+	} = $props();
 
     let CurrentLocation: string = $state("Home");
     let AdditionalComponent: any = $state("");
@@ -182,7 +182,7 @@
                     CurrentLocation = "Moderator Dashboard";
                     AdditionalComponent = UserIndicator;
                     break;
-                case "/my-highlights":
+                case currentRoute === "/my-highlights":
                     if ($isUserAdmin) {
                         page.redirect("/");
                     } else {
@@ -293,7 +293,7 @@
 
 <main class="h-fit w-fit">
     {#key currentPage}
-        <BurgerBar Location={CurrentLocation} Width={barWidth} BarItems={BarItems}
+        <BurgerBar Location={CurrentLocation} FullWidth={FullWidth} BarItems={BarItems}
                    AdditionalComponent={AdditionalComponent}/>
     {/key}
 </main>

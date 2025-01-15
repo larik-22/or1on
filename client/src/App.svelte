@@ -145,7 +145,7 @@
     <div class="flex">
         {#if innerWidth < 640}
             <div class="sm:block hidden" class:showSideBar={showSideBar}>
-                <Navigation barWidth='100vw' currentRoute={currentRoute} bind:currentPage={page}></Navigation>
+                <Navigation FullWidth={true} currentRoute={currentRoute} bind:currentPage={page}></Navigation>
             </div>
             <button type="button"
                     class="absolute right-5 top-[3vh] z-[999] text-[30px] text-[black] bg-gray-50 pl-[15px] pr-[15px] rounded-[5px] sm:hidden"
@@ -167,10 +167,10 @@
 
         }}>{buttonText}</button>
         {:else}
-            <Navigation barWidth='15vw' currentRoute={currentRoute} bind:currentPage={page}></Navigation>
+            <Navigation FullWidth={false} currentRoute={currentRoute} bind:currentPage={page}></Navigation>
         {/if}
 
-        //eslint-disable-next-line
+<!--        eslint-disable-next-line-->
         <svelte:component this={page} {params}/>
     </div>
 
