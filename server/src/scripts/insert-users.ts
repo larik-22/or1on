@@ -41,7 +41,6 @@ import bcrypt from "bcryptjs";
             password: await bcrypt.hash('Password4',10),
             isAdmin: false,
             verified: false
-
         },
         {
             id: randomUUID(),
@@ -73,7 +72,7 @@ import bcrypt from "bcryptjs";
             email: 'user3@dummy.com',
             password: await bcrypt.hash('Password8',10),
             isAdmin: false,
-            verified: false
+            verified: true
         },
         {
             id: randomUUID(),
@@ -105,7 +104,7 @@ import bcrypt from "bcryptjs";
             email: 'user3@dummy.com',
             password: await bcrypt.hash('Password12',10),
             isAdmin: false,
-            verified: false
+            verified: true
         },
         {
             id: randomUUID(),
