@@ -126,7 +126,7 @@
 						{
 							color: "blue",
 							opacity: 0.75,
-							weight: 3,
+							weight: 4.5,
 							stroke: true,
 							dashArray: "5, 10",
 							lineCap: "round",

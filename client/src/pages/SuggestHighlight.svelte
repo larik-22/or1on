@@ -37,7 +37,6 @@
 		highlightPayload.category = highlightPayload.category as HighlightType;
 		highlightPayload.businessDescription = highlightPayload?.businessDescription;
 		validated = highlightSuggestionSchema.safeParse(highlightPayload).success;
-		$inspect(validated, highlightPayload)
 	})
 
 
