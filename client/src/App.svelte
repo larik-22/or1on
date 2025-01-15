@@ -21,6 +21,8 @@
     import MyHighlights from "./pages/MyHighlights.svelte";
     import TourPage from "./pages/TourPage.svelte";
     import ToursManage from "./lib/components/moderatorDashboard/ToursManage.svelte";
+    import HighlightsManage from "./lib/components/moderatorDashboard/HighlightsManage.svelte";
+    import HighlightSuggestion from "./lib/components/moderatorDashboard/HighlightSuggestion.svelte";
 
     let page: any = $state(Homepage);
     let params: Context = $state();
@@ -91,6 +93,7 @@
         params = ctx;
     });
 
+
     router('/feedbacks', isLoggedIn, (ctx) => {
         page = UserFeedbacks;
         currentRoute = ctx.pathname;
@@ -132,6 +135,21 @@
         currentRoute = ctx.pathname;
         params = ctx;
     })
+
+    router('/manage-highlights', isLoggedIn, isAdmin, (ctx) => {
+        page = HighlightsManage;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    })
+
+    router('/manage-suggestions', isLoggedIn, isAdmin, (ctx) => {
+        page = HighlightSuggestion;
+        currentRoute = ctx.pathname;
+        params = ctx;
+    })
+
+
+
 
 
     router.start();

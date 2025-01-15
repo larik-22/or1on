@@ -67,6 +67,78 @@ import { Highlight } from "../models/highlight.js";
                 ...getHighlightsByCategory('Historical')
             ]
         },
+        {
+            name: 'Tour 5',
+            category: 'Pub',
+            description: 'Deventer Pub Crawl',
+            duration_time: '03:00',
+            start_hour: '20:00',
+            highlights: [
+                ...getHighlightsByCategory('Pub')
+            ]
+        },
+        {
+            name: 'Tour 6',
+            category: 'Nature',
+            description: 'Parks Around Deventer',
+            duration_time: '02:00',
+            start_hour: '16:00',
+            highlights: [
+                ...getHighlightsByCategory('Nature')
+            ]
+        },
+        {
+            name: 'Tour 7',
+            category: 'Architecture',
+            description: 'Churches Around Deventer',
+            duration_time: '03:00',
+            start_hour: '14:00',
+            highlights: [
+                ...highlights.filter(h => ['De Waag', 'Bergkerk', 'Lebuinuskerk',
+                    'St. Nicholas Church', 'Broederenkerk', 'Koningskerk'].includes(h.name))
+            ]
+        },
+        {
+            name: 'Tour 8',
+            category: 'Museum',
+            description: 'Museums Around Deventer',
+            duration_time: '02:10',
+            start_hour: '15:30',
+            highlights: [
+                ...getHighlightsByCategory('Museum')
+            ]
+        },
+        {
+            name: 'Tour 9',
+            category: 'Historical',
+            description: 'Historical Districts in Deventer',
+            duration_time: '00:40',
+            start_hour: '14:00',
+            highlights: [
+                ...highlights.filter(h => ['Bergkwartier', 'De Brink Square'].includes(h.name))
+            ]
+        },
+        {
+            name: 'Tour 10',
+            category: 'IT Company',
+            description: 'IT Companies Around Deventer',
+            duration_time: '00:45',
+            start_hour: '15:00',
+            highlights: [
+                ...getHighlightsByCategory('IT Company')
+            ]
+        },
+        {
+            name: 'Tour 11',
+            category: 'Pub',
+            description: 'Dine and Dash Tour',
+            duration_time: '00:40',
+            start_hour: '18:00',
+            highlights: [
+                ...highlights.filter(h => ['ZUS. Bar-Kitchen Deventer',
+                    'Bar & keuken De buren van Schimmelpenninck'].includes(h.name))
+            ]
+        }
     ];
 
     for (const tourData of tours) {
