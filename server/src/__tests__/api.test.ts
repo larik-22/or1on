@@ -1990,7 +1990,7 @@ describe('POST /api/highlights/:id/feedbacks', () => {
         });
 
         const invalidFeedbackData = {
-            rating: 'notANumber', // Invalid rating type
+            rating: 'notANumber',
             feedbackMessage: 'Great highlight!',
         };
 
@@ -2241,3 +2241,101 @@ describe ('PUT /users/:id/trust', () => {
     });
 
 })
+
+describe('GET /api/feedbacks/approval', () => {
+    it('should return a list of feedbacks for approval for admin users', async () => {
+        const admin = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+        };
+
+        const feedbacks = [
+            {
+                id: 15,
+                tour: {}, // Ensure tour is an empty object
+                highlight: {}, // Ensure highlight is an empty object
+                user: { id: "f9a87494-9003-435e-a576-b72b693d2190", username: "testuser1" },
+                rating: 5,
+                comment: "awesome",
+                is_approved: false
+            },
+            {
+                id: 22,
+                tour: { id: 5 }, // Set tour with an id object
+                highlight: {}, // Ensure highlight is an empty object
+                user: { id: "80215af7-5e2d-4058-b3e8-7ecbc508af92", username: "testuser2" },
+                rating: 2,
+                comment: "trash",
+                is_approved: false
+            }
+        ];
+
+        em.find = vi.fn().mockResolvedValue(feedbacks);
+
+        const token = await generateToken(admin);
+
+        const response = await app.request('/api/feedbacks/approval', {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody).toEqual(feedbacks);
+    });
+});
+
+describe('GET /api/feedbacks/user/:id', () => {
+    it('should return a list of feedbacks for a specific user', async () => {
+        const user = {
+            id: 'f9a87494-9003-435e-a576-b72b693d2190',
+            email: 'user@example.com',
+            isAdmin: false
+        };
+        const token = await generateToken(user);
+
+        const feedbacks = [
+            {
+                id: 15,
+                tour: 3,
+                highlight: null,
+                user: "f9a87494-9003-435e-a576-b72b693d2190",
+                rating: 5,
+                comment: "awesome",
+                is_approved: false
+            }
+        ];
+
+        em.find = vi.fn().mockResolvedValue(feedbacks);
+
+        const response = await app.request(`/api/feedbacks/user/${user.id}`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.feedbacks).toEqual(feedbacks);
+    });
+
+    it('should return 404 if no feedbacks are found', async () => {
+        const user = {
+            id: '80215af7-5e2d-4058-b3e8-7ecbc508af92',
+            email: 'user2@example.com',
+            isAdmin: false
+        };
+        const token = await generateToken(user);
+
+        em.find = vi.fn().mockResolvedValue([]);
+
+        const response = await app.request(`/api/feedbacks/user/${user.id}`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        expect(response.status).toBe(404);
+        const responseBody = await response.json();
+        expect(responseBody.message).toBe('No feedbacks found for this user');
+    });
+});

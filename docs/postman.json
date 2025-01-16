@@ -695,6 +695,60 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Fetches all feedbacks for a specific user",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/feedbacks/user/550e8400-e29b-41d4-a716-446655440000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"feedbacks",
+						"user",
+						"550e8400-e29b-41d4-a716-446655440000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetches feedback approval status",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/feedbacks/approval",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"feedbacks",
+						"approval"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
