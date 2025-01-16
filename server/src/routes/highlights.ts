@@ -139,8 +139,8 @@ highlights.get('/:id/my-highlights', isLoggedIn, async (ctx) => {
 
         const highlights = await getHighlightsByUserToken(em, jwtPayload.email);
 
-        // Return empty array instead of null for no highlights
-        if (!highlights) {
+        // Return empty array if null (no user found)
+        if (highlights === null) {
             logger.info('No highlights found for user', { email: jwtPayload.email });
             return ctx.json({ highlights: [] }, 200);
         }
@@ -254,11 +254,16 @@ highlights.put('/:id/approve', isLoggedIn, isAdmin, async (ctx) => {
 highlights.put('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtPayload') as EntityManager;
-        const id = parseInt(ctx.req.param('id'))
+        const params = numberIdSchema.safeParse(ctx.req.param());
 
+        if (!params.success) {
+            return ctx.json(createErrorResponse(400, 'Invalid highlightId parameter'), 400);
+        }
+
+        const { id } = params.data;
         const highlight = await getHighlightById(em, id);
 
-        if (!highlight){
+        if (!highlight) {
             return ctx.json({message: `Highlight not found`}, 404);
         }
 
@@ -271,11 +276,11 @@ highlights.put('/:id', isLoggedIn, isAdmin, async (ctx) => {
         await updateHighlight(em, id, highlightData.data);
 
         return ctx.json({message: `Highlight with ID ${id} updated`}, 200);
-    }catch (error){
+    } catch (error) {
         logger.error('Error while updating highlight', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
-})
+});
 
 /**
  * Handles deleting a highlight.

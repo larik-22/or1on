@@ -18,30 +18,13 @@ export const getAllHighlights = async (em: EntityManager): Promise<Highlight[] |
             return null;
         }
 
-        const formattedHighlights = highlights.map(highlight => ({
-            ...highlight,
-            users: highlight.users.getItems().map(user => ({
-                email: user.email,
-                username: user.username
-            }))
-        }));
-
-        return formattedHighlights;
+        return highlights;
     } catch (error) {
         logger.error('Failed to fetch highlights: ' + error);
         return null;
     }
 }
 
-/**
- * Fetches a highlight by its id from the database.
- *
- * @param em - The MikroORM EntityManager instance.
- * @param id - The id of the highlight to be found.
- * @returns {Promise<Highlight | null>} A promise resolving to the highlight object if found,
- * otherwise null.
- */
-// eslint-disable-next-line max-len
 export const getHighlightById = async (em: EntityManager, id: number): Promise<Highlight | null> => {
     try {
         const highlight = await em.findOne(Highlight, { id }, { populate: ['users'] });
@@ -49,20 +32,15 @@ export const getHighlightById = async (em: EntityManager, id: number): Promise<H
             return null;
         }
 
-        const formattedHighlight = {
-            ...highlight,
-            users: highlight.users.getItems().map(user => ({
-                email: user.email,
-                username: user.username
-            }))
-        };
-
-        return formattedHighlight;
+        return highlight;
     } catch (error) {
         logger.error('Failed to fetch highlight with id: ' + id + ' error: ' + error);
         return null;
     }
 }
+
+
+
 
 /**
  * Creates a new highlight and stores it in the database.
@@ -177,25 +155,14 @@ export const deleteHighlight = async (em: EntityManager, id: number): Promise<vo
 // eslint-disable-next-line max-len
 export const getHighlightsByUserToken = async (em: EntityManager, userEmail: string): Promise<Highlight[] | null> => {
     try {
-        if (!userEmail) {
-            logger.error('User email is required');
-            return null;
-        }
-
-        // Find the user with their highlights
-        const user = await em.findOne(User, { email: userEmail }, {
-            populate: ['highlights']
-        });
-
+        // First find the user
+        const user = await em.findOne(User, { email: userEmail }, { populate: ['highlights'] });
         if (!user) {
-            logger.error('User not found: ' + userEmail);
             return null;
         }
 
         // Get highlights through the user's highlights collection
         const highlights = user.highlights.getItems();
-
-        // Return null if no highlights found
         if (highlights.length === 0) {
             return null;
         }
@@ -219,4 +186,4 @@ export const getHighlightsByUserToken = async (em: EntityManager, userEmail: str
         logger.error('Failed to fetch highlights for user with email: ' + userEmail + ' error: ' + error);
         return null;
     }
-};
+}
