@@ -202,10 +202,9 @@
 
 </script>
 
-<main class="w-[100%] flex justify-center">
-    <div class="w-fit h-fit pt-[10vh]">
+<main class="flex items-center content-center w-[100%] h-[100vh] justify-center overflow-x-scroll overflow-y-scroll">
+    <div class="w-full  max-w-fit">
         <Table newTable={table} actionConfigs={configs}></Table>
-
     </div>
     {#if enableEditComment}
        <Modal bind:modal={editModal} bind:enableEditModal={enableEditComment}></Modal>

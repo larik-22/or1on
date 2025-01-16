@@ -8,13 +8,14 @@
 	import {onMount} from "svelte";
 	import FilterDropdown from "../lib/components/highlights/FilterDropdown.svelte";
 	import "leaflet.markercluster";
-	import {getUserLocationMarker, getMapMarker, getUserLocation} from "../lib/utils/mapUtils.svelte";
+	import {getMapMarker, getUserLocation, getUserLocationMarker} from "../lib/utils/mapUtils.svelte";
+	import {userLocation} from "../lib/stores/userLocation";
 
 	let geoJSONData: FeatureCollection | null = $state(null);
 	let geoJSONElement: SGeoJson | null = $state(null);
 	let map: SMap | null = $state(null);
 	let currentHighlightFilter: string[] = $state([]);
-	let userLocation: LatLng | null = $state(null);
+	let loc: LatLng | null = $state($userLocation);
 
 	let markerClusterGroup: L.MarkerClusterGroup = $state(L.markerClusterGroup({
 		showCoverageOnHover: false,
@@ -35,15 +36,16 @@
 		fetchGeoJSON();
 
 		getUserLocation().then((location) => {
-			userLocation = location;
+			loc = location;
 		}).catch(() => {
-			userLocation = null;
+			loc = null;
 		});
 
 		//Zoom to user location
 		$effect(() => {
-			if (userLocation != null) {
-				map?.addLayer(getUserLocationMarker(userLocation));
+			if (loc != null) {
+				map?.addLayer(getUserLocationMarker(loc));
+				map.setView(loc, 15);
 			}
 		})
 	});
@@ -144,4 +146,9 @@
 	</Map>
 </div>
 
-
+<style>
+ :global(.leaflet-top , .leaflet-bottom){
+		z-index: 800 !important;
+		position: absolute !important;
+	}
+</style>

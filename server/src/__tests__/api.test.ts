@@ -6,11 +6,7 @@ import { deleteFeedback } from '../controllers/feedbackController.js'
 import { getFeedbackByUserId, getFeedbackByHighlight } from '../controllers/feedbackController.js'
 import { createTour, updateTour, deleteTour } from "../controllers/tourController.js";
 import { getAllTours, getTourById, getHighlightsByTour } from "../controllers/tourController.js";
-import {
-    approveHighlightSuggestion,
-    getHighlightsByUserToken,
-    updateHighlight
-} from "../controllers/highlightController.js";
+import { approveHighlightSuggestion, updateHighlight } from "../controllers/highlightController.js";
 import { createHighlight, deleteHighlight } from "../controllers/highlightController.js";
 import { getAllHighlights, getHighlightById } from "../controllers/highlightController.js";
 import {type EntityManager, MikroORM} from "@mikro-orm/core";
@@ -858,77 +854,84 @@ describe('DELETE /api/users/:id/feedbacks/:id', () => {
 
 describe('GET /api/highlights', () => {
     it('should fetch all highlights', async () => {
-        // Mock data setup
-        const mockedHighlights = [
+        const mockHighlights = [
             {
                 id: 1,
-                name: 'something',
-                description: 'some description',
-                category: 'history',
+                name: "something",
+                description: "some description",
+                category: "history",
                 latitude: 40.7128,
-                longitude: -74.006,
-                is_approved: false,
-                users: []
+                longitude: -74.0060,
+                is_approved: false
             },
             {
                 id: 2,
-                name: 'something else',
-                description: 'some description',
-                category: 'history',
+                name: "something",
+                description: "some description",
+                category: "history",
                 latitude: 40.7128,
-                longitude: -74.006,
-                is_approved: false,
-                users: []
+                longitude: -74.0060,
+                is_approved: false
             }
-        ];
+        ]
 
-        // Mock the em.find function to return our mock data
-        em.find = vi.fn().mockResolvedValue(mockedHighlights);
+        em.find = vi.fn( async () => mockHighlights);
 
-        const response = await app.request('/api/highlights', { method: 'GET' }, mockEnv);
+        const response = await app.request('/api/highlights', {method: 'GET'}, mockEnv);
+
         expect(response.status).toBe(200);
         const responseBody = await response.json();
-
-        // Update expected data structure to match what we're actually getting
-        expect(responseBody.highlights).toEqual(mockedHighlights);
+        expect(responseBody.highlights).toEqual(mockHighlights);
     });
-});
+})
 
 describe('GET /api/highlights/:id', () => {
-    it('should fetch a highlight', async () => {
-        // Mock data setup
-        const mockedHighlight = {
+    it('should fetch a user and only be accessible to admins', async () => {
+        const mockHighlight = {
             id: 1,
-            name: 'something',
-            description: 'some description',
-            category: 'history',
+            name: "something",
+            description: "some description",
+            category: "history",
             latitude: 40.7128,
-            longitude: -74.006,
-            is_approved: false,
-            users: []
+            longitude: -74.0060,
+            is_approved: false
         };
 
-        // Mock the em.findOne function to return our mock data
-        em.findOne = vi.fn().mockResolvedValue(mockedHighlight);
+        em.findOne = vi.fn( async (entity, condition) =>
+            condition.id === mockHighlight.id ? mockHighlight: null);
 
-        const response = await app.request('/api/highlights/1', { method: 'GET' }, mockEnv);
+        const response = await app.request('/api/highlights/1', {method: 'GET'}, mockEnv);
+
         expect(response.status).toBe(200);
         const responseBody = await response.json();
-
-        // Update expected data structure to match what we're actually getting
-        expect(responseBody.highlight).toEqual(mockedHighlight);
+        expect(responseBody.highlight).toEqual(mockHighlight);
     });
-});
+    it('should return 404 if user is not found', async () => {
+        em.findOne = vi.fn( async () => null);
+
+        const response = await app.request('/api/highlights/2', {method: 'GET'}, mockEnv);
+
+        expect(response.status).toBe(404);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Highlight not found');
+    });
+})
 
 describe('POST /api/highlights', () => {
     it('should create a new highlight', async () => {
         const adminUser = {
-            id: 1,
-            email: 'admin1@dummy.com',
-            password: 'Password2',
+            email: 'admin@example.com',
+            password: 'password123',
             isAdmin: true,
-            username: 'admin1',
+            username: '880005553535',
         };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdUser = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdUser,
+            password: adminUser.password
+        });
 
         const highlightData = {
             name: "something",
@@ -936,64 +939,118 @@ describe('POST /api/highlights', () => {
             category: "history",
             latitude: 40.7128,
             longitude: -74.0060,
-        };
-
-        // Mock finding the user
-        em.findOne = vi.fn(async () => adminUser);
-
-        // Mock creating the highlight
-        em.create = vi.fn(() => ({
-            ...highlightData,
-            id: 1,
-            users: {
-                add: vi.fn()
-            }
-        }));
-
-        em.persistAndFlush = vi.fn();
-
-        const token = await generateToken(adminUser);
-
+        }
         const response = await app.request('/api/highlights', {
             method: 'POST',
             body: JSON.stringify(highlightData),
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Authorization': `Bearer ${token}`}
         }, mockEnv);
 
         expect(response.status).toBe(201);
     });
-});
-
-describe('PUT /api/highlights/:id/approve', () => {
-    it('should approve a highlight suggestion', async () => {
-        const adminUser = {
-            id: 1,
-            email: 'admin1@dummy.com',
-            password: 'Password2',
-            isAdmin: true,
-            username: 'admin1',
+    it('should create a new highlight suggestion', async () => {
+        const user = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
         };
 
-        // Mock the highlight exists
-        em.findOne = vi.fn(async () => ({ id: 1 }));
-        em.nativeUpdate = vi.fn(async () => 1);
-        em.flush = vi.fn();
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdUser = await createUser(em, user);
+        const token = await generateToken({
+            ...createdUser,
+            password: user.password
+        });
 
-        const token = await generateToken(adminUser);
-
-        const response = await app.request('/api/highlights/1/approve', {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${token}` }
+        const highlightData = {
+            name: "something",
+            description: "some description",
+            category: "history",
+            latitude: 40.7128,
+            longitude: -74.0060,
+        }
+        const response = await app.request('/api/highlights', {
+            method: 'POST',
+            body: JSON.stringify(highlightData),
+            headers: { 'Authorization': `Bearer ${token}`}
         }, mockEnv);
+
+        expect(response.status).toBe(201);
+    });
+    it('should return 400 if invalid parameters', async () => {
+        const user = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+        };
+        const highlightData = {
+            name: 1,
+            description: "some description",
+            category: "history",
+            latitude: 40.7128,
+            longitude: -74.0060,
+        }
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdUser = await createUser(em, user);
+        const token = await generateToken({
+            ...createdUser,
+            password: user.password
+        });
+        const response = await app.request('/api/highlights', {
+            method: 'POST',
+            body: JSON.stringify(highlightData),
+            headers: { 'Authorization': `Bearer ${token}`}
+        }, mockEnv);
+
+        expect(response.status).toBe(400);
+    });
+})
+
+describe('PUT /api/highlights/:id/approve', () => {
+    it('should should approve a highlight suggestion', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.nativeUpdate = vi.fn(async () => 1);
+
+        const response = await app.request('/api/highlights/1/approve', {method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
 
         expect(response.status).toBe(200);
         const responseBody = await response.json();
-        expect(responseBody.message).to.equal('Highlight with ID 1 approved');
+        expect(responseBody.message).toEqual(`Highlight with ID 1 approved`);
     });
-});
+    it('should return 400 for invalid highlight id', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        const response = await app.request('/api/feedbacks/invalidId/approve',
+            {method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(400);
+    });
+})
 
 describe('PUT /api/highlights/:id', () => {
     it('should should approve a highlight suggestion', async () => {
@@ -1493,129 +1550,68 @@ describe('deleteTour function', () => {
 describe('getAllHighlights function', () => {
     it('should fetch a list of highlights', async () => {
         const highlights = [
-            {
-                id: 1,
+            {id: '1',
                 name: 'something',
                 description: 'someDescription',
                 category: 'history',
-                is_approved: false,
-                users: {
-                    /**
-                     * Retrieves the items in the user's highlights collection.
-                     *
-                     * @returns {Array} An array of highlight items.
-                     */
-                    getItems: () => [{
-                        email: 'user2@dummy.com',
-                        username: 'dummyUser2'
-                    }]
-                }
-            },
-            {
-                id: 2,
+                is_approved: false},
+            {id: '2',
                 name: 'somethingElse',
                 description: 'someDescription',
                 category: 'pubs',
-                is_approved: false,
-                users: {
-                    /**
-                     * Retrieves the items in the user's highlights collection.
-                     *
-                     * @returns {Array} An array of highlight items.
-                     */
-                    getItems: () => [{
-                        email: 'user2@dummy.com',
-                        username: 'dummyUser2'
-                    }]
-                }
-            }
+                is_approved: false}
         ];
 
-        const mockFind = vi.fn(async () => highlights);
-        em.find = mockFind;
+        em.find = vi.fn(async () => highlights);
 
         const fetchedHighlights = await getAllHighlights(em);
 
-        expect(fetchedHighlights).not.toBeNull();
+        expect(fetchedHighlights).toBeDefined();
         expect(fetchedHighlights).toHaveLength(2);
-        expect(fetchedHighlights[0].id).toBe(1);
-        expect(fetchedHighlights[1].id).toBe(2);
+        expect(fetchedHighlights[0].id).toBe(highlights[0].id);
+        expect(fetchedHighlights[1].id).toBe(highlights[1].id);
     });
+    it('should return null if no users', async () => {
+        em.findOne = vi.fn(async () => []);
 
-    it('should return null if no highlights are found', async () => {
-        em.find = vi.fn(async () => []); // Simulate no highlights found
+        const fetchedHighlights = await getAllHighlights(em);
 
-        const highlights = await getAllHighlights(em);
-
-        expect(highlights).toBeNull();
+        expect(fetchedHighlights).toBeNull();
     });
-});
+})
 
 describe('getHighlightById function', () => {
     it('should fetch a highlight by id', async () => {
-        const highlight = {
-            id: 2,
+        const highlight = {id: '2',
             name: 'somethingElse',
             description: 'someDescription',
             category: 'pubs',
-            is_approved: false,
-            users: {
-                /**
-                 * Retrieves the items in the user's highlights collection.
-                 *
-                 * @returns {Array} An array of highlight items.
-                 */
-                getItems: () => [
-                    {
-                        email: 'user3@dummy.com',
-                        username: 'dummyUser3'
-                    }
-                ]
+            is_approved: false};
+
+        em.findOne = vi.fn(async (_entity, condition) => {
+            if (condition.id === highlight.id){
+                return highlight;
             }
-        };
+            return null;
+        }) as unknown as typeof em.findOne;
 
-        // Mock the `findOne` function to return the highlight
-        em.findOne.mockResolvedValue(highlight);
+        const fetchedHighlight = await getHighlightById(em, highlight.id);
 
-        const fetchedHighlight = await getHighlightById(em, 2);
-
-        // Validate the result
-        expect(fetchedHighlight).not.toBeNull();
-        expect(fetchedHighlight.id).toBe(2);
-        expect(fetchedHighlight.name).toBe('somethingElse');
-        expect(fetchedHighlight.users.getItems()).toEqual([
-            {
-                email: 'user3@dummy.com',
-                username: 'dummyUser3'
-            }
-        ]);
+        expect(fetchedHighlight).toBeDefined();
+        expect(fetchedHighlight?.id).toBe(highlight.id);
     });
 
-    it('should return 404 if highlight is not found', async () => {
-        // Mock the `findOne` function to simulate no highlight found
-        em.findOne.mockResolvedValue(null);
+    it('should return null for non-existent highlight', async () => {
+        em.findOne = vi.fn(async () => null);
 
-        // Simulate an API request
-        const response = await app.request('/api/highlights/999', { method: 'GET' }, mockEnv);
+        const fetchedHighlight = await getHighlightById(em, 'fakeID');
 
-        // Validate the response
-        expect(response.status).toBe(404);
-
-        const responseBody = await response.json();
-        expect(responseBody).toEqual({
-            message: 'Highlight not found'
-        });
+        expect(fetchedHighlight).toBeNull();
     });
 });
 
 describe('createHighlight function', () => {
     it('should create highlight', async () => {
-        const user = {
-            id: 1,
-            email: 'test@example.com',
-            username: 'testuser'
-        };
-
         const highlightData = {
             name: "something",
             description: "some description",
@@ -1625,48 +1621,31 @@ describe('createHighlight function', () => {
             is_approved: false
         };
 
-        // Mock finding the user
-        em.findOne = vi.fn(async () => user);
+        em.create = vi.fn((entity, data) => ({...data, id: 1}));
+        em.persistAndFlush = vi.fn;
 
-        // Mock creating the highlight
-        em.create = vi.fn(() => ({
-            ...highlightData,
-            id: 1,
-            users: {
-                add: vi.fn()
+        em.findOne = vi.fn(async (entity, condition) => {
+            if (condition.id === 1){
+                return {
+                    id: 1,
+                    ...highlightData
+                };
             }
-        }));
+            return null;
+        }) as unknown as typeof em.findOne;
 
-        em.persistAndFlush = vi.fn();
+        await createHighlight(em, highlightData);
 
-        await createHighlight(em, highlightData, user.email);
+        const createdHighlight = await getHighlightById(em, 1);
 
-
-        expect(em.create).toHaveBeenCalled();
-        expect(em.persistAndFlush).toHaveBeenCalled();
-    });
-    it('should handle errors when creating highlight', async () => {
-        const highlightData = {
-            name: "something",
-            description: "some description",
-            category: "history",
-            latitude: 40.7128,
-            longitude: -74.0060,
-            is_approved: false
-        };
-
-        em.findOne = vi.fn(async () => ({ email: 'user@example.com' })); // Simulate user found
-        em.create = vi.fn(() => { throw new Error('Database error'); });
-
-        let errorMessage = '';
-        try {
-            await updateHighlight(em, 1, highlightData);
-        } catch (error) {
-            errorMessage = error.message;
-        }
-        expect(errorMessage)
-    });
-});
+        expect(createdHighlight).toHaveProperty('id');
+        expect(createdHighlight).toHaveProperty('name', highlightData.name);
+        expect(createdHighlight).toHaveProperty('description', highlightData.description);
+        expect(createdHighlight).toHaveProperty('category', highlightData.category);
+        expect(createdHighlight).toHaveProperty('longitude', highlightData.longitude);
+        expect(createdHighlight).toHaveProperty('latitude', highlightData.latitude);
+    })
+})
 
 describe('approveHighlightSuggestion function', () => {
     it('should approve a highlight suggestion', async () => {
@@ -1712,19 +1691,6 @@ describe('updateHighlight function', () => {
 
         expect(updatedHighlight).toBeDefined();
     });
-    it('should handle errors when updating highlight', async () => {
-        const highlightData = { name: 'newName' };
-        em.findOne = vi.fn(async () => ({ id: 1 })); // Simulate highlight found
-        em.assign = vi.fn(() => { throw new Error('Database error'); });
-
-        let errorMessage = '';
-        try {
-            await updateHighlight(em, 1, highlightData);
-        } catch (error) {
-            errorMessage = error.message;
-        }
-        expect(errorMessage)
-    });
 })
 
 describe('deleteHighlight function', () => {
@@ -1740,16 +1706,6 @@ describe('deleteHighlight function', () => {
 
         expect(em.nativeDelete).toBeCalledWith(Highlight, {id: '2'});
     });
-    it('should handle errors when deleting highlight', async () => {
-        em.nativeDelete = vi.fn(() => { throw new Error('Database error'); });
-
-        let errorMessage = '';
-        try {
-            await deleteHighlight(em, 1);
-        } catch (error) {
-            errorMessage = error.message;
-        }
-        expect(errorMessage)
 })
 
 describe('Database Utilities', () => {
@@ -2192,215 +2148,3 @@ describe('GET /api/:id/map/highlights', () => {
         expect(body.error.message).toBe('Internal error');
     });
 });
-describe('GET /api/highlights/:id/my-highlights', () => {
-    let em: EntityManager;
-    let app: Hono<BlankEnv, BlankSchema, "/">;
-
-    beforeEach(async () => {
-        // Mock EntityManager
-        em = {
-            findOne: vi.fn(),
-        } as unknown as EntityManager;
-
-        // Create app instance using your createApp function
-        app = await createApp({
-            ALLOWED_HOST: '*',
-            ENV: 'test',
-            em: em
-        });
-    });
-
-
-    it('should return empty array when user has no highlights', async () => {
-
-        /**
-         * Mock user data with no highlights.
-         */
-        const mockUser = {
-            id: 1,
-            email: 'user@example.com',
-            username: 'testuser',
-            highlights: {
-                /**
-                 * Retrieves the highlights associated with the user.
-                 *
-                 * @returns {Array} An array of highlight items.
-                 */
-                getItems: () => []
-            }
-        };
-
-        em.findOne = vi.fn().mockResolvedValue(mockUser);
-
-        const token = await generateToken(mockUser);
-
-        const response = await app.request('/api/highlights/0/my-highlights', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        expect(response.status).toBe(200);
-        const responseBody = await response.json();
-        expect(responseBody.highlights).toEqual([]);
-    });
-
-    it('should return 401 when no token is provided', async () => {
-        const response = await app.request('/api/highlights/1/my-highlights', {
-            method: 'GET'
-        });
-
-        expect(response.status).toBe(401);
-    });
-
-    it('should return 401 when invalid token is provided', async () => {
-        const response = await app.request('/api/highlights/0/my-highlights', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer invalid_token'
-            }
-        });
-
-        expect(response.status).toBe(401);
-    });
-
-    it('should handle user not found', async () => {
-        em.findOne = vi.fn().mockResolvedValue(null);
-
-        const token = await generateToken({ email: 'nonexistent@example.com' });
-
-        const response = await app.request('/api/highlights/0/my-highlights', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        expect(response.status).toBe(200);
-        const responseBody = await response.json();
-        expect(responseBody.highlights).toEqual([]);
-    });
-
-});
-describe('getHighlightsByUserToken', () => {
-    let em: EntityManager;
-
-    beforeEach(() => {
-        em = {
-            findOne: vi.fn(),
-        } as unknown as EntityManager;
-    });
-
-    it('should return formatted highlights when user has highlights', async () => {
-        const mockUser = {
-            /**
-             * The email address of the user.
-             */
-            email: 'test@example.com',
-            username: 'testuser',
-            highlights: {
-                /**
-                 * Retrieves the highlights associated with the user.
-                 *
-                 * @returns {Highlight[]} An array of highlight items.
-                 */
-                getItems: () => ([
-                    {
-                        id: 1,
-                        name: 'Test Highlight',
-                        description: 'Test Description',
-                        category: 'history',
-                        latitude: 40.7128,
-                        longitude: -74.006,
-                        is_approved: true,
-                        businessDescription: 'Test Business'
-                    }
-                ])
-            }
-        };
-
-        vi.mocked(em.findOne).mockResolvedValue(mockUser);
-
-        const result = await getHighlightsByUserToken(em, 'test@example.com');
-
-        expect(result).not.toBeNull();
-        expect(Array.isArray(result)).toBe(true);
-        expect(result).toHaveLength(1);
-        expect(result?.[0] ?? {}).toEqual({
-            id: 1,
-            name: 'Test Highlight',
-            description: 'Test Description',
-            category: 'history',
-            latitude: 40.7128,
-            longitude: -74.006,
-            is_approved: true,
-            businessDescription: 'Test Business',
-            suggestedBy: {
-                username: 'testuser',
-                email: 'test@example.com'
-            }
-        });
-    });
-
-    it('should return null when user has no highlights', async () => {
-        const mockUser = {
-            email: 'test@example.com',
-            username: 'testuser',
-            highlights: {
-                /**
-                 * Retrieves the highlights associated with the user.
-                 *
-                 * @returns {Highlight[]} An array of highlight items.
-                 */
-                getItems: () => []
-            }
-        };
-
-        vi.mocked(em.findOne).mockResolvedValue(mockUser);
-
-        const result = await getHighlightsByUserToken(em, 'test@example.com');
-        expect(result).toBeNull();
-    });
-
-    it('should return null when user is not found', async () => {
-        vi.mocked(em.findOne).mockResolvedValue(null);
-
-        const result = await getHighlightsByUserToken(em, 'nonexistent@example.com');
-        expect(result).toBeNull();
-    });
-
-    it('should return null when database error occurs', async () => {
-        vi.mocked(em.findOne).mockRejectedValue(new Error('Database error'));
-
-        const result = await getHighlightsByUserToken(em, 'test@example.com');
-        expect(result).toBeNull();
-    });
-    /**
-     * It should call findOne with correct parameters.
-     */
-    it('should call findOne with correct parameters', async () => {
-        const mockUser = {
-            email: 'test@example.com',
-            username: 'testuser',
-            highlights: {
-                /**
-                 * Retrieves the highlights associated with the user.
-                 *
-                 * @returns {Highlight[]} An array of highlight items.
-                 */
-                getItems: () => []
-            }
-        };
-
-        vi.mocked(em.findOne).mockResolvedValue(mockUser);
-
-        await getHighlightsByUserToken(em, 'test@example.com');
-
-        expect(em.findOne).toHaveBeenCalledWith(
-            expect.any(Function),
-            { email: 'test@example.com' },
-            { populate: ['highlights'] }
-        );
-    });
-})});

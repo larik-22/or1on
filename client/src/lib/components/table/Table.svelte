@@ -25,7 +25,7 @@
 </script>
 
 <main class="w-full">
-    <div class="bg-gray-50 shadow-md rounded overflow-x-scroll max-w-[65vw] overflow-y-scroll max-h-[70vh]">
+    <div class="bg-gray-50 shadow-md max-h-[70vh] w-full rounded overflow-x-scroll overflow-y-scroll">
         <table class="table-auto w-full text-left border-collapse">
             <!-- Column Headers -->
             <thead>

@@ -293,3 +293,79 @@ Absentees: Sarina, Jan, Petko, Rafael, Robert;
 - What will we commit to doing in the next sprint:
     - The team will try to assign each member at least 3 issues in the next sprint.
     - The team will give strikes and warnings to members who don't finish their tasks on time.
+
+
+## Sprint 3 - Ilarion Petriv
+
+### Sprint 3 Planning
+![backlog](img/sprint_3_planning.png)
+
+### 1st Meeting (7/01/2024)
+
+Meeting Notes:
+- Discussed the issues for the sprint as a team, since on the last meeting it was 3 people at we couln't decide on the
+  issues.
+- Discussed the team issues about unequal involvement in the project.
+- Discussed the functionality of the application and the issues that need to be done for the next sprint.
+
+Attendees: Rafael, Ilarion, Ignat, Jan, Sarina, Robert;
+Absentees: Petko, Botond;
+
+### 2nd Meeting (8/01/2024)
+
+Meeting Notes:
+- Rafael: Assigned to ORN-087
+- Ilarion: Assigned to ORN-080
+- Ignat: Assigned to ORN-082
+- Jan: Assigned to ORN-081 and finishing ORN-020
+- Robert: Doing hotfixes and assigned to ORN-084
+- Botond: Assigned to ORN-089
+- Sarina: Continue working on old issues. 
+- Petko: Assigned to ORN-083
+
+Attendees: Rafael, Ilarion, Ignat, Jan, Sarina, Robert;
+Absentees: Petko, Botond;
+
+### 3rd Meeting (10/01/2024)
+
+Meeting Notes:
+- Rafael: Done with ORN-087.
+- Ilarion: Done with ORN-080. 
+- Ignat: Progress on deployment
+- Jan: Done with ORN-081 and ORN-020. Assigned to ORN-088
+- Robert: Will finish by the next meeting 
+- Botond: Assigned to ORN-086. Needs testing to finish ORN-089
+- Sarina: Done with ORN-018. Continuing with ORN-048
+- Petko: Done with ORN-083. Assigned to ORN-090
+
+Attendees: Rafael, Ilarion, Ignat, Jan, Sarina, Robert, Petko, Botond;
+Absentees: None;
+
+
+### 4th Meeting (13/01/2024)
+
+Meeting Notes:
+- Botond: Willing to take a task for not finishing ORN-089 and ORN-086 properly.
+- Ignat: Done with ORN-082. Assigned to ORN-092
+- Robert: Done with ORN-084. Needs to fix test. Assigned to not completed ORN-089
+- Jan: ORN-088 made progress. Will finish by 15/01
+- Petko: Progress on ORN-090.
+- Sarina: ORN-048 blocked by ORN-088.
+- Botond: Assigned to ORN-094
+- Rafael: Assigned to ORN-086
+- Ilarion: Assigned to ORN-093
+
+Attendees: Rafael, Ilarion, Ignat, Jan, Sarina, Robert, Petko, Botond;
+Absentees: None;
+
+### 5th Meeting (15/01/2024)
+
+Meeting Notes:
+- Ignat: In progress with ORN-092
+- Robert: Progress on ORN-089. Needs to test.
+- Jan: Done with ORN-088. Needs help with testing.  
+- Petko: Done with ORN-090. Assigned to ORN-099
+- Sarina: Done with ORN-048. Assigned to ORN-096 and ORN-100
+- Botond: Done with ORN-094. 
+- Rafael: Done with ORN-086. Needs help with testing. Assigned to ORN-097
+- Ilarion: Done with ORN-093; Assigned to ORN-098
