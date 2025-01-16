@@ -2241,6 +2241,7 @@ describe ('PUT /users/:id/trust', () => {
     });
 
 })
+
 describe('GET /api/feedbacks/approval', () => {
     it('should return a list of feedbacks for approval for admin users', async () => {
         const admin = {
@@ -2284,6 +2285,7 @@ describe('GET /api/feedbacks/approval', () => {
         expect(responseBody.feedbacks).toEqual(feedbacks);
     });
 });
+
 describe('GET /api/feedbacks/user/:id', () => {
     it('should return a list of feedbacks for a specific user', async () => {
         const user = {

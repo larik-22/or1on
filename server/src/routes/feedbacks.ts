@@ -56,9 +56,29 @@ feedbacks.get('/approval', isLoggedIn, isAdmin, async (ctx) => {
         const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const feedbacks = await getFeedbacksForApproval(em);
 
-        return ctx.json({feedbacks}, 200);
+        if (!feedbacks) {
+            return ctx.json({ message: 'No feedbacks found' }, 404);
+        }
+
+        const formattedFeedbacks = feedbacks.map(feedback => ({
+            id: feedback.id,
+            tour: feedback.tour,
+            highlight: {
+                id: feedback.highlight?.id,
+                name: feedback.highlight?.name,
+            },
+            user: {
+                id: feedback.user.id,
+                username: feedback.user.username, // Include the username here
+            },
+            rating: feedback.rating,
+            comment: feedback.comment,
+            is_approved: feedback.is_approved,
+        }));
+
+        return ctx.json(formattedFeedbacks, 200);
     } catch (error) {
-        logger.error('Error while fetching feedbacks for approval', {error});
+        logger.error('Error while fetching feedbacks for approval', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 });

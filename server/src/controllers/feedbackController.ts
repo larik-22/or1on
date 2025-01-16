@@ -28,14 +28,13 @@ export const getFeedbackByUserId = async (em: EntityManager, userId: string):
  * @param em - The MikroORM EntityManager instance.
  * @returns {Promise<Feedback[] | null>} A promise resolving list of feedbacks for approval if found
  * */
-export const getFeedbacksForApproval = async (em: EntityManager):
-    Promise<Feedback[] | null> => {
+export const getFeedbacksForApproval = async (em: EntityManager): Promise<Feedback[] | null> => {
     try {
-        return await em.find(
-            Feedback, {is_approved: false}
-        )
+        return await em.find(Feedback, {
+            is_approved: false
+        }, { populate: ['user'] }); // Ensure 'user' is populated
     } catch (error) {
-        logger.error('Failed to fetch feedback feedbacks for approval' + error);
+        logger.error('Failed to fetch feedbacks for approval:' + error);
         return null;
     }
 };
