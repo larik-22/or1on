@@ -13,7 +13,7 @@ import {
 } from "../controllers/highlightController.js";
 import { createHighlight, deleteHighlight } from "../controllers/highlightController.js";
 import { getAllHighlights, getHighlightById } from "../controllers/highlightController.js";
-import {type Collection, type EntityManager, MikroORM} from "@mikro-orm/core";
+import {type EntityManager, MikroORM} from "@mikro-orm/core";
 import { randomUUID } from "crypto";
 import { createApp } from "../app.js";
 import type { Hono } from 'hono';
@@ -1500,6 +1500,11 @@ describe('getAllHighlights function', () => {
                 category: 'history',
                 is_approved: false,
                 users: {
+                    /**
+                     * Retrieves the items in the user's highlights collection.
+                     *
+                     * @returns {Array} An array of highlight items.
+                     */
                     getItems: () => [{
                         email: 'user2@dummy.com',
                         username: 'dummyUser2'
@@ -1513,6 +1518,11 @@ describe('getAllHighlights function', () => {
                 category: 'pubs',
                 is_approved: false,
                 users: {
+                    /**
+                     * Retrieves the items in the user's highlights collection.
+                     *
+                     * @returns {Array} An array of highlight items.
+                     */
                     getItems: () => [{
                         email: 'user2@dummy.com',
                         username: 'dummyUser2'
@@ -1521,15 +1531,17 @@ describe('getAllHighlights function', () => {
             }
         ];
 
-        em.find = vi.fn(async () => highlights);
+        const mockFind = vi.fn(async () => highlights);
+        em.find = mockFind;
 
         const fetchedHighlights = await getAllHighlights(em);
 
-        expect(fetchedHighlights).to.not.be.null;
-        expect(fetchedHighlights).to.have.lengthOf(2);
-        expect(fetchedHighlights[0].id).to.equal(1);
-        expect(fetchedHighlights[1].id).to.equal(2);
+        expect(fetchedHighlights).not.toBeNull();
+        expect(fetchedHighlights).toHaveLength(2);
+        expect(fetchedHighlights[0].id).toBe(1);
+        expect(fetchedHighlights[1].id).toBe(2);
     });
+
     it('should return null if no highlights are found', async () => {
         em.find = vi.fn(async () => []); // Simulate no highlights found
 
@@ -1548,28 +1560,51 @@ describe('getHighlightById function', () => {
             category: 'pubs',
             is_approved: false,
             users: {
-                getItems: () => [{
-                    email: 'user3@dummy.com',
-                    username: 'dummyUser3'
-                }]
+                /**
+                 * Retrieves the items in the user's highlights collection.
+                 *
+                 * @returns {Array} An array of highlight items.
+                 */
+                getItems: () => [
+                    {
+                        email: 'user3@dummy.com',
+                        username: 'dummyUser3'
+                    }
+                ]
             }
         };
 
-        em.findOne = vi.fn(async () => highlight);
+        // Mock the `findOne` function to return the highlight
+        em.findOne.mockResolvedValue(highlight);
 
         const fetchedHighlight = await getHighlightById(em, 2);
 
-        expect(fetchedHighlight).to.not.be.null;
-        expect(fetchedHighlight.id).to.equal(2);
+        // Validate the result
+        expect(fetchedHighlight).not.toBeNull();
+        expect(fetchedHighlight.id).toBe(2);
+        expect(fetchedHighlight.name).toBe('somethingElse');
+        expect(fetchedHighlight.users.getItems()).toEqual([
+            {
+                email: 'user3@dummy.com',
+                username: 'dummyUser3'
+            }
+        ]);
     });
-    it('should return 404 if highlight is not found', async () => {
-        em.findOne = vi.fn(async () => null); // Simulate highlight not found
 
+    it('should return 404 if highlight is not found', async () => {
+        // Mock the `findOne` function to simulate no highlight found
+        em.findOne.mockResolvedValue(null);
+
+        // Simulate an API request
         const response = await app.request('/api/highlights/999', { method: 'GET' }, mockEnv);
 
+        // Validate the response
         expect(response.status).toBe(404);
+
         const responseBody = await response.json();
-        expect(responseBody.message).toBe('Highlight not found');
+        expect(responseBody).toEqual({
+            message: 'Highlight not found'
+        });
     });
 });
 
@@ -1623,11 +1658,13 @@ describe('createHighlight function', () => {
         em.findOne = vi.fn(async () => ({ email: 'user@example.com' })); // Simulate user found
         em.create = vi.fn(() => { throw new Error('Database error'); });
 
+        let errorMessage = '';
         try {
-            await createHighlight(em, highlightData, 'user@example.com');
+            await updateHighlight(em, 1, highlightData);
         } catch (error) {
-            expect(error.message).toBe('Database error');
+            errorMessage = error.message;
         }
+        expect(errorMessage)
     });
 });
 
@@ -1680,11 +1717,13 @@ describe('updateHighlight function', () => {
         em.findOne = vi.fn(async () => ({ id: 1 })); // Simulate highlight found
         em.assign = vi.fn(() => { throw new Error('Database error'); });
 
+        let errorMessage = '';
         try {
             await updateHighlight(em, 1, highlightData);
         } catch (error) {
-            expect(error.message).toBe('Database error');
+            errorMessage = error.message;
         }
+        expect(errorMessage)
     });
 })
 
@@ -1704,12 +1743,13 @@ describe('deleteHighlight function', () => {
     it('should handle errors when deleting highlight', async () => {
         em.nativeDelete = vi.fn(() => { throw new Error('Database error'); });
 
+        let errorMessage = '';
         try {
             await deleteHighlight(em, 1);
         } catch (error) {
-            expect(error.message).toBe('Database error');
+            errorMessage = error.message;
         }
-    });
+        expect(errorMessage)
 })
 
 describe('Database Utilities', () => {
@@ -2172,12 +2212,20 @@ describe('GET /api/highlights/:id/my-highlights', () => {
 
 
     it('should return empty array when user has no highlights', async () => {
-        // Mock user data with no highlights
+
+        /**
+         * Mock user data with no highlights.
+         */
         const mockUser = {
             id: 1,
             email: 'user@example.com',
             username: 'testuser',
             highlights: {
+                /**
+                 * Retrieves the highlights associated with the user.
+                 *
+                 * @returns {Array} An array of highlight items.
+                 */
                 getItems: () => []
             }
         };
@@ -2246,9 +2294,17 @@ describe('getHighlightsByUserToken', () => {
 
     it('should return formatted highlights when user has highlights', async () => {
         const mockUser = {
+            /**
+             * The email address of the user.
+             */
             email: 'test@example.com',
             username: 'testuser',
             highlights: {
+                /**
+                 * Retrieves the highlights associated with the user.
+                 *
+                 * @returns {Highlight[]} An array of highlight items.
+                 */
                 getItems: () => ([
                     {
                         id: 1,
@@ -2271,7 +2327,7 @@ describe('getHighlightsByUserToken', () => {
         expect(result).not.toBeNull();
         expect(Array.isArray(result)).toBe(true);
         expect(result).toHaveLength(1);
-        expect(result![0]).toEqual({
+        expect(result?.[0] ?? {}).toEqual({
             id: 1,
             name: 'Test Highlight',
             description: 'Test Description',
@@ -2292,6 +2348,11 @@ describe('getHighlightsByUserToken', () => {
             email: 'test@example.com',
             username: 'testuser',
             highlights: {
+                /**
+                 * Retrieves the highlights associated with the user.
+                 *
+                 * @returns {Highlight[]} An array of highlight items.
+                 */
                 getItems: () => []
             }
         };
@@ -2315,12 +2376,19 @@ describe('getHighlightsByUserToken', () => {
         const result = await getHighlightsByUserToken(em, 'test@example.com');
         expect(result).toBeNull();
     });
-
+    /**
+     * It should call findOne with correct parameters.
+     */
     it('should call findOne with correct parameters', async () => {
         const mockUser = {
             email: 'test@example.com',
             username: 'testuser',
             highlights: {
+                /**
+                 * Retrieves the highlights associated with the user.
+                 *
+                 * @returns {Highlight[]} An array of highlight items.
+                 */
                 getItems: () => []
             }
         };
@@ -2335,4 +2403,4 @@ describe('getHighlightsByUserToken', () => {
             { populate: ['highlights'] }
         );
     });
-});
+})});

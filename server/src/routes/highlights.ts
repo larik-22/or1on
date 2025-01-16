@@ -14,7 +14,7 @@ import type {User} from "../models/user.js";
 import {getUserByEmail} from "../controllers/userController.js";
 import {isUser} from "../middleware/isUser.js";
 import {getHighlightsByUserToken} from "../controllers/highlightController.js";
-/*eslint-disable */
+
 
 dotenv.config();
 

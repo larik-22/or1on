@@ -49,7 +49,7 @@ export const getHighlightById = async (em: EntityManager, id: number): Promise<H
  * @param data -  - The highlight data excluding the `id` field.
  * @returns {Promise<void>}
  */
-// eslint-disable-next-line max-len
+
 export const createHighlight = async (em: EntityManager, data: Omit<Highlight, 'id'>, userEmail: string): Promise<void> => {
     try {
         // First find the user
@@ -85,7 +85,7 @@ export const createHighlight = async (em: EntityManager, data: Omit<Highlight, '
         await em.persistAndFlush(newHighlight);
     } catch (error) {
         logger.error('Failed to create highlight: ' + error);
-        throw error;
+        throw error; // Rethrow the error after logging it
     }
 }
 
@@ -152,7 +152,7 @@ export const deleteHighlight = async (em: EntityManager, id: number): Promise<vo
  * otherwise null.
  */
 
-// eslint-disable-next-line max-len
+
 export const getHighlightsByUserToken = async (em: EntityManager, userEmail: string): Promise<Highlight[] | null> => {
     try {
         // First find the user
