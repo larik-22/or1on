@@ -1633,11 +1633,22 @@ describe('createHighlight function', () => {
             verified: true
         };
 
-        em.create = vi.fn((entity, data) => ({...data, id: 1}));
+        em.create = vi.fn((entity, data) => ({
+            ...data,
+            id: 1,
+            users: { add: vi.fn() }
+        }));
         em.persistAndFlush = vi.fn();
         em.findOne = vi.fn(async (entity, condition) => {
             if (entity === User && condition.email === user.email) {
                 return user;
+            }
+            if (entity === Highlight && condition.id === 1) {
+                return {
+                    ...highlightData,
+                    id: 1,
+                    users: []
+                };
             }
             return null;
         }) as unknown as typeof em.findOne;
