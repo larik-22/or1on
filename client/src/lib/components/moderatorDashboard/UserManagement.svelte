@@ -73,7 +73,7 @@ function DataToTable(data: object[]): TableType {
 }
 
 let table = $state(DataToTable(users));
-let actionCssConfig = "border-[1px] bg-zinc-950 text-neutral-100 p-[5px] rounded-[6px] border-transparent";
+let actionCssConfig = "border-[1px] bg-zinc-950 text-neutral-100 p-[5px] rounded-[6px] border-transparent truncate";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let currentRow : Row;
@@ -105,8 +105,8 @@ let configs: ActionConfig[] = [lockUserAccount, toggleTrustUser];
 
 </script>
 
-<main class="flex items-center content-center w-[100%] justify-center">
-	<div class="border-[1px] bg-[#f9fafb] shadow-md w-[50vw] h-fit mb-[10vh]">
+<main class="flex items-center content-center w-[100%] h-[100vh] justify-center overflow-x-scroll overflow-y-scroll">
+	<div class="w-full max-w-fit">
 		<Table newTable={table} actionConfigs={configs}></Table>
 	</div>
 </main>
