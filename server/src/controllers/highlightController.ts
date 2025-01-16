@@ -52,7 +52,6 @@ export const getHighlightById = async (em: EntityManager, id: number): Promise<H
 
 export const createHighlight = async (em: EntityManager, data: Omit<Highlight, 'id'>, userEmail: string): Promise<void> => {
     try {
-        // First find the user
         const user = await em.findOne(User, { email: userEmail });
         if (!user) {
             throw new Error('User not found');
@@ -79,15 +78,14 @@ export const createHighlight = async (em: EntityManager, data: Omit<Highlight, '
             tours: []
         });
 
-        // Important: Add the user to the highlight's users collection
         newHighlight.users.add(user);
 
         await em.persistAndFlush(newHighlight);
     } catch (error) {
         logger.error('Failed to create highlight: ' + error);
-        throw error; // Rethrow the error after logging it
+        throw error;
     }
-}
+};
 
 /**
  * Updates is_approved field in specific highlight.
