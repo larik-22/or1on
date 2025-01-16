@@ -13,6 +13,8 @@ import {createFeedback, getFeedbackByHighlight} from "../controllers/feedbackCon
 import type {User} from "../models/user.js";
 import {getUserByEmail} from "../controllers/userController.js";
 import {isUser} from "../middleware/isUser.js";
+import {getHighlightsByUserToken} from "../controllers/highlightController.js";
+
 
 dotenv.config();
 
@@ -121,6 +123,42 @@ highlights.get('/:id/feedbacks', async (ctx) => {
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
+highlights.get('/:id/my-highlights', isLoggedIn, async (ctx) => {
+    try {
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
+        const jwtPayload = ctx.get('jwtPayload');
+
+        // Check if we have the user's email from JWT
+        if (!jwtPayload?.email) {
+            logger.warn('JWT payload missing email', { payload: jwtPayload });
+            return ctx.json(
+                createErrorResponse(401, 'Invalid authentication token'),
+                401
+            );
+        }
+
+        const highlights = await getHighlightsByUserToken(em, jwtPayload.email);
+
+        // Return empty array if null (no user found)
+        if (highlights === null) {
+            logger.info('No highlights found for user', { email: jwtPayload.email });
+            return ctx.json({ highlights: [] }, 200);
+        }
+
+        logger.info('Successfully retrieved highlights for user', {
+            email: jwtPayload.email,
+            count: highlights.length
+        });
+
+        return ctx.json({ highlights }, 200);
+    } catch (error) {
+        logger.error('Error while fetching highlights for user', {
+            error: error,
+            userEmail: ctx.get('jwtPayload')?.email
+        });
+        return ctx.json(createErrorResponse(500, 'Internal server error'), 500);
+    }
+});
 
 highlights.post('/:id/feedbacks', isLoggedIn, isUser,async (ctx) => {
     try {
@@ -162,27 +200,24 @@ highlights.post('/', isLoggedIn, async (ctx) => {
         const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const body = await ctx.req.json();
         const highlight = highlightSchema.safeParse(body);
+        const payload = ctx.get('jwtPayload') as User;
 
-        if (!highlight.success){
+        if (!highlight.success) {
             return ctx.json(createErrorResponse(400, 'Invalid data'), 400);
         }
 
-        const payload = ctx.get('jwtPayload') as User
-
-        if (payload.isAdmin || payload.verified){
-            highlight.data.is_approved = true
-        } else {
-            highlight.data.is_approved = true
+        if (payload.isAdmin || payload.verified) {
+            highlight.data.is_approved = true;
         }
 
-        await createHighlight(em, highlight.data);
-
-        return ctx.json({message: 'Highlight created successfully'}, 201)
-    }catch (error){
+        // Pass the user email to createHighlight
+        await createHighlight(em, highlight.data, payload.email);
+        return ctx.json({message: 'Highlight created successfully'}, 201);
+    } catch (error) {
         logger.error('Error while creating highlight', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
-})
+});
 
 /**
  * Handles approving a highlight suggestion.
@@ -219,11 +254,16 @@ highlights.put('/:id/approve', isLoggedIn, isAdmin, async (ctx) => {
 highlights.put('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtPayload') as EntityManager;
-        const id = parseInt(ctx.req.param('id'))
+        const params = numberIdSchema.safeParse(ctx.req.param());
 
+        if (!params.success) {
+            return ctx.json(createErrorResponse(400, 'Invalid highlightId parameter'), 400);
+        }
+
+        const { id } = params.data;
         const highlight = await getHighlightById(em, id);
 
-        if (!highlight){
+        if (!highlight) {
             return ctx.json({message: `Highlight not found`}, 404);
         }
 
@@ -236,11 +276,11 @@ highlights.put('/:id', isLoggedIn, isAdmin, async (ctx) => {
         await updateHighlight(em, id, highlightData.data);
 
         return ctx.json({message: `Highlight with ID ${id} updated`}, 200);
-    }catch (error){
+    } catch (error) {
         logger.error('Error while updating highlight', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
-})
+});
 
 /**
  * Handles deleting a highlight.
