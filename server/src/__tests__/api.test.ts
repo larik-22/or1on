@@ -930,7 +930,6 @@ describe('POST /api/highlights', () => {
             username: '880005553535',
         };
 
-        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
         const createdUser = await createUser(em, adminUser);
         const token = await generateToken({
             ...createdUser,
@@ -944,13 +943,34 @@ describe('POST /api/highlights', () => {
             latitude: 40.7128,
             longitude: -74.0060,
         }
+
+        em.create = vi.fn((entity, data) => ({
+            ...data,
+            id: 1,
+            users: { add: vi.fn() }
+        }));
+        em.persistAndFlush = vi.fn();
+        em.findOne = vi.fn(async (entity, condition) => {
+            if (entity === User && condition.email === createdUser.email) {
+                return createdUser;
+            }
+            if (entity === Highlight && condition.id === 1) {
+                return {
+                    ...highlightData,
+                    id: 1,
+                    users: []
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
         const response = await app.request('/api/highlights', {
             method: 'POST',
             body: JSON.stringify(highlightData),
             headers: { 'Authorization': `Bearer ${token}`}
         }, mockEnv);
 
-        expect(response.status);
+        expect(response.status).toBe(201);
     });
     it('should create a new highlight suggestion', async () => {
         const user = {
@@ -974,13 +994,36 @@ describe('POST /api/highlights', () => {
             latitude: 40.7128,
             longitude: -74.0060,
         }
+
+
+        em.create = vi.fn((entity, data) => ({
+            ...data,
+            id: 1,
+            users: { add: vi.fn() }
+        }));
+        em.persistAndFlush = vi.fn();
+        em.findOne = vi.fn(async (entity, condition) => {
+            if (entity === User && condition.email === createdUser.email) {
+                return createdUser;
+            }
+            if (entity === Highlight && condition.id === 1) {
+                return {
+                    ...highlightData,
+                    id: 1,
+                    users: []
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
         const response = await app.request('/api/highlights', {
             method: 'POST',
             body: JSON.stringify(highlightData),
             headers: { 'Authorization': `Bearer ${token}`}
         }, mockEnv);
 
-        expect(response.status);
+        expect(response.status).toBe(201);
     });
     it('should return 400 if invalid parameters', async () => {
         const user = {
@@ -2010,7 +2053,7 @@ describe('POST /api/highlights/:id/feedbacks', () => {
         });
 
         const invalidFeedbackData = {
-            rating: 'notANumber', // Invalid rating type
+            rating: 'notANumber',
             feedbackMessage: 'Great highlight!',
         };
 
@@ -2378,6 +2421,196 @@ describe('GET /api/:id/map/highlights', () => {
                 { populate: ['highlights'] }
             );
         });
-    })});
+    })
+});
 
+describe ('PUT /users/:id/trust', () => {
+    it('should return 400 if user is not found', async () => {
+        const admin = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+            verified: true
+        };
+
+        const user = {
+            email: 'email@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553536',
+            verified: false
+        }
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, admin);
+        const createdUser = await createUser(em, user);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: admin.password
+        });
+        em.nativeUpdate = vi.fn(async () => 1);
+        const response = await app.request(`/api/users/${createdUser.email}/trust`, {method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(400);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('User does not exist');
+    });
+
+    it('should return 200 if user is trusted', async () => {
+        const admin = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+            verified: true
+        };
+
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, admin);
+
+        const token = await generateToken({
+            ...createdAdmin,
+            password: admin.password
+        });
+        em.nativeUpdate = vi.fn(async () => 1);
+        const response = await app.request(
+            `/api/users/${createdAdmin.email}/trust`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(200);
+    });
+
+    it('should return 403 if user is not admin', async () => {
+        const admin = {
+            email: 'user@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+            verified: true
+        };
+
+        const user = {
+            email: 'email@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553536',
+            verified: false
+        }
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, admin);
+        const createdUser = await createUser(em, user);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: admin.password
+        });
+        em.nativeUpdate = vi.fn(async () => 1);
+        const response = await app.request(`api/users/${createdUser.email}/trust`, {method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}` }}, mockEnv);
+
+        expect(response.status).toBe(403);
+
+    });
+
+})
+
+describe('GET /api/feedbacks/approval', () => {
+    it('should return a list of feedbacks for approval for admin users', async () => {
+        const admin = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+        };
+
+        const feedbacks = [
+            {
+                id: 15,
+                tour: {}, // Ensure tour is an empty object
+                highlight: {}, // Ensure highlight is an empty object
+                user: { id: "f9a87494-9003-435e-a576-b72b693d2190", username: "testuser1" },
+                rating: 5,
+                comment: "awesome",
+                is_approved: false
+            },
+            {
+                id: 22,
+                tour: { id: 5 }, // Set tour with an id object
+                highlight: {}, // Ensure highlight is an empty object
+                user: { id: "80215af7-5e2d-4058-b3e8-7ecbc508af92", username: "testuser2" },
+                rating: 2,
+                comment: "trash",
+                is_approved: false
+            }
+        ];
+
+        em.find = vi.fn().mockResolvedValue(feedbacks);
+
+        const token = await generateToken(admin);
+
+        const response = await app.request('/api/feedbacks/approval', {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody).toEqual(feedbacks);
+    });
+});
+
+describe('GET /api/feedbacks/user/:id', () => {
+    it('should return a list of feedbacks for a specific user', async () => {
+        const user = {
+            id: 'f9a87494-9003-435e-a576-b72b693d2190',
+            email: 'user@example.com',
+            isAdmin: false
+        };
+        const token = await generateToken(user);
+
+        const feedbacks = [
+            {
+                id: 15,
+                tour: 3,
+                highlight: null,
+                user: "f9a87494-9003-435e-a576-b72b693d2190",
+                rating: 5,
+                comment: "awesome",
+                is_approved: false
+            }
+        ];
+
+        em.find = vi.fn().mockResolvedValue(feedbacks);
+
+        const response = await app.request(`/api/feedbacks/user/${user.id}`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.feedbacks).toEqual(feedbacks);
+    });
+
+    it('should return 404 if no feedbacks are found', async () => {
+        const user = {
+            id: '80215af7-5e2d-4058-b3e8-7ecbc508af92',
+            email: 'user2@example.com',
+            isAdmin: false
+        };
+        const token = await generateToken(user);
+
+        em.find = vi.fn().mockResolvedValue([]);
+
+        const response = await app.request(`/api/feedbacks/user/${user.id}`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        expect(response.status).toBe(404);
+        const responseBody = await response.json();
+        expect(responseBody.message).toBe('No feedbacks found for this user');
+    });
+});
 
