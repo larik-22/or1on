@@ -38,7 +38,7 @@ The app is web-based and compatible with any device that supports location servi
 - Jan Pospiech
 - Robert Pelin
 - Petko Vragov
-- Botond Vendler
+- Botond Vendiler
 
 ---
 
