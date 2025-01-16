@@ -2253,18 +2253,18 @@ describe('GET /api/feedbacks/approval', () => {
         const feedbacks = [
             {
                 id: 15,
-                tour: 3,
-                highlight: null,
-                user: "f9a87494-9003-435e-a576-b72b693d2190",
+                tour: {}, // Ensure tour is an empty object
+                highlight: {}, // Ensure highlight is an empty object
+                user: { id: "f9a87494-9003-435e-a576-b72b693d2190", username: "testuser1" },
                 rating: 5,
                 comment: "awesome",
                 is_approved: false
             },
             {
                 id: 22,
-                tour: 5,
-                highlight: null,
-                user: "80215af7-5e2d-4058-b3e8-7ecbc508af92",
+                tour: { id: 5 }, // Set tour with an id object
+                highlight: {}, // Ensure highlight is an empty object
+                user: { id: "80215af7-5e2d-4058-b3e8-7ecbc508af92", username: "testuser2" },
                 rating: 2,
                 comment: "trash",
                 is_approved: false
@@ -2282,7 +2282,7 @@ describe('GET /api/feedbacks/approval', () => {
 
         expect(response.status).toBe(200);
         const responseBody = await response.json();
-        expect(responseBody.feedbacks).toEqual(feedbacks);
+        expect(responseBody).toEqual(feedbacks);
     });
 });
 
