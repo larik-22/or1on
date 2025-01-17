@@ -34,6 +34,10 @@ tours.get('/', async (ctx) => {
         const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const tours = await getAllTours(em);
 
+        if (!tours){
+            return ctx.json(createErrorResponse(404, 'Tour not found'), 404);
+        }
+
         return ctx.json({tours}, 200);
     }catch (error){
         logger.error('Error while fetching tours', { error: error });

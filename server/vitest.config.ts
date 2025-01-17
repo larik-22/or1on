@@ -22,7 +22,7 @@ export default defineConfig({
                 'src/scripts/insert-users.ts',
             ],
             thresholds: {
-                lines: 88
+                lines: 90
             }
         },
     },
