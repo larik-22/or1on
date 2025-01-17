@@ -21,6 +21,7 @@
 	} = $props();
 
     let CurrentLocation: string = $state("Home");
+    // eslint-disable-next-line
     let AdditionalComponent: any = $state("");
 
     let BarItems: BarItem[] = $state([
