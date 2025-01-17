@@ -3,6 +3,39 @@ import {EntityManager} from "@mikro-orm/core";
 import logger from "../utils/logger.js";
 import {User} from "../models/user.js";
 import {getHighlightById} from "./highlightController.js";
+/**
+ * Fetches all feedbacks
+ * @param em - The MikroORM EntityManager instance.
+ * @returns {Promise<Feedback[] | null>} A promise resolving to a list of all feedbacks if found,
+ * otherwise null.
+ */
+export const getAllFeedbacks = async (em: EntityManager):
+    Promise<Feedback[] | null> => {
+    try {
+        return em.find(Feedback)
+    } catch (error){
+        logger.error('Failed to fetch feedbacks error: ' + error);
+        return null;
+    }
+}
+
+/**
+ * Fetches a specific feedback by a specific ID
+ * @param em - The MikroORM EntityManager instance.
+ * @param id - The ID of the feedback to be found.
+ * @returns {Promise<Feedback | null>} A promise resolving to a feedback if found,
+ * otherwise null.
+ */
+export const getFeedbackById = async (em: EntityManager, id: number):
+    Promise<Feedback | null> => {
+    try {
+        const a = em.findOne(Feedback, {id})
+        return a
+    } catch (error){
+        logger.error('Failed to fetch feedback by id: ' + id + ' error: ' + error);
+        return null;
+    }
+}
 
 /**
  * Fetches all feedback posted by a specific user.
