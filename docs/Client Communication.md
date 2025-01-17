@@ -35,6 +35,13 @@ After the meeting, we merged the notes into **user requirements**, **business re
 ### Communication Plan
 The client provided their email address, and we made a plan to send retrospectives for every sprint. This allowed us to keep the client informed of progress and ensure alignment with the project goals.
 
+### Proof Of Communication:
+![client](img/sprint0-client1.png)
+![client](img/sprint0-client1.png)
+
+### Client Response:
+![client](img/sprint0-client3.png)
+
 -------------------------------------------------------------------------------
 
 ## Sprint 1: Progress Retrospective and Second Client Meeting
@@ -57,6 +64,12 @@ At the end of Sprint 1, we sent a retrospective email to the client outlining ou
 3. **Next Steps**:
     - Plan Sprint 2 by the end of the following week.
     - Schedule the next client meeting for **January 9th** or **January 6th**.
+
+### Proof Of Communication:
+![client](img/sprint1-client1.png)
+
+### Client Response:
+![client](img/sprint1-client2.png)
 
 ----------------------------------------------------------------------------------
 
