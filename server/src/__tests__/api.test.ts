@@ -6,7 +6,11 @@ import { deleteFeedback } from '../controllers/feedbackController.js'
 import { getFeedbackByUserId, getFeedbackByHighlight } from '../controllers/feedbackController.js'
 import { createTour, updateTour, deleteTour } from "../controllers/tourController.js";
 import { getAllTours, getTourById, getHighlightsByTour } from "../controllers/tourController.js";
-import { approveHighlightSuggestion, updateHighlight } from "../controllers/highlightController.js";
+import {
+    approveHighlightSuggestion,
+    getHighlightsByUserToken,
+    updateHighlight
+} from "../controllers/highlightController.js";
 import { createHighlight, deleteHighlight } from "../controllers/highlightController.js";
 import { getAllHighlights, getHighlightById } from "../controllers/highlightController.js";
 import {type EntityManager, MikroORM} from "@mikro-orm/core";
@@ -926,7 +930,6 @@ describe('POST /api/highlights', () => {
             username: '880005553535',
         };
 
-        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
         const createdUser = await createUser(em, adminUser);
         const token = await generateToken({
             ...createdUser,
@@ -940,6 +943,27 @@ describe('POST /api/highlights', () => {
             latitude: 40.7128,
             longitude: -74.0060,
         }
+
+        em.create = vi.fn((entity, data) => ({
+            ...data,
+            id: 1,
+            users: { add: vi.fn() }
+        }));
+        em.persistAndFlush = vi.fn();
+        em.findOne = vi.fn(async (entity, condition) => {
+            if (entity === User && condition.email === createdUser.email) {
+                return createdUser;
+            }
+            if (entity === Highlight && condition.id === 1) {
+                return {
+                    ...highlightData,
+                    id: 1,
+                    users: []
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
         const response = await app.request('/api/highlights', {
             method: 'POST',
             body: JSON.stringify(highlightData),
@@ -970,6 +994,29 @@ describe('POST /api/highlights', () => {
             latitude: 40.7128,
             longitude: -74.0060,
         }
+
+
+        em.create = vi.fn((entity, data) => ({
+            ...data,
+            id: 1,
+            users: { add: vi.fn() }
+        }));
+        em.persistAndFlush = vi.fn();
+        em.findOne = vi.fn(async (entity, condition) => {
+            if (entity === User && condition.email === createdUser.email) {
+                return createdUser;
+            }
+            if (entity === Highlight && condition.id === 1) {
+                return {
+                    ...highlightData,
+                    id: 1,
+                    users: []
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
         const response = await app.request('/api/highlights', {
             method: 'POST',
             body: JSON.stringify(highlightData),
@@ -1621,20 +1668,35 @@ describe('createHighlight function', () => {
             is_approved: false
         };
 
-        em.create = vi.fn((entity, data) => ({...data, id: 1}));
-        em.persistAndFlush = vi.fn;
+        const user = {
+            id: '1',
+            email: 'admin@example.com',
+            username: 'adminUser',
+            highlights: [],
+            verified: true
+        };
 
+        em.create = vi.fn((entity, data) => ({
+            ...data,
+            id: 1,
+            users: { add: vi.fn() }
+        }));
+        em.persistAndFlush = vi.fn();
         em.findOne = vi.fn(async (entity, condition) => {
-            if (condition.id === 1){
+            if (entity === User && condition.email === user.email) {
+                return user;
+            }
+            if (entity === Highlight && condition.id === 1) {
                 return {
+                    ...highlightData,
                     id: 1,
-                    ...highlightData
+                    users: []
                 };
             }
             return null;
         }) as unknown as typeof em.findOne;
 
-        await createHighlight(em, highlightData);
+        await createHighlight(em, highlightData, user.email);
 
         const createdHighlight = await getHighlightById(em, 1);
 
@@ -1644,7 +1706,8 @@ describe('createHighlight function', () => {
         expect(createdHighlight).toHaveProperty('category', highlightData.category);
         expect(createdHighlight).toHaveProperty('longitude', highlightData.longitude);
         expect(createdHighlight).toHaveProperty('latitude', highlightData.latitude);
-    })
+        expect(createdHighlight).toHaveProperty('is_approved', highlightData.is_approved);
+    });
 })
 
 describe('approveHighlightSuggestion function', () => {
@@ -2147,8 +2210,219 @@ describe('GET /api/:id/map/highlights', () => {
         expect(body.error.code).toBe(500);
         expect(body.error.message).toBe('Internal error');
     });
-});
+    describe('GET /api/highlights/:id/my-highlights', () => {
+        let em: EntityManager;
+        let app: Hono<BlankEnv, BlankSchema, "/">;
 
+        beforeEach(async () => {
+            // Mock EntityManager
+            em = {
+                findOne: vi.fn(),
+            } as unknown as EntityManager;
+
+            // Create app instance using your createApp function
+            app = await createApp({
+                ALLOWED_HOST: '*',
+                ENV: 'test',
+                em: em
+            });
+        });
+
+
+        it('should return empty array when user has no highlights', async () => {
+
+            /**
+             * Mock user data with no highlights.
+             */
+            const mockUser = {
+                id: 1,
+                email: 'user@example.com',
+                username: 'testuser',
+                highlights: {
+                    /**
+                     * Retrieves the highlights associated with the user.
+                     *
+                     * @returns {Array} An array of highlight items.
+                     */
+                    getItems: () => []
+                }
+            };
+
+            em.findOne = vi.fn().mockResolvedValue(mockUser);
+
+            const token = await generateToken(mockUser);
+
+            const response = await app.request('/api/highlights/0/my-highlights', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            expect(response.status).toBe(200);
+            const responseBody = await response.json();
+            expect(responseBody.highlights).toEqual([]);
+        });
+
+        it('should return 401 when no token is provided', async () => {
+            const response = await app.request('/api/highlights/1/my-highlights', {
+                method: 'GET'
+            });
+
+            expect(response.status).toBe(401);
+        });
+
+        it('should return 401 when invalid token is provided', async () => {
+            const response = await app.request('/api/highlights/0/my-highlights', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer invalid_token'
+                }
+            });
+
+            expect(response.status).toBe(401);
+        });
+
+        it('should handle user not found', async () => {
+            em.findOne = vi.fn().mockResolvedValue(null);
+
+            const token = await generateToken({ email: 'nonexistent@example.com' });
+
+            const response = await app.request('/api/highlights/0/my-highlights', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            expect(response.status).toBe(200);
+            const responseBody = await response.json();
+            expect(responseBody.highlights).toEqual([]);
+        });
+
+    });
+    describe('getHighlightsByUserToken', () => {
+        let em: EntityManager;
+
+        beforeEach(() => {
+            em = {
+                findOne: vi.fn(),
+            } as unknown as EntityManager;
+        });
+
+        it('should return formatted highlights when user has highlights', async () => {
+            const mockUser = {
+                /**
+                 * The email address of the user.
+                 */
+                email: 'test@example.com',
+                username: 'testuser',
+                highlights: {
+                    /**
+                     * Retrieves the highlights associated with the user.
+                     *
+                     * @returns {Highlight[]} An array of highlight items.
+                     */
+                    getItems: () => ([
+                        {
+                            id: 1,
+                            name: 'Test Highlight',
+                            description: 'Test Description',
+                            category: 'history',
+                            latitude: 40.7128,
+                            longitude: -74.006,
+                            is_approved: true,
+                            businessDescription: 'Test Business'
+                        }
+                    ])
+                }
+            };
+
+            vi.mocked(em.findOne).mockResolvedValue(mockUser);
+
+            const result = await getHighlightsByUserToken(em, 'test@example.com');
+
+            expect(result).not.toBeNull();
+            expect(Array.isArray(result)).toBe(true);
+            expect(result).toHaveLength(1);
+            expect(result?.[0] ?? {}).toEqual({
+                id: 1,
+                name: 'Test Highlight',
+                description: 'Test Description',
+                category: 'history',
+                latitude: 40.7128,
+                longitude: -74.006,
+                is_approved: true,
+                businessDescription: 'Test Business',
+                suggestedBy: {
+                    username: 'testuser',
+                    email: 'test@example.com'
+                }
+            });
+        });
+
+        it('should return null when user has no highlights', async () => {
+            const mockUser = {
+                email: 'test@example.com',
+                username: 'testuser',
+                highlights: {
+                    /**
+                     * Retrieves the highlights associated with the user.
+                     *
+                     * @returns {Highlight[]} An array of highlight items.
+                     */
+                    getItems: () => []
+                }
+            };
+
+            vi.mocked(em.findOne).mockResolvedValue(mockUser);
+
+            const result = await getHighlightsByUserToken(em, 'test@example.com');
+            expect(result).toBeNull();
+        });
+
+        it('should return null when user is not found', async () => {
+            vi.mocked(em.findOne).mockResolvedValue(null);
+
+            const result = await getHighlightsByUserToken(em, 'nonexistent@example.com');
+            expect(result).toBeNull();
+        });
+
+        it('should return null when database error occurs', async () => {
+            vi.mocked(em.findOne).mockRejectedValue(new Error('Database error'));
+
+            const result = await getHighlightsByUserToken(em, 'test@example.com');
+            expect(result).toBeNull();
+        });
+        /**
+         * It should call findOne with correct parameters.
+         */
+        it('should call findOne with correct parameters', async () => {
+            const mockUser = {
+                email: 'test@example.com',
+                username: 'testuser',
+                highlights: {
+                    /**
+                     * Retrieves the highlights associated with the user.
+                     *
+                     * @returns {Highlight[]} An array of highlight items.
+                     */
+                    getItems: () => []
+                }
+            };
+
+            vi.mocked(em.findOne).mockResolvedValue(mockUser);
+
+            await getHighlightsByUserToken(em, 'test@example.com');
+
+            expect(em.findOne).toHaveBeenCalledWith(
+                expect.any(Function),
+                { email: 'test@example.com' },
+                { populate: ['highlights'] }
+            );
+        });
+    })
+});
 
 describe ('PUT /users/:id/trust', () => {
     it('should return 400 if user is not found', async () => {
@@ -2339,3 +2613,4 @@ describe('GET /api/feedbacks/user/:id', () => {
         expect(responseBody.message).toBe('No feedbacks found for this user');
     });
 });
+
