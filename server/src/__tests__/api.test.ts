@@ -3817,3 +3817,52 @@ describe('PUT /api/feedbacks/:id', () => {
         expect(response.status).toBe(500);
     });
 });
+
+describe('GET /api/feedbacks', () => {
+    it('should return all feedbacks', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: 1,
+                    tour: null,
+                    is_approved: createdAdmin.isAdmin
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const response = await app.request('/api/feedbacks', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(200);
+    });
+
+});
