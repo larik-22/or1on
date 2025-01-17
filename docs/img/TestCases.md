@@ -18,6 +18,6 @@ Sept 3 - User choses the location from the map.
 ![alt text](../img/test_cases/suggest-highlight3.png)<br>
 
 Sept 4 - After all filds are completed user can submit the request.
-![alt text](../img/test_cases/suggest-highlight4.png)<br>
+![alt text](../img/test_cases/suggest-highlight4.1.png)<br>
 
 After all 4 steps user is done by requesting for a new highlight.
