@@ -11,10 +11,10 @@
 		name: string,
 		description: string,
 		highlightId: string,
-		businessOffer: string | null,
+		businessDescription: string | null,
 	}
 
-	const {name, description, highlightId, businessOffer, close, isOpen}: HighlightModalProps = $props()
+	const {name, description, highlightId, businessDescription, close, isOpen}: HighlightModalProps = $props()
 
 	// promise, that will trigger the re-render
 	let feedbackPromise: Promise<any> | null = $state(fetchFeedback());
@@ -142,10 +142,10 @@
 				</button>
 			</div>
 			<!-- Business Offer -->
-			{#if businessOffer}
+			{#if businessDescription}
 				<div class="p-4 bg-yellow-100 border-b border-yellow-300 rounded-md shadow-sm mt-[-2rem]">
 					<p class="text-yellow-800 font-semibold">Business Offer</p>
-					<p class="text-yellow-700 mt-1">{businessOffer}</p>
+					<p class="text-yellow-700 mt-1">{businessDescription}</p>
 				</div>
 			{/if}
 			<div class="p-4 border-b">

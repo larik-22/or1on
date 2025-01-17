@@ -198,11 +198,6 @@
 		await fetchTourGeoJSON(tourId);
 		watchUserLocation();
 		initializeRoute()
-
-		// testing purposes only
-		map?.on("click", (event: L.LeafletMouseEvent) => {
-			$userLocation = event.latlng;
-		});
 	});
 
 	onDestroy(() => {

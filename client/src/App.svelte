@@ -148,10 +148,6 @@
         params = ctx;
     })
 
-
-
-
-
     router.start();
 
 </script>
@@ -168,7 +164,6 @@
             <button type="button"
                     class="absolute right-5 top-[3vh] z-[999] text-[30px] text-[black] bg-gray-50 pl-[15px] pr-[15px] rounded-[5px] sm:hidden"
                     onclick={()=>{
-
                 clearTimeout(timer);
                 timer = setTimeout(()=>{
                     showSideBar = !showSideBar;
@@ -215,7 +210,5 @@
         position: absolute;
         z-index: 900;
     }
-
-
 </style>
 
