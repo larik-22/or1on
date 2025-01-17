@@ -2252,7 +2252,7 @@ describe('GET /api/:id/map/highlights', () => {
 
             const token = await generateToken(mockUser);
 
-            const response = await app.request('/api/highlights/0/my-highlights', {
+            const response = await app.request('/api/highlights/my-highlights', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -2265,7 +2265,7 @@ describe('GET /api/:id/map/highlights', () => {
         });
 
         it('should return 401 when no token is provided', async () => {
-            const response = await app.request('/api/highlights/1/my-highlights', {
+            const response = await app.request('/api/highlights/my-highlights', {
                 method: 'GET'
             });
 
@@ -2273,7 +2273,7 @@ describe('GET /api/:id/map/highlights', () => {
         });
 
         it('should return 401 when invalid token is provided', async () => {
-            const response = await app.request('/api/highlights/0/my-highlights', {
+            const response = await app.request('/api/highlights/my-highlights', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer invalid_token'
@@ -2288,7 +2288,7 @@ describe('GET /api/:id/map/highlights', () => {
 
             const token = await generateToken({ email: 'nonexistent@example.com' });
 
-            const response = await app.request('/api/highlights/0/my-highlights', {
+            const response = await app.request('/api/highlights/my-highlights', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`

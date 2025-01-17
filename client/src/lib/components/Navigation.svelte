@@ -11,11 +11,13 @@
 	let {
 		currentRoute,
 		currentPage = $bindable(Homepage),
-		FullWidth = $bindable()
+        FullWidth = $bindable(),
+        showSideBar = $bindable()
     }: {
 		currentRoute: string;
 		currentPage: any;
 		FullWidth: boolean;
+        showSideBar: boolean;
 	} = $props();
 
     let CurrentLocation: string = $state("Home");
@@ -42,9 +44,6 @@
             overrideFunction: () => {
                 page.redirect("/my-highlights");
             }
-        },
-        {
-            label: "My reviews"
         },
         {
             label: "My feedbacks",
@@ -296,7 +295,6 @@
 
 <main class="h-fit w-fit">
     {#key currentPage}
-        <BurgerBar Location={CurrentLocation} FullWidth={FullWidth} BarItems={BarItems}
-                   AdditionalComponent={AdditionalComponent}/>
+        <BurgerBar bind:showSideBar={showSideBar} Location={CurrentLocation} FullWidth={FullWidth} BarItems={BarItems} />
     {/key}
 </main>

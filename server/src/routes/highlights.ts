@@ -55,6 +55,43 @@ highlights.get('/', async (ctx) => {
     }
 })
 
+highlights.get('/my-highlights', isLoggedIn, async (ctx) => {
+    try {
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
+        const jwtPayload = ctx.get('jwtPayload');
+
+        // Check if we have the user's email from JWT
+        if (!jwtPayload?.email) {
+            logger.warn('JWT payload missing email', { payload: jwtPayload });
+            return ctx.json(
+                createErrorResponse(401, 'Invalid authentication token'),
+                401
+            );
+        }
+
+        const highlights = await getHighlightsByUserToken(em, jwtPayload.email);
+
+        // Return empty array if null (no user found)
+        if (highlights === null) {
+            logger.info('No highlights found for user', { email: jwtPayload.email });
+            return ctx.json({ highlights: [] }, 200);
+        }
+
+        logger.info('Successfully retrieved highlights for user', {
+            email: jwtPayload.email,
+            count: highlights.length
+        });
+
+        return ctx.json({ highlights }, 200);
+    } catch (error) {
+        logger.error('Error while fetching highlights for user', {
+            error: error,
+            userEmail: ctx.get('jwtPayload')?.email
+        });
+        return ctx.json(createErrorResponse(500, 'Internal server error'), 500);
+    }
+});
+
 /**
  * Handles fetching a highlight by id.
  *
@@ -123,42 +160,6 @@ highlights.get('/:id/feedbacks', async (ctx) => {
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
-highlights.get('/:id/my-highlights', isLoggedIn, async (ctx) => {
-    try {
-        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
-        const jwtPayload = ctx.get('jwtPayload');
-
-        // Check if we have the user's email from JWT
-        if (!jwtPayload?.email) {
-            logger.warn('JWT payload missing email', { payload: jwtPayload });
-            return ctx.json(
-                createErrorResponse(401, 'Invalid authentication token'),
-                401
-            );
-        }
-
-        const highlights = await getHighlightsByUserToken(em, jwtPayload.email);
-
-        // Return empty array if null (no user found)
-        if (highlights === null) {
-            logger.info('No highlights found for user', { email: jwtPayload.email });
-            return ctx.json({ highlights: [] }, 200);
-        }
-
-        logger.info('Successfully retrieved highlights for user', {
-            email: jwtPayload.email,
-            count: highlights.length
-        });
-
-        return ctx.json({ highlights }, 200);
-    } catch (error) {
-        logger.error('Error while fetching highlights for user', {
-            error: error,
-            userEmail: ctx.get('jwtPayload')?.email
-        });
-        return ctx.json(createErrorResponse(500, 'Internal server error'), 500);
-    }
-});
 
 highlights.post('/:id/feedbacks', isLoggedIn, isUser,async (ctx) => {
     try {
