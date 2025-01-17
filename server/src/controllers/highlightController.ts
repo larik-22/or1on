@@ -143,8 +143,7 @@ export const approveHighlightSuggestion = async (em: EntityManager, id: number):
  * @param updatedData - The changed data of the updated attributes.
  * @returns {Promise<void>}
  */
-export const updateHighlight =
-    async (em: EntityManager, id: number, updatedData: Partial<Highlight>): Promise<void> =>{
+export const updateHighlight = async (em: EntityManager, id: number, updatedData: Partial<Highlight>): Promise<void> =>{
     const highlight = await em.findOne(Highlight, {id: id});
     if(!highlight){
         throw new Error('Highlight with id ${id} not found');

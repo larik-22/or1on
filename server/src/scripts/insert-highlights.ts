@@ -1,9 +1,8 @@
 import { MikroORM } from '@mikro-orm/core';
-import { Highlight } from '../models/highlight.js';
 import mikroConfig from '../../mikro-orm.config.js';
 import {User} from "../models/user.js";
 import logger from "../utils/logger.js";
-import {createHighlight, createHighlightWithUser} from "../controllers/highlightController.js";
+import {createHighlightWithUser} from "../controllers/highlightController.js";
 
 (async () => {
     const orm = await MikroORM.init(mikroConfig);
@@ -568,7 +567,7 @@ import {createHighlight, createHighlightWithUser} from "../controllers/highlight
 
 
     for (const highlightData of highlights) {
-        const highlight = createHighlightWithUser(em, highlightData, highlightData.user)
+        await createHighlightWithUser(em, highlightData, highlightData.user)
     }
 
     await em.flush();
