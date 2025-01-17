@@ -57,7 +57,8 @@ export const openHighlightModal = async (feature: HighlightFeature) => {
 	await modals.open(HighlightModal, {
 		name: feature.properties.name,
 		description: feature.properties.description,
-		highlightId: feature.properties.id
+		highlightId: feature.properties.id,
+		businessDescription: feature.properties.businessDescription,
 	})
 }
 
@@ -65,7 +66,7 @@ export const openHighlightModal = async (feature: HighlightFeature) => {
 /**
  * Gets the user location. Returns a promise that resolves with the location or rejects with an error
  */
-export const getUserLocation = (): Promise<L.LatLng> => {
+export function getUserLocation  (): Promise<L.LatLng> {
 	return new Promise((resolve, reject) => {
 		navigator.geolocation.getCurrentPosition((position) => {
 			const latlng = L.latLng(position.coords.latitude, position.coords.longitude);

@@ -21,6 +21,9 @@
 
 	const saveLocation = (e: LocationEvent) => {
 		selectedLocation = e.latlng;
+		setTimeout(() => {
+			close(selectedLocation)
+		}, 500);
 	}
 
 	const clearMarkers = () => {

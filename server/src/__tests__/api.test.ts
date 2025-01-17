@@ -9,7 +9,8 @@ import { getAllTours, getTourById, getHighlightsByTour } from "../controllers/to
 import {
     approveHighlightSuggestion,
     getHighlightsByUserToken,
-    updateHighlight
+    updateHighlight,
+    createHighlightWithUser
 } from "../controllers/highlightController.js";
 import { createHighlight, deleteHighlight } from "../controllers/highlightController.js";
 import { getAllHighlights, getHighlightById } from "../controllers/highlightController.js";
@@ -2252,7 +2253,7 @@ describe('GET /api/:id/map/highlights', () => {
 
             const token = await generateToken(mockUser);
 
-            const response = await app.request('/api/highlights/0/my-highlights', {
+            const response = await app.request('/api/highlights/my-highlights', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -2265,7 +2266,7 @@ describe('GET /api/:id/map/highlights', () => {
         });
 
         it('should return 401 when no token is provided', async () => {
-            const response = await app.request('/api/highlights/1/my-highlights', {
+            const response = await app.request('/api/highlights/my-highlights', {
                 method: 'GET'
             });
 
@@ -2273,7 +2274,7 @@ describe('GET /api/:id/map/highlights', () => {
         });
 
         it('should return 401 when invalid token is provided', async () => {
-            const response = await app.request('/api/highlights/0/my-highlights', {
+            const response = await app.request('/api/highlights/my-highlights', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer invalid_token'
@@ -2288,7 +2289,7 @@ describe('GET /api/:id/map/highlights', () => {
 
             const token = await generateToken({ email: 'nonexistent@example.com' });
 
-            const response = await app.request('/api/highlights/0/my-highlights', {
+            const response = await app.request('/api/highlights/my-highlights', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -2614,3 +2615,51 @@ describe('GET /api/feedbacks/user/:id', () => {
     });
 });
 
+describe('createHighlightWithUser function', () => {
+    it('should successfully create a Highlight with user', async () => {
+        const emMock = {
+            create: vi.fn((entity, data) => ({
+                ...data,
+                id: 'test-highlight-id',
+                users: {
+                    add: vi.fn()
+                }
+            })),
+            persistAndFlush: vi.fn().mockResolvedValue(undefined)
+        } as unknown as EntityManager;
+
+        const userMock = {
+            id: 'test-user-id',
+            email: 'user@example.com',
+            username: 'testUser',
+            highlights: [],
+        } as unknown as User;
+
+        const highlightData = {
+            name: 'Test Highlight',
+            description: 'Just a test highlight',
+            category: 'Category',
+            businessDescription: 'Some business info',
+            latitude: 55.7558,
+            longitude: 37.6173,
+            is_approved: false,
+        };
+
+        await createHighlightWithUser(emMock, highlightData, userMock);
+
+        expect(emMock.create).toHaveBeenCalledWith(Highlight, {
+            name: highlightData.name,
+            description: highlightData.description,
+            category: highlightData.category,
+            latitude: highlightData.latitude,
+            longitude: highlightData.longitude,
+            is_approved: highlightData.is_approved,
+            businessDescription: highlightData.businessDescription,
+            tours: [],
+        });
+        expect(emMock.persistAndFlush).toHaveBeenCalledTimes(1);
+
+        const createdHighlight = emMock.create.mock.results[0].value;
+        expect(createdHighlight.users.add).toHaveBeenCalledWith(userMock);
+    });
+});

@@ -75,7 +75,7 @@ export const createHighlight = async (em: EntityManager, data: Omit<Highlight, '
             longitude: longitude ?? null,
             is_approved: is_approved ?? false,
             businessDescription: businessDescription ?? 'none',
-            tours: []
+            tours: [],
         });
 
         newHighlight.users.add(user);
@@ -86,6 +86,38 @@ export const createHighlight = async (em: EntityManager, data: Omit<Highlight, '
         throw error;
     }
 };
+
+export const createHighlightWithUser = async (em: EntityManager, data: Omit<Highlight, 'id'>, user: User) =>{
+    try {
+        const {
+            name,
+            description,
+            category,
+            businessDescription,
+            latitude,
+            longitude,
+            is_approved
+        } = data;
+
+        const newHighlight = em.create(Highlight, {
+            name,
+            description,
+            category,
+            latitude: latitude ?? null,
+            longitude: longitude ?? null,
+            is_approved: is_approved ?? false,
+            businessDescription: businessDescription ?? 'none',
+            tours: [],
+        });
+
+        newHighlight.users.add(user);
+
+        await em.persistAndFlush(newHighlight);
+    } catch (error) {
+        logger.error('Failed to create highlight: ' + error);
+        throw error;
+    }
+}
 
 /**
  * Updates is_approved field in specific highlight.
@@ -111,8 +143,7 @@ export const approveHighlightSuggestion = async (em: EntityManager, id: number):
  * @param updatedData - The changed data of the updated attributes.
  * @returns {Promise<void>}
  */
-export const updateHighlight =
-    async (em: EntityManager, id: number, updatedData: Partial<Highlight>): Promise<void> =>{
+export const updateHighlight = async (em: EntityManager, id: number, updatedData: Partial<Highlight>): Promise<void> =>{
     const highlight = await em.findOne(Highlight, {id: id});
     if(!highlight){
         throw new Error('Highlight with id ${id} not found');

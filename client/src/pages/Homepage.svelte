@@ -16,6 +16,7 @@
 	let map: SMap | null = $state(null);
 	let currentHighlightFilter: string[] = $state([]);
 	let loc: LatLng | null = $state($userLocation);
+	let userLocationMarker: L.Marker | null = $state(null);
 
 	let markerClusterGroup: L.MarkerClusterGroup = $state(L.markerClusterGroup({
 		showCoverageOnHover: false,
@@ -43,8 +44,9 @@
 
 		//Zoom to user location
 		$effect(() => {
-			if (loc != null) {
-				map?.addLayer(getUserLocationMarker(loc));
+			if (loc != null && userLocationMarker == null) {
+				userLocationMarker = getUserLocationMarker(loc);
+				map?.addLayer(userLocationMarker);
 				map.setView(loc, 15);
 			}
 		})
