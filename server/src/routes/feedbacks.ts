@@ -4,19 +4,35 @@ import {z} from 'zod';
 import dotenv from "dotenv";
 import {EntityManager} from "@mikro-orm/core";
 import {
-    approveFeedback,
+    approveFeedback, deleteFeedback, getAllFeedbacks, getFeedbackById,
     getFeedbackByUserId,
     getFeedbacksForApproval
 } from "../controllers/feedbackController.js";
 import {isAdmin} from "../middleware/isAdmin.js";
 import logger from "../utils/logger.js";
 import {isLoggedIn} from "../middleware/isLoggedIn.js";
+import type {User} from "../models/user.js";
 
 dotenv.config();
 
 const feedbacks = new Hono();
 
 const numberIdSchema = z.object({id: z.preprocess((val) => Number(val), z.number())});
+
+
+feedbacks.get('/', isLoggedIn, isAdmin, async (ctx) => {
+    try{
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
+        const feedbacks = await getAllFeedbacks(em)
+
+        return ctx.json({feedbacks}, 200)
+    }catch (error){
+        logger.error('Error while fetching feedbacks', { error: error });
+        return ctx.json(createErrorResponse(500, 'Internal error'), 500);
+    }
+})
+
+
 
 /**
  * Handles approving a feedback.
@@ -110,5 +126,84 @@ feedbacks.get('/user/:id', isLoggedIn, async (ctx) => {
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 });
+
+feedbacks.put('/:id', isLoggedIn, async (ctx) => {
+    try {
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
+        const params = numberIdSchema.safeParse(ctx.req.param());
+        const body = await ctx.req.json();
+
+        const payload = ctx.get('jwtPayload') as User
+
+        if (!params.success){
+            return ctx.json(createErrorResponse(400, 'Invalid feedbackId parameter'), 400)
+        }
+
+        const {id} = params.data;
+
+        const feedback = await getFeedbackById(em, id)
+        if (feedback === null){
+            return ctx.json(createErrorResponse(404, 'Feedback not found'), 404)
+        }
+
+        if (payload.id !== feedback.user.id && !payload.isAdmin ){
+            return ctx.json(createErrorResponse(403,
+                'You are not allowed to update this feedback'), 403)
+        }
+
+        await em.populate(feedback, 'user')
+
+        feedback.comment = body.comment || feedback.comment;
+        feedback.rating = body.rating || feedback.rating;
+
+        await em.persistAndFlush(feedback);
+
+        return ctx.json({message: 'Feedback updated successfully'}, 200);
+    }catch (error){
+        logger.error('Error while updating feedback', { error: error });
+        return ctx.json(createErrorResponse(500, 'Internal error'), 500);
+    }
+});
+
+/**
+ * Handles deleting a feedback.
+ *
+ * @param ctx - The Hono context object.
+ * @returns A response with a success or error message.
+ */
+
+feedbacks.delete('/:id', isLoggedIn, async (ctx) => {
+    try {
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
+        const params = numberIdSchema.safeParse(ctx.req.param());
+
+        const payload = ctx.get('jwtPayload') as User
+
+
+        if (!params.success){
+            return ctx.json(createErrorResponse(400, 'Invalid feedbackId parameter'), 400)
+        }
+
+        const {id} = params.data;
+
+        const feedback = await getFeedbackById(em, id)
+        if (feedback === null){
+            return ctx.json(createErrorResponse(404, 'Feedback not found'), 404)
+        }
+
+        if (payload.id !== feedback.user.id && !payload.isAdmin ){
+            return ctx.json(createErrorResponse(403,
+                'You are not allowed to delete this feedback'), 403)
+        }
+
+        await deleteFeedback(em, id);
+
+        return ctx.json({message: 'Feedback deleted successfully'}, 200);
+    }catch (error){
+        logger.error('Error while deleting feedback', { error: error });
+        return ctx.json(createErrorResponse(500, 'Internal error'), 500);
+    }
+});
+
 
 export default feedbacks;

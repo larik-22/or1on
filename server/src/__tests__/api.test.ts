@@ -64,6 +64,7 @@ beforeEach(() => {
         persistAndFlush: vi.fn(),
         create: vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() })),
         fork: vi.fn().mockReturnValue(em),
+        populate: vi.fn()
     } as unknown as EntityManager;
 
     app = createApp(em);
@@ -2661,5 +2662,1158 @@ describe('createHighlightWithUser function', () => {
 
         const createdHighlight = emMock.create.mock.results[0].value;
         expect(createdHighlight.users.add).toHaveBeenCalledWith(userMock);
+    });
+});
+
+describe('DELETE /api/highlights/:id/feedbacks/:feedbackId', () => {
+    it('should delete specific feedback', async () => {
+
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const highlight = {
+            id:1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        };
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Highlight && condition.id == 1) {
+                return {
+                    ...highlight,
+                    users: []
+                };
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: highlight.id
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/api/highlights/1/feedbacks/1', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Feedback deleted successfully');
+    });
+    it('should return 400 for invalid feedbackId',async () => {
+
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const highlight = {
+            id:1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        };
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Highlight && condition.id == 1) {
+                return {
+                    ...highlight,
+                    users: []
+                };
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: highlight.id
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/api/highlights/1/feedbacks/asd', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(400);
+    });
+    it('should return 400 for invalid highlightId', async () => {
+
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const highlight = {
+            id:1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        };
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Highlight && condition.id == 1) {
+                return {
+                    ...highlight,
+                    users: []
+                };
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: highlight.id
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/api/highlights/asdasd/feedbacks/asd', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(400);
+    });
+    it('should return 404 for non existent feedback', async () => {
+
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const highlight = {
+            id:1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        };
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Highlight && condition.id == 1) {
+                return {
+                    ...highlight,
+                    users: []
+                };
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: highlight.id
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/api/highlights/1/feedbacks/100', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(404);
+    });
+    it('should return 404 for non existent highlight', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const highlight = {
+            id:1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        };
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Highlight && condition.id == 1) {
+                return {
+                    ...highlight,
+                    users: []
+                };
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: highlight.id
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/api/highlights/100/feedbacks/1', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(404);
+    });
+    it('should return 403 for unauthorized user', async () => {
+
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+        };
+
+        const otherUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+        }
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const createdUser = await createUser(em, otherUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const highlight = {
+            id:1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        };
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Highlight && condition.id == 1) {
+                return {
+                    ...highlight,
+                    users: []
+                };
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdUser,
+                    highlight: highlight.id
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/api/highlights/1/feedbacks/1', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(403);
+    });
+});
+
+describe('PUT /api/highlights/:id/feedbacks/:feedbackId', () => {
+    it('should update specific feedback', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const highlight = {
+            id:1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        };
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Highlight && condition.id == 1) {
+                return {
+                    ...highlight,
+                    users: []
+                };
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: highlight.id
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/api/highlights/1/feedbacks/1', {
+            method: 'PUT',
+            body: JSON.stringify({ rating: 5, comment: 'updated comment' }),
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(200);
+        const responseBody = await response.json();
+        expect(responseBody.message).toEqual('Feedback updated successfully');    });
+
+    it('should return 500 for invalid feedback data', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+
+        const response = await app.request('/api/highlights/1/feedbacks/1', {
+            method: 'PUT',
+            body: { rating: 'invalid', comment: 'updated comment' },
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(500);
+    });
+
+    it('should return 404 if feedback not found', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const highlight = {
+            id:1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        };
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Highlight && condition.id == 1) {
+                return {
+                    ...highlight,
+                    users: []
+                };
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: highlight.id
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/api/highlights/1/feedbacks/2', {
+            method: 'PUT',
+            body: JSON.stringify({ rating: 5, comment: 'updated comment' }),
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        logger.warn( await response.json);
+
+        expect(response.status).toBe(404);
+    });
+    it('should return 404 if highlight not found', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const highlight = {
+            id:1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        };
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Highlight && condition.id == 1) {
+                return {
+                    ...highlight,
+                    users: []
+                };
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: highlight.id
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/api/highlights/100/feedbacks/2', {
+            method: 'PUT',
+            body: JSON.stringify({ rating: 5, comment: 'updated comment' }),
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        logger.warn( await response.json);
+
+        expect(response.status).toBe(404);
+    });
+    it('should return 400 if feedbackId invalid', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const highlight = {
+            id:1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        };
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Highlight && condition.id == 1) {
+                return {
+                    ...highlight,
+                    users: []
+                };
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: highlight.id
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/api/highlights/1/feedbacks/asd', {
+            method: 'PUT',
+            body: JSON.stringify({ rating: 5, comment: 'updated comment' }),
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        logger.warn( await response.json);
+
+        expect(response.status).toBe(400);
+    });
+    it('should return 400 if highlightId invalid', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const highlight = {
+            id:1,
+            name: 'someHighlight',
+            description: 'some description',
+            category: 'history',
+            latitude: 40.7128,
+            longitude: -74.0060,
+            is_approved: false
+        };
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Highlight && condition.id == 1) {
+                return {
+                    ...highlight,
+                    users: []
+                };
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: highlight.id
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+
+        const response = await app.request('/api/highlights/asdasd/feedbacks/asd', {
+            method: 'PUT',
+            body: JSON.stringify({ rating: 5, comment: 'updated comment' }),
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        logger.warn( await response.json);
+
+        expect(response.status).toBe(400);
+    });
+});
+
+describe('DELETE /api/feedbacks/:id', () => {
+
+    it('should delete feedback', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: 1,
+                    tour: null,
+                    is_approved: createdAdmin.isAdmin
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const response = await app.request('/api/feedbacks/1', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(200);
+
+    });
+
+    it('should return 404 if feedback not found', async () => {
+
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: 1,
+                    tour: null,
+                    is_approved: createdAdmin.isAdmin
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const response = await app.request('/api/feedbacks/100', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(404);
+    });
+
+    it('should return 403 if user is not authorized', async () => {
+
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+        };
+
+        const otherUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const createdOtherUser = await createUser(em, otherUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdOtherUser,
+                    highlight: 1,
+                    tour: null,
+                    is_approved: createdAdmin.isAdmin
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const response = await app.request('/api/feedbacks/1', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(403);
+    });
+
+    it('should return 400 if feedback ID is invalid', async () => {
+
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: 1,
+                    tour: null,
+                    is_approved: createdAdmin.isAdmin
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const response = await app.request('/api/feedbacks/asdads', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(400);
+
+    });
+
+});
+
+describe('PUT /api/feedbacks/:id', () => {
+
+    it('should update feedback', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: 1,
+                    tour: null,
+                    is_approved: createdAdmin.isAdmin
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const response = await app.request('/api/feedbacks/1', {
+            method: 'PUT',
+            body: JSON.stringify({comment: 'updated comment' },),
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(200);
+    });
+
+    it('should return 404 if feedback not found', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: 1,
+                    tour: null,
+                    is_approved: createdAdmin.isAdmin
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const response = await app.request('/api/feedbacks/100', {
+            method: 'PUT',
+            body: JSON.stringify({comment: 'updated comment' },),
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(404);
+    });
+
+    it('should return 403 if user is not authorized', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+        };
+        const otherUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: false,
+            username: '880005553535',
+        }
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const createdUser = await createUser(em, otherUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdUser,
+                    highlight: 1,
+                    tour: null,
+                    is_approved: createdAdmin.isAdmin
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const response = await app.request('/api/feedbacks/1', {
+            method: 'PUT',
+            body: JSON.stringify({comment: 'updated comment' },),
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(403);
+    });
+
+    it('should return 400 if feedback ID is invalid', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: 1,
+                    tour: null,
+                    is_approved: createdAdmin.isAdmin
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const response = await app.request('/api/feedbacks/asdasd', {
+            method: 'PUT',
+            body: JSON.stringify({comment: 'updated comment' },),
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(400);
+    });
+    it('should return 500 ', async () => {
+        const adminUser = {
+            email: 'admin@example.com',
+            password: 'password123',
+            isAdmin: true,
+            username: '880005553535',
+        };
+        em.create = vi.fn((entity, data) => ({ ...data, id: data.id || randomUUID() }));
+        const createdAdmin = await createUser(em, adminUser);
+        const token = await generateToken({
+            ...createdAdmin,
+            password: adminUser.password
+        });
+        em.assign = vi.fn(async () => 1);
+
+        const feedback = {
+            rating: 4,
+            comment: 'crazy'
+        };
+
+        em.findOne = vi.fn(async (entity, condition) => {
+
+            if (entity === User && condition.id === createdAdmin.id) {
+                return createdAdmin;
+            }
+            if (entity === Feedback && condition.id == 1) {
+                return {
+                    ...feedback,
+                    id: 1,
+                    user: createdAdmin,
+                    highlight: 1,
+                    tour: null,
+                    is_approved: createdAdmin.isAdmin
+                };
+            }
+            return null;
+        }) as unknown as typeof em.findOne;
+
+        const response = await app.request('/api/feedbacks/asdasd', {
+            method: 'PUT',
+            body: {comment: 'updated comment' },
+            headers: { 'Authorization': `Bearer ${token}` }
+        }, mockEnv);
+
+        expect(response.status).toBe(500);
     });
 });
