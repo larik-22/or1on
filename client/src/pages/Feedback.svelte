@@ -9,69 +9,44 @@
 <script lang="ts">
     import Modal, {type ModalType} from "../lib/components/Modal.svelte";
 
-    let testData = $state([
-        {
-            id: 1,
-            highlightId: 1,
-            user: {
-                id: "1",
-                username: "John Doe"
-            },
-            rating: 5,
-            comment: "John John",
-            is_approved: false,
-        },
-        {
-            id: 2,
-            highlightId: 2,
-            user: {
-                id: "2",
-                username: "John Typescript"
-            },
-            rating: 5,
-            comment: "typeshit",
-            is_approved: false,
-        },
-        {
-            id: 3,
-            highlightId: 3,
-            user: {
-                id: "2",
-                username: "John Tailwind"
-            },
-            rating: 5,
-            comment: "just cssing",
-            is_approved: false,
-        }
-    ]);
-
     import {fetchWithAuthSvelte} from "../lib/utils/fetchWithAuth.svelte";
     import type {Row, TableType} from "../lib/components/table/Table.svelte";
     import Table from "../lib/components/table/Table.svelte";
     import {type ActionConfig} from "../lib/components/table/Action.svelte";
-    import WarningPopUp from "../lib/components/moderatorDashboard/WarningPopUp.svelte";
+
+    let fetchedFeedbacks: any = $state([]);
+
+    async function fetchFeedbacks(): Promise<TableType> {
+        const feedbacksUrl = `${import.meta.env.VITE_BACKEND_URL}/feedbacks/`;
+        let resp = await fetchWithAuthSvelte(feedbacksUrl);
+        fetchedFeedbacks = await resp.json();
+        let data = DataToTable(fetchedFeedbacks.users);
+        return data;
+    }
 
     /**
      * Convert the fetched data into a table that is readable by the Table component
      * @param data
      * */
 
-    //TODO: Provide datatype
-    /* eslint-disable @typescript-eslint/no-empty-object-type */
-    function DataToTable(data: {}[]): TableType {
-        let columns: string[] = ["Id", "HighlightId", "User ID", "Rating", "Comment", "Approved State"];
+    function DataToTable(data: object[]): TableType {
+        let columns: string[] = ["Id", "Tour Id", "Highlight Id", "User Id", "Rating", "Comment", "Approved State"];
         let rows: Row[] = [];
 
         for (let i = 0; i < data.length; i++) {
             let objectEntries = Object.entries(data[i]);
             let row: Row = {
                 row: [],
-                actionsVisibility: [true,true,true]
+                actionsVisibility: [true, true, true]
             };
             for (let j = 0; j < objectEntries.length; j++) {
                 if (objectEntries[j][0] === "user") {
                     let user: User = objectEntries[j][1] as User;
                     row.row.push(`${user.id}`);
+                } else if (objectEntries[j][0] === "highlight" && objectEntries[j][1] !== null) {
+                    row.row.push(`${objectEntries[j][1].id}`);
+                } else if (objectEntries[j][0] === "tour" && objectEntries[j][1] !== null) {
+                    row.row.push(`${objectEntries[j][1].id}`);
                 } else {
                     row.row.push(`${objectEntries[j][1]}`);
                 }
@@ -84,54 +59,35 @@
             rows: rows
         };
     }
-    /* eslint-enable @typescript-eslint/no-empty-object-type */
-    let table = $state(DataToTable(testData));
-
     /*
    * Function to execute when confirming the editing
    * In this case for test purposes we edit the array.
    * In production this will be replaced with an api call
    * */
-    // let onConfirmEdit = async (newText: string) => {
-    //     currentRow.row[4] = newText;
-    //
-    //     const approveFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/highlights/${currentRow.row[1]}/feedbacks/${currentRow.row[0]}`;
-    //     // await fetchWithAuthSvelte(approveFeedbackUrl, {
-    //     //     method: "PUT",
-    //     //     body: JSON.stringify({
-    //     //         comment: currentRow[4],
-    //     //         approvedState: currentRow[5]
-    //     //     }),
-    //     // })
-    // };
-    let onApproveFeedback = async () => {
-        currentRow.row[5] = "true";
-        currentRow.actionsVisibility = [false,true];
-        // const approveFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/highlights/${currentRow.row[1]}/feedbacks/${currentRow.row[0]}`;
+    let onConfirmEdit = async () => {
 
-        // await fetchWithAuthSvelte(approveFeedbackUrl, {
-        //     method: "PUT",
-        //     body: JSON.stringify({
-        //         comment: currentRow[4],
-        //         approvedState: currentRow[5]
-        //     }),
-        // })
+        const approveFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/feedbacks/${currentRow.row[0]}`;
+        await fetchWithAuthSvelte(approveFeedbackUrl, {
+            method: "PUT",
+            body: JSON.stringify({
+                "comment": currentRow.row[5],
+                "rating": currentRow.row[4]
+            }),
+        });
     };
-    let onRemoveFeedback = async () => {
-        let index = testData.findIndex(x=>x.id === parseInt(currentRow.row[0]))
+    let onApproveFeedback = async () => {
+        const approveFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/feedbacks/${currentRow.row[0]}/approve`;
 
-         table.rows.splice(index, 1);
-        const removeFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/users/${currentRow.row[2]}/feedback/${currentRow.row[0]}`;
-        await fetchWithAuthSvelte(removeFeedbackUrl, {
-            method: "DELETE",
+        await fetchWithAuthSvelte(approveFeedbackUrl, {
+            method: "PUT",
         })
     };
-
-
-    // const feedbacksUrl = `${import.meta.env.VITE_BACKEND_URL}feedbacks`;
-    // const feedbacksResp = fetchWithAuthSvelte(feedbacksUrl, {
-    //     method: "GET",
-    // });
+    let onRemoveFeedback = async () => {
+        const removeFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/feedbacks/${currentRow.row[0]}`;
+        await fetchWithAuthSvelte(removeFeedbackUrl, {
+            method: "DELETE",
+        });
+    };
 
     let enableEditComment = $state(false);
     let enableApproveFeedback = $state(false);
@@ -142,14 +98,12 @@
 
 
     let actionCssConfig: string = "border-[1px] bg-zinc-950 text-neutral-100 p-[5px] rounded-[6px] border-transparent";
-    let approveText: string = "Are you sure you want to approve this feedback?";
-    let removalText: string = "Are you sure you want to remove this feedback?";
 
     let approveActionConfig: ActionConfig = {
         actionName: "Approve",
         actionFunction: (row: any) => {
             console.log("Hi");
-            currentRow = row
+            currentRow = row;
             if (currentRow.row[5] !== "true") {
                 enableApproveFeedback = true;
             }
@@ -181,10 +135,10 @@
 
     let configs: ActionConfig[] = [approveActionConfig, editActionConfig, removeActionConfig];
 
-    let editModal : ModalType = $state({
+    let editModal: ModalType = $state({
         title: "Edit Feedback",
         confirmFunction: () => {
-
+            onConfirmEdit();
         },
         sections: [
             {
@@ -198,23 +152,42 @@
                 }
             }
         ]
-    })
+    });
+
+    let approveFeedbackModal: ModalType = {
+        title: "Approve Feedback",
+        confirmFunction: () => {
+            onApproveFeedback()
+        },
+        sections: []
+    };
+
+    let deleteFeedbackModal: ModalType = {
+        title: "Delete Feedback",
+        confirmFunction: () => {
+            onRemoveFeedback()
+        },
+        sections: []
+    };
 
 </script>
 
 <main class="flex items-center content-center w-[100%] h-[100vh] justify-center overflow-x-scroll overflow-y-scroll">
-    <div class="w-full  max-w-fit">
-        <Table newTable={table} actionConfigs={configs}></Table>
-    </div>
+    {#await fetchFeedbacks()}
+        Loading...
+    {:then table}
+        <div class="w-full  max-w-fit">
+            <Table newTable={table} actionConfigs={configs}></Table>
+        </div>
+    {/await}
+
     {#if enableEditComment}
-       <Modal bind:modal={editModal} bind:enableEditModal={enableEditComment}></Modal>
+        <Modal bind:modal={editModal} bind:enableEditModal={enableEditComment}></Modal>
     {/if}
     {#if enableApproveFeedback}
-        <WarningPopUp onConfirmFunction={onApproveFeedback} bind:enabled_popup={enableApproveFeedback}
-                      popupText={approveText}></WarningPopUp>
+        <Modal modal={approveFeedbackModal} bind:enableEditModal={enableApproveFeedback}></Modal>
     {/if}
     {#if enableRemoveFeedback}
-        <WarningPopUp onConfirmFunction={onRemoveFeedback} bind:enabled_popup={enableRemoveFeedback}
-                      popupText={removalText}></WarningPopUp>
+        <Modal modal={deleteFeedbackModal} bind:enableEditModal={enableRemoveFeedback}></Modal>
     {/if}
 </main>
