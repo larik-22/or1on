@@ -96,10 +96,8 @@ The main business goals of the project are:
 | RFU-06 | As a user, I want to filter tours and highlights based on color on the map to quickly identify attractions that match my interests.                                                        | F    | MUST   | Appendix A |
 | RFU-07 | As a user, I want to be able to choose my preferred language in the app to ensure I can understand and fully use the app’s features.                                                       | F    | COULD  | Appendix A |
 | RFU-08 | As a user, I want to log in, register, and reset my password if needed so I can securely manage my account and access personalized features.                                               | F    | MUST   | Appendix B |
-| RFU-09 | As a user, I want to be notified if my account is blocked due to inappropriate behavior, with an explanation for the suspension, so I understand the situation and can address any issues. | F    | SHOULD | Appendix A |
 | RFU-10 | As a moderator, I want to review comments and ratings before they are published to ensure fairness and, if necessary, suspend users for inappropriate feedback.                            | F    | MUST   | Appendix B |
 | RFU-11 | As a moderator, I want the ability to add, edit and delete highlights and tours within the app to keep the information accurate and up-to-date.                                            | F    | MUST   | Appendix B |
-| RFU-12 | As a moderator, I want to be able to suspend suspicious accounts based on inappropriate behavior to maintain a safe and respectful platform for all users.                                 | F    | MUST   | Appendix A |
 | RFU-13 | As a moderator, I want to approve or reject new highlights suggested by trusted users based on photos or audio they submit to ensure the quality and relevance of added content.           | F    | MUST   | Appendix A |
 | RFU-14 | As a business owner, I want to be able to add my own highlight through posting an ad in the app to attract visitors and promote my business.                                               | F    | COULD  | Appendix A |
 | RFU-15 | As a user, I want to see business offers (e.g., discounts or free items) when visiting a particular location to make the experience more rewarding and enjoyable.                          | F    | COULD  | Appendix A |
@@ -119,10 +117,7 @@ The main business goals of the project are:
 | SR-009 | The system SHOULD allow moderator users to accept, deny or edit ratings and comments    | F    | MUST   | Appendix B |
 | SR-010 | The system SHOULD allow moderator users to accept or deny highlight suggestions         | F    | MUST   | Appendix B |
 | SR-011 | The system SHOULD allow moderator users to mark users as trustworthy                    | F    | SHOULD | Appendix A |
-| SR-012 | The system SHOULD allow moderator users to ban users                                    | F    | MUST   | Appendix A |
-| SR-013 | The system SHOULD automatically find users abusing the rating system                    | F    | SHOULD | Appendix A |
 | SR-014 | The system SHOULD allow moderator users to add new highlights and tours                 | F    | MUST   | Appendix A |
-| SR-015 | The system SHOULD allow all users to upload images and audio files to highlights        | F    | SHOULD | Appendix A |
 | SR-016 | The system SHOULD allow business highlights to contain promotions                       | F    | COULD  | Appendix A |
 | SR-017 | The system SHOULD allow users to edit or remove their own ratings and comments          | F    | MUST   | Appendix A |
 | SR-018 | The system SHOULD allow users to switch between languages                               | F    | COULD  | Appendix A |
