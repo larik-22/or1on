@@ -25,7 +25,7 @@
         latitude: number | null;
         longitude: number | null;
         is_approved: boolean;
-        approvedState?: string; //track rejected state
+        approvedState?: string;  //track rejected state
         businessDescription: string | null;
         users: [{ username: string }] | null;
         suggestedBy: {username: string} | null
