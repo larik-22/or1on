@@ -17,10 +17,10 @@
     let fetchedFeedbacks: any = $state([]);
 
     async function fetchFeedbacks(): Promise<TableType> {
-        const feedbacksUrl = `${import.meta.env.VITE_BACKEND_URL}/feedbacks/`;
+        const feedbacksUrl = `${import.meta.env.VITE_BACKEND_URL}/feedbacks`;
         let resp = await fetchWithAuthSvelte(feedbacksUrl);
         fetchedFeedbacks = await resp.json();
-        let data = DataToTable(fetchedFeedbacks.users);
+        let data = DataToTable(fetchedFeedbacks.feedbacks);
         return data;
     }
 

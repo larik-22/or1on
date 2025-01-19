@@ -14,7 +14,10 @@
 		businessDescription: string | null,
 	}
 
-	const {name, description, highlightId, businessDescription, close, isOpen}: HighlightModalProps = $props()
+	let {name, description, highlightId, businessDescription, close, isOpen}: HighlightModalProps = $props()
+	if (businessDescription === "none"){
+		businessDescription = null;
+	}
 
 	// promise, that will trigger the re-render
 	let feedbackPromise: Promise<any> | null = $state(fetchFeedback());

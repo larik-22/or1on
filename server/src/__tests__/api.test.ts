@@ -1955,6 +1955,7 @@ describe('POST /api/highlights/:id/feedbacks', () => {
         expect(responseBody.error.message).toBe('Unauthorized');
     });
 });
+
 describe('GET /api/:id/map/highlights', () => {
     it('should successfully return highlights', async () => {
         const mockGeoJSON = {
