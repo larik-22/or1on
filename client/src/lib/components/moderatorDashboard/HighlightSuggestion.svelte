@@ -42,7 +42,6 @@
 
             // type fetch data
             const data: { highlights: Suggestion[] } = await response.json();
-            console.log("API RESPONSE: ", data);
 
 
             // Filter unapproved highlights
@@ -106,7 +105,6 @@
             });
 
             if (response.ok) {
-                console.log(`Approved suggestion ID: ${id}`);
                 await fetchSuggestions(); // refresh
             } else {
                 console.error(`Failed to approve suggestion ID: ${id}`);
@@ -128,7 +126,6 @@
             });
 
             if (response.ok) {
-                console.log(`Rejected suggestion ID: ${id}`);
                 // Update the state of the rejected suggestion
                 suggestions = suggestions.map((highlight) =>
                     highlight.id === id ? { ...highlight, is_approved: false, approvedState: "Rejected" } : highlight

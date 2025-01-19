@@ -41,21 +41,18 @@
                         {#if section.sectionType === "basic"}
                             <input type="text" value={section.getValue()} oninput={(e) => {
                                 if (e != null && e.target != null) {
-                                    console.log(e.target.value);
                                     section.setValue(e.target.value);
                                 }
                             }} class="w-full border px-2 py-1 rounded"/>
                         {:else if section.sectionType === "descriptive"}
                             <textarea value={section.getValue()} oninput={(e) => {
                                 if (e != null && e.target != null) {
-                                    console.log(e.target.value);
                                     section.setValue(e.target.value);
                                 }
                             }} class="w-full border px-2 py-1 rounded"></textarea>
                         {:else if section.sectionType === "number" && section.maxValue !== undefined && section.minValue !== undefined}
                             <input type="number" bind:value={section.value} oninput={(e) => {
                                 if (e != null && e.target != null) {
-                                    console.log(e.target.value);
                                     section.setValue(e.target.value);
                                 }
                             }} max="{section.maxValue}"

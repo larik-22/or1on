@@ -32,6 +32,7 @@
     function DataToTable(data: object[]): TableType {
         let columns: string[] = ["Id", "Tour Id", "Highlight Id", "User Id", "Rating", "Comment", "Approved State"];
         let rows: Row[] = [];
+        console.log(data[0])
 
         for (let i = 0; i < data.length; i++) {
             let objectEntries = Object.entries(data[i]);
@@ -41,12 +42,12 @@
             };
             for (let j = 0; j < objectEntries.length; j++) {
                 if (objectEntries[j][0] === "user") {
-                    let user: User = objectEntries[j][1] as User;
-                    row.row.push(`${user.id}`);
+                    let user: User = objectEntries[j][1] as any;
+                    row.row.push(`${user}`);
                 } else if (objectEntries[j][0] === "highlight" && objectEntries[j][1] !== null) {
                     row.row.push(`${objectEntries[j][1].id}`);
                 } else if (objectEntries[j][0] === "tour" && objectEntries[j][1] !== null) {
-                    row.row.push(`${objectEntries[j][1].id}`);
+                    row.row.push(`${objectEntries[j][1]}`);
                 } else {
                     row.row.push(`${objectEntries[j][1]}`);
                 }
@@ -102,7 +103,6 @@
     let approveActionConfig: ActionConfig = {
         actionName: "Approve",
         actionFunction: (row: any) => {
-            console.log("Hi");
             currentRow = row;
             if (currentRow.row[5] !== "true") {
                 enableApproveFeedback = true;
@@ -114,7 +114,6 @@
     let editActionConfig: ActionConfig = {
         actionName: "Edit",
         actionFunction: (row: any) => {
-            console.log("Hi :3");
             currentRow = row;
             enableEditComment = true;
             commentValue = row.row[4];
@@ -125,7 +124,6 @@
     let removeActionConfig: ActionConfig = {
         actionName: "Remove",
         actionFunction: (row: any) => {
-            console.log("Hi :3");
             currentRow = row;
             enableRemoveFeedback = true;
         },

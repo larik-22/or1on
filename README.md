@@ -50,7 +50,7 @@ The app is web-based and compatible with any device that supports location servi
 ---
 
 ## Quick Start
-1. Open the app on any device with location services.
+1. Open the on `https://or1on.city` any device with location services.
 2. Select your preferred highlights and tour theme.
 3. Start your personalized tour and enjoy exploring Deventer!
 

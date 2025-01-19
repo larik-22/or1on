@@ -61,8 +61,6 @@ let lockUserAccount: ActionConfig = {
 	actionFunction: (row: any) => {
 		currentRow = row;
 
-		console.log("Hi :3");
-
 	},
 	actionClassStyle: actionCssConfig,
 };
@@ -89,7 +87,6 @@ let modal: ModalType = {
 			method: "PUT"
 		});
 		fetchedUsers = await resp.json();
-		// window.location.reload();
 	},
 	sections : []
 }
