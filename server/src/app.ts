@@ -24,7 +24,7 @@ export const createApp = (em: EntityManager): Hono => {
         await next();
     });
 
-    api.use('*', cors({
+    app.use('*', cors({
         origin: '*',
         allowHeaders: ['Origin', 'Content-Type', 'Authorization'],
         allowMethods: ['GET', 'OPTIONS', 'POST', 'PUT', 'DELETE'],
