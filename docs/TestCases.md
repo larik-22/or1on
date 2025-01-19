@@ -1,7 +1,7 @@
 # Test report
 
 Here you can find the results of the tests that were executed.<br>
-Tester: Rafael Tavares, Botond Vendler 😎, Sarina Bameriniya <br>
+Tester: Rafael Tavares, Botond Vendler, Sarina Bameriniya, Jan <br>
 Date: 17-01-2025<br>
 
 ## Test Case 1
@@ -184,46 +184,41 @@ Step 2 - User clicks on Logout button until they encounter the confirmation of t
 ![alt text](img/test_cases/userdashboard-11-logout-confirmation.png)<br>
 
 After these steps user will successfully log out and redirect to the login page. 
-## Test Case 10
+## Test Case 11
 Name: Administrator can manage tours<br>
 Status: Success
 
 Step 1 - Administrator starts by clicking on the Manage Tours tab in the navigation bar.
 
-![alt text](img/test_cases/Screenshot 2025-01-19 155100.png)<br>
+![alt text](img/test_cases/pic_1.png)<br>
 
 Step 2 - Administrator can see all the tours and can edit, delete or add new tours.
-![alt text](img/test_cases/Screenshot 2025-01-19 155414.png)<br>
+![alt text](img/test_cases/pic_2.png)<br>
 
-## Test Case 11
+## Test Case 12
 Name: Administrator can edit tours<br>
 Status: Success
 
 Step 1 - Administrator starts by clicking edit button on the tour they want to edit.
-![alt text](img/test_cases/Screenshot 2025-01-19 155618.png)<br>
+![alt text](img/test_cases/pic_3.png)<br>
 
 Step 2 - Administrator can edit the tour and save the changes.
-![alt text](img/test_cases/Screenshot 2025-01-19 155715.png)<br>
+![alt text](img/test_cases/pic_4.png)<br>
 
-## Test Case 12
+## Test Case 13
 Name: Administrator can delete tours<br>
 Status: Success
 
 Step 1 - Administrator starts by clicking delete button on the tour they want to delete.
-![alt text](img/test_cases/Screenshot 2025-01-19 155808.png)<br>
+![alt text](img/test_cases/pic_5.png)<br>
 
-## Test Case 13
+## Test Case 14
 Name: Administrator can add tours<br>
 Status: Success
 
 Step 1 - Administrator starts by clicking add tour button.
-![alt text](img/test_cases/Screenshot 2025-01-19 155847.png)<br>
+![alt text](img/test_cases/pic_6.png)<br>
 
 Step 2 - Administrator can fill the form and add the new tour.
-![alt text](img/test_cases/Screenshot 2025-01-19 155952.png)<br>
-![alt text](img/test_cases/Screenshot 2025-01-19 160020.png)<br>
-
-
-
-
-
+![alt text](img/test_cases/pic_7.png)<br>
+![alt text](img/test_cases/pic_8.png)<br>
