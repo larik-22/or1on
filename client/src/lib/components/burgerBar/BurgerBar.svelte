@@ -20,13 +20,16 @@
         Location = "",
         FullWidth = false,
         MinWidth = "320px",
+        showSideBar = $bindable(),
         AdditionalComponent,
     }: {
         BarItems: BarItem[],
         Location: string
         FullWidth?: boolean
-        MinWidth?: string
-        AdditionalComponent?: typeof SvelteComponent
+        MinWidth?: string,
+        showSideBar: boolean,
+        AdditionalComponent?: typeof SvelteComponent,
+
     } = $props();
 
     let lastClicked: string = $state("0");
@@ -49,12 +52,12 @@
         <ul class="pt-[100px]">
             {#each BarItems as item, i}
                 <li>
-                    <BurgerBarItem Item={item} sectionNumber={(i+1)} bind:lastClicked={lastClicked}></BurgerBarItem>
+                    <BurgerBarItem bind:showSideBar={showSideBar} Item={item} sectionNumber={(i+1)} bind:lastClicked={lastClicked}></BurgerBarItem>
                 </li>
             {/each}
 
         </ul>
-        <BurgerBarItem Item={homeButton} paddingTop="pt-[10vh]"/>
+        <BurgerBarItem bind:showSideBar={showSideBar} Item={homeButton} paddingTop="pt-[10vh]"/>
     </div>
 </main>
 

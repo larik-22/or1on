@@ -11,14 +11,17 @@
 	let {
 		currentRoute,
 		currentPage = $bindable(Homepage),
-		FullWidth = $bindable()
-	}: {
+        FullWidth = $bindable(),
+        showSideBar = $bindable()
+    }: {
 		currentRoute: string;
 		currentPage: any;
 		FullWidth: boolean;
+        showSideBar: boolean;
 	} = $props();
 
     let CurrentLocation: string = $state("Home");
+    // eslint-disable-next-line
     let AdditionalComponent: any = $state("");
 
     let BarItems: BarItem[] = $state([
@@ -44,9 +47,6 @@
             }
         },
         {
-            label: "My reviews"
-        },
-        {
             label: "My feedbacks",
             overrideClick: true,
             overrideFunction: () => {
@@ -64,27 +64,19 @@
             label: "User dashboard",
             overrideClick: true,
             overrideFunction: () => {
-                page.redirect("/user-dashboard");
+                page.redirect("/logout")
             }
-        },
-        {
-            label: "Test Path",
-            overrideClick: true,
-            overrideFunction: () => {
-                page.redirect("/test");
-            }
-        },
+        }
     ]);
     let AdminBarItems: BarItem[] = $state([
         {
             label: "Moderator dashboard",
             overrideClick: true,
             overrideFunction: () => {
-                page.redirect("/moderator-dashboard");
+                page.redirect("/user-management")
             }
         },
     ]);
-
     let AdminDashboardBarItems: BarItem[] = $state([
         {
             label: "Users",
@@ -103,13 +95,13 @@
                 {
                     label: "Manage",
                     action: () => {
-                        console.log("Hi");
+                        page.redirect("/manage-highlights")
                     }
                 },
                 {
                     label: "Suggestions",
                     action: () => {
-                        console.log("Hi");
+                        page.redirect("/manage-suggestions")
                     }
                 },
                 {
@@ -126,7 +118,7 @@
                 {
                     label: "Manage",
                     action: () => {
-                        console.log("Hi");
+                        page.redirect("/manage-tours")
                     }
                 }
             ]
@@ -267,6 +259,17 @@
                     CurrentLocation = "Feedbacks Management";
                     AdditionalComponent = UserIndicator;
                     break;
+
+                case currentRoute === "/manage-suggestions":
+                    BarItems = AdminDashboardBarItems;
+                    CurrentLocation = "Manage Suggestions";
+                    AdditionalComponent = UserIndicator;
+                    break;
+                case currentRoute === "/manage-highlights":
+                    BarItems = AdminDashboardBarItems;
+                    CurrentLocation = "Manage Highlights";
+                    AdditionalComponent = UserIndicator;
+                    break;
             }
         } else {
             BarItems = [
@@ -293,7 +296,6 @@
 
 <main class="h-fit w-fit">
     {#key currentPage}
-        <BurgerBar Location={CurrentLocation} FullWidth={FullWidth} BarItems={BarItems}
-                   AdditionalComponent={AdditionalComponent}/>
+        <BurgerBar bind:showSideBar={showSideBar} Location={CurrentLocation} FullWidth={FullWidth} BarItems={BarItems} />
     {/key}
 </main>

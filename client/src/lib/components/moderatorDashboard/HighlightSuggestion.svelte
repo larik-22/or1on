@@ -25,8 +25,10 @@
         latitude: number | null;
         longitude: number | null;
         is_approved: boolean;
+        approvedState?: string; //track rejected state
         businessDescription: string | null;
-        suggestedBy?: { username: string };
+        users: [{ username: string }] | null;
+        suggestedBy: {username: string} | null
     };
 
     // Fetch suggestions from the backend
@@ -40,9 +42,20 @@
 
             // type fetch data
             const data: { highlights: Suggestion[] } = await response.json();
+            console.log("API RESPONSE: ", data);
 
-            // filter highlights with correct type
-            suggestions = (data.highlights || []).filter((highlight: Suggestion) => !highlight.is_approved);
+
+            // Filter unapproved highlights
+            suggestions = (data.highlights || []).filter(
+                (highlight: Suggestion) => !highlight.is_approved
+            );
+
+            // mapping through suggestions to ensure the suggestedBy field is handled
+            suggestions = suggestions.map((highlight) => ({
+                ...highlight,
+                suggestedBy: highlight.users ? highlight.users[0] : { username: "Unknown" },
+            }));
+
             newTable = dataToTable(suggestions);
         } catch (error) {
             console.error("Failed to fetch suggestions:", error);
@@ -74,7 +87,7 @@
                 highlight.latitude?.toFixed(6) || "N/A",
                 highlight.longitude?.toFixed(6) || "N/A",
                 highlight.suggestedBy?.username || "Unknown",
-                highlight.is_approved ? "Approved" : "Pending",
+                highlight.approvedState || (highlight.is_approved ? "Approved" : "Pending"),
             ],
             actionsVisibility: [true, true],
         }));
@@ -116,7 +129,11 @@
 
             if (response.ok) {
                 console.log(`Rejected suggestion ID: ${id}`);
-                await fetchSuggestions(); // Refresh data
+                // Update the state of the rejected suggestion
+                suggestions = suggestions.map((highlight) =>
+                    highlight.id === id ? { ...highlight, is_approved: false, approvedState: "Rejected" } : highlight
+                );
+                newTable = dataToTable(suggestions); // Update the table
             } else {
                 console.error(`Failed to reject suggestion ID: ${id}`);
             }

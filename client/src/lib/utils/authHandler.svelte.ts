@@ -1,5 +1,6 @@
 import {authToken} from "../stores/auth";
 import page from "page";
+import {userLocation} from "../stores/userLocation";
 
 /**
  * Handles authentication errors based on the response status.
@@ -57,6 +58,7 @@ const setToken = (token: string | null) => {
  * Logs out the user by clearing the token and redirecting to the login page.
  */
 const logout = () => {
+	userLocation.set(null);
 	authToken.set(null);
 	localStorage.removeItem('token');
 	page.redirect('/login');

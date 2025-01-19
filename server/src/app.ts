@@ -1,6 +1,5 @@
 import { Hono } from 'hono';
 import auth from './routes/auth.js';
-import test from './routes/test.js';
 import map from './routes/map.js';
 import { cors } from 'hono/cors';
 import logger from './utils/logger.js';
@@ -25,7 +24,7 @@ export const createApp = (em: EntityManager): Hono => {
         await next();
     });
 
-    api.use('*', cors({
+    app.use('*', cors({
         origin: '*',
         allowHeaders: ['Origin', 'Content-Type', 'Authorization'],
         allowMethods: ['GET', 'OPTIONS', 'POST', 'PUT', 'DELETE'],
@@ -33,7 +32,6 @@ export const createApp = (em: EntityManager): Hono => {
     }));
 
     api.route('/auth', auth);
-    api.route('/test', test);
     api.route('/map', map);
     api.route('/tours', tours);
     api.route('/users', users);
