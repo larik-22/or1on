@@ -98,7 +98,7 @@ The main business goals of the project are:
 | RFU-08 | As a user, I want to log in, register, and reset my password if needed so I can securely manage my account and access personalized features.                                               | F    | MUST   | Appendix B |
 | RFU-09 | As a user, I want to be notified if my account is blocked due to inappropriate behavior, with an explanation for the suspension, so I understand the situation and can address any issues. | F    | SHOULD | Appendix A |
 | RFU-10 | As a moderator, I want to review comments and ratings before they are published to ensure fairness and, if necessary, suspend users for inappropriate feedback.                            | F    | MUST   | Appendix B |
-| RFU-11 | As a moderator, I want the ability to edit and delete highlights and tours within the app to keep the information accurate and up-to-date.                                                 | F    | MUST   | Appendix B |
+| RFU-11 | As a moderator, I want the ability to add, edit and delete highlights and tours within the app to keep the information accurate and up-to-date.                                            | F    | MUST   | Appendix B |
 | RFU-12 | As a moderator, I want to be able to suspend suspicious accounts based on inappropriate behavior to maintain a safe and respectful platform for all users.                                 | F    | MUST   | Appendix A |
 | RFU-13 | As a moderator, I want to approve or reject new highlights suggested by trusted users based on photos or audio they submit to ensure the quality and relevance of added content.           | F    | MUST   | Appendix A |
 | RFU-14 | As a business owner, I want to be able to add my own highlight through posting an ad in the app to attract visitors and promote my business.                                               | F    | COULD  | Appendix A |
@@ -126,7 +126,7 @@ The main business goals of the project are:
 | SR-016 | The system SHOULD allow business highlights to contain promotions                       | F    | COULD  | Appendix A |
 | SR-017 | The system SHOULD allow users to edit or remove their own ratings and comments          | F    | MUST   | Appendix A |
 | SR-018 | The system SHOULD allow users to switch between languages                               | F    | COULD  | Appendix A |
-| SR-019 | The system SHOULD allow users to reset their passwords                                  | F    | MUST   | Appendix A |
+| SR-019 | The system SHOULD allow users to edit their passwords                                   | F    | MUST   | Appendix A |
 | SR-020 | The system SHOULD display different types of highlights with different indicators       | F    | MUST   | Appendix A |
 | SR-021 | The system SHOULD allow trustworthy users to post ratings and comments without approval | F    | SHOULD | Appendix A |
 | SR-022 | The system SHOULD automatically determine a path between highlights within tours        | F    | SHOULD | Appendix A |
