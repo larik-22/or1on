@@ -369,3 +369,11 @@ Meeting Notes:
 - Botond: Done with ORN-094. 
 - Rafael: Done with ORN-086. Needs help with testing. Assigned to ORN-097
 - Ilarion: Done with ORN-093; Assigned to ORN-098
+
+Attendees: Rafael, Ilarion, Ignat, Jan, Sarina, Robert, Petko, Botond;
+Absentees: None;
+
+### 6th Meeting (17/01/2024)
+
+Meeting Notes:
+- Ignat: Done with ORN-092.
