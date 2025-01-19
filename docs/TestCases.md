@@ -4,6 +4,9 @@ Here you can find the results of the tests that were executed.<br>
 Tester: Rafael Tavares, Botond Vendler, Sarina Bameriniya, Jan <br>
 Date: 17-01-2025<br>
 
+----------------------------------------------------
+
+# Test cases for a Non-admin user
 ## Test Case 1
 Name: User can log in. <br>
 Status: Success
@@ -184,7 +187,114 @@ Step 2 - User clicks on Logout button until they encounter the confirmation of t
 ![alt text](img/test_cases/userdashboard-11-logout-confirmation.png)<br>
 
 After these steps user will successfully log out and redirect to the login page. 
-## Test Case 11
+
+
+---------------------------------------------------
+
+# Test cases for Moderator 
+
+## Test Case 1
+Name: Moderator can manage highlights<br>
+Status: Success
+
+Step 1 - Moderator starts by clicking on the moderator dashboard on the nav bar.
+
+![alt text](img/test_cases/moderatordashboard.png)<br>
+
+Step 2 - Moderator clicks on highlights then on the Manage bar.
+
+![alt text](img/test_cases/moderator-highlightManage1.png)<br>
+
+## Test Case 2
+Name: Moderator can edit highlights<br>
+Status: Success
+
+Step 1 - Moderator clicks on edit button.
+
+![alt text](img/test_cases/moderator-highlightsManage2-edit.png)<br>
+
+Step 2 - Moderator edits the required data then clicks on the confirm button to save the updated data.
+
+![alt text](img/test_cases/moderator-highlightsManage3-edit-confirm.png)<br>
+
+After all these steps moderator can see the result of edited data on the table.
+
+![alt text](img/test_cases/moderator-highlightsManage4-edit-result.png)<br>
+
+## Test Case 3
+Name: Moderator can add new highlights<br>
+Status: Success
+
+Step 1 - Moderator starts by clicking on the add highlight button in manage highlights page.
+
+![alt text](img/test_cases/moderator-highlightsManage5-add-button.png)<br>
+
+step 2 - Moderator fills in accurate data for adding a new highlight then clicks on the confirm button. (make sure to add none for business description if it is not needed).
+
+![alt text](img/test_cases/moderator-highlightsManage6-add-confirm.png)<br>
+
+Step 3 - Moderator can check the newly added highlight in the table as well as the map.
+
+![alt text](img/test_cases/moderator-highlightsManage7-add-result.png)<br>
+
+After all these steps moderator can see the result of newly added data on the table.
+
+## Test Case 4
+Name: Moderator can delete highlight.<br>
+Status: Success
+
+Step 1 - Moderator clicks on the delete button for the to-be-deleted highlight.
+
+![alt text](img/test_cases/moderator-highlightsManage8-delete-button.png)<br>
+
+Step 2 - Moderator clicks on the "Yes" button to confirm the elimination of the selected highlight.
+
+![alt text](img/test_cases/moderator-highlightsManage9-delete-confirmation.png)<br>
+
+After all these steps moderator can see the result of the deleted highlight on the table.
+
+## Test Case 5
+Name: Moderator can manage highlight suggestions<br>
+Status: Success
+
+Step 1 - Moderator starts by clicking on the Suggestions in the moderator dashboard's nav bar.
+
+![alt text](img/test_cases/moderator-highlightSuggestion1.png)<br>
+
+## Test Case 6
+Name: Moderator can Accept a highlight suggested by a non-admin user.<br>
+Status: Success
+
+Step 1 - Moderator clicks on the "Accept" button for the selected highlight from user. 
+
+![alt text](img/test_cases/moderator-highlightSuggestion2-accept.png)<br>
+
+Step 2 - Moderator clicks on "Yes" button to once more confirm the highlight.
+
+![alt text](img/test_cases/moderator-highlightSuggestion3-confirm.png)<br>
+
+Step 3 - Moderator goes to highlight management page to check the accepted highlight.
+![alt text](img/test_cases/moderator-highlightSuggestion4-result.png)<br>
+
+After all these steps moderator can accept the suggested highlight from user and add it to all highlights. They can also check it on the map.
+
+## Test Case 7
+Name: Moderator can reject a highlight suggested by a non-admin user.<br>
+Status: Success
+
+Step 1 - Moderator clicks on the "Reject" button for the selected highlight from user.
+
+![alt text](img/test_cases/moderator-highlightSuggestion5-reject.png)<br>
+
+Step 2 - Moderator clicks on "Yes" button to once more confirm rejecting the highlight.
+
+![alt text](img/test_cases/moderator-highlightSuggestion6-reject-confirm.png)<br>
+
+After all these steps moderator can see the state of rejecting a highlight on the table.
+
+![alt text](img/test_cases/moderator-highlightSuggestion7-reject-result.png)<br>
+
+## Test Case 8
 Name: Administrator can manage tours<br>
 Status: Success
 
@@ -193,32 +303,38 @@ Step 1 - Administrator starts by clicking on the Manage Tours tab in the navigat
 ![alt text](img/test_cases/pic_1.png)<br>
 
 Step 2 - Administrator can see all the tours and can edit, delete or add new tours.
+
 ![alt text](img/test_cases/pic_2.png)<br>
 
-## Test Case 12
+## Test Case 9
 Name: Administrator can edit tours<br>
 Status: Success
 
 Step 1 - Administrator starts by clicking edit button on the tour they want to edit.
+
 ![alt text](img/test_cases/pic_3.png)<br>
 
 Step 2 - Administrator can edit the tour and save the changes.
+
 ![alt text](img/test_cases/pic_4.png)<br>
 
-## Test Case 13
+## Test Case 10
 Name: Administrator can delete tours<br>
 Status: Success
 
 Step 1 - Administrator starts by clicking delete button on the tour they want to delete.
+
 ![alt text](img/test_cases/pic_5.png)<br>
 
-## Test Case 14
+## Test Case 11
 Name: Administrator can add tours<br>
 Status: Success
 
 Step 1 - Administrator starts by clicking add tour button.
+
 ![alt text](img/test_cases/pic_6.png)<br>
 
 Step 2 - Administrator can fill the form and add the new tour.
+
 ![alt text](img/test_cases/pic_7.png)<br>
 ![alt text](img/test_cases/pic_8.png)<br>
