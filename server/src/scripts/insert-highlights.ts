@@ -1,9 +1,7 @@
 import { MikroORM } from '@mikro-orm/core';
-import { Highlight } from '../models/highlight.js';
 import mikroConfig from '../../mikro-orm.config.js';
 import {User} from "../models/user.js";
-import logger from "../utils/logger.js";
-import {createHighlight, createHighlightWithUser} from "../controllers/highlightController.js";
+import {createHighlightWithUser} from "../controllers/highlightController.js";
 
 (async () => {
     const orm = await MikroORM.init(mikroConfig);
