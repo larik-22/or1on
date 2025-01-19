@@ -1,6 +1,5 @@
 import { Hono } from 'hono';
 import auth from './routes/auth.js';
-import test from './routes/test.js';
 import map from './routes/map.js';
 import { cors } from 'hono/cors';
 import logger from './utils/logger.js';
@@ -19,26 +18,28 @@ import userDashboard from "./routes/userDashboard.js";
  */
 export const createApp = (em: EntityManager): Hono => {
     const app = new Hono();
-    app.use('*', async (ctx, next) => {
+    const api = new Hono();
+    api.use('*', async (ctx, next) => {
         ctx.set('em' as 'jwtPayload', em);
         await next();
     });
 
     app.use('*', cors({
-        origin: 'http://localhost:5173',
+        origin: '*',
         allowHeaders: ['Origin', 'Content-Type', 'Authorization'],
         allowMethods: ['GET', 'OPTIONS', 'POST', 'PUT', 'DELETE'],
         credentials: true,
     }));
 
-    app.route('/auth', auth);
-    app.route('/test', test);
-    app.route('/map', map);
-    app.route('/tours', tours);
-    app.route('/users', users);
-    app.route('/feedbacks', feedbacks);
-    app.route('/highlights', highlights);
-    app.route('/userDashboard', userDashboard);
+    api.route('/auth', auth);
+    api.route('/map', map);
+    api.route('/tours', tours);
+    api.route('/users', users);
+    api.route('/feedbacks', feedbacks);
+    api.route('/highlights', highlights);
+    api.route('/userDashboard', userDashboard);
+
+    app.route('/api', api);
 
     app.get('/', (c) => {
         logger.info('Received GET request on /');

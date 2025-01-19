@@ -63,6 +63,7 @@ export interface HighlightProperties {
 	name: string;
 	description: string;
 	category: HighlightType;
+	businessDescription: string | null;
 }
 
 /**

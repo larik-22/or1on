@@ -9,10 +9,17 @@ import {updateHighlight, deleteHighlight} from "../controllers/highlightControll
 import {createHighlight, approveHighlightSuggestion} from "../controllers/highlightController.js";
 import {getAllHighlights, getHighlightById} from "../controllers/highlightController.js";
 import logger from "../utils/logger.js";
-import {createFeedback, getFeedbackByHighlight} from "../controllers/feedbackController.js";
+import {
+    createFeedback,
+    deleteFeedback,
+    getFeedbackByHighlight,
+    getFeedbackById
+} from "../controllers/feedbackController.js";
 import type {User} from "../models/user.js";
-import {getUserByEmail} from "../controllers/userController.js";
+import {getUserByEmail, getUserById} from "../controllers/userController.js";
 import {isUser} from "../middleware/isUser.js";
+import {getHighlightsByUserToken} from "../controllers/highlightController.js";
+
 
 dotenv.config();
 
@@ -30,7 +37,9 @@ const highlightSchema = z.object({
 
 const feedbackSchema = z.object({
     rating: z.number(),
-    feedbackMessage: z.string()
+    feedbackMessage: z.string().optional().default(''),
+    is_approved: z.boolean().default(false)
+
 })
 
 const numberIdSchema = z.object({id: z.preprocess((val) => Number(val), z.number())});
@@ -52,6 +61,43 @@ highlights.get('/', async (ctx) => {
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
+
+highlights.get('/my-highlights', isLoggedIn, async (ctx) => {
+    try {
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
+        const jwtPayload = ctx.get('jwtPayload');
+
+        // Check if we have the user's email from JWT
+        if (!jwtPayload?.email) {
+            logger.warn('JWT payload missing email', { payload: jwtPayload });
+            return ctx.json(
+                createErrorResponse(401, 'Invalid authentication token'),
+                401
+            );
+        }
+
+        const highlights = await getHighlightsByUserToken(em, jwtPayload.email);
+
+        // Return empty array if null (no user found)
+        if (highlights === null) {
+            logger.info('No highlights found for user', { email: jwtPayload.email });
+            return ctx.json({ highlights: [] }, 200);
+        }
+
+        logger.info('Successfully retrieved highlights for user', {
+            email: jwtPayload.email,
+            count: highlights.length
+        });
+
+        return ctx.json({ highlights }, 200);
+    } catch (error) {
+        logger.error('Error while fetching highlights for user', {
+            error: error,
+            userEmail: ctx.get('jwtPayload')?.email
+        });
+        return ctx.json(createErrorResponse(500, 'Internal server error'), 500);
+    }
+});
 
 /**
  * Handles fetching a highlight by id.
@@ -162,27 +208,24 @@ highlights.post('/', isLoggedIn, async (ctx) => {
         const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const body = await ctx.req.json();
         const highlight = highlightSchema.safeParse(body);
+        const payload = ctx.get('jwtPayload') as User;
 
-        if (!highlight.success){
+        if (!highlight.success) {
             return ctx.json(createErrorResponse(400, 'Invalid data'), 400);
         }
 
-        const payload = ctx.get('jwtPayload') as User
-
-        if (payload.isAdmin || payload.verified){
-            highlight.data.is_approved = true
-        } else {
-            highlight.data.is_approved = true
+        if (payload.isAdmin || payload.verified) {
+            highlight.data.is_approved = true;
         }
 
-        await createHighlight(em, highlight.data);
-
-        return ctx.json({message: 'Highlight created successfully'}, 201)
-    }catch (error){
+        // Pass the user email to createHighlight
+        await createHighlight(em, highlight.data, payload.email);
+        return ctx.json({message: 'Highlight created successfully'}, 201);
+    } catch (error) {
         logger.error('Error while creating highlight', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
-})
+});
 
 /**
  * Handles approving a highlight suggestion.
@@ -219,11 +262,16 @@ highlights.put('/:id/approve', isLoggedIn, isAdmin, async (ctx) => {
 highlights.put('/:id', isLoggedIn, isAdmin, async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtPayload') as EntityManager;
-        const id = parseInt(ctx.req.param('id'))
+        const params = numberIdSchema.safeParse(ctx.req.param());
 
+        if (!params.success) {
+            return ctx.json(createErrorResponse(400, 'Invalid highlightId parameter'), 400);
+        }
+
+        const { id } = params.data;
         const highlight = await getHighlightById(em, id);
 
-        if (!highlight){
+        if (!highlight) {
             return ctx.json({message: `Highlight not found`}, 404);
         }
 
@@ -236,11 +284,66 @@ highlights.put('/:id', isLoggedIn, isAdmin, async (ctx) => {
         await updateHighlight(em, id, highlightData.data);
 
         return ctx.json({message: `Highlight with ID ${id} updated`}, 200);
-    }catch (error){
+    } catch (error) {
         logger.error('Error while updating highlight', { error: error });
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
+});
+
+
+highlights.put('/:id/feedbacks/:feedbackId', isLoggedIn, async (ctx) => {
+    try {
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
+        const {id, feedbackId} = ctx.req.param();
+        const feedback = await getFeedbackById(em, feedbackId)
+        const highlight = await getHighlightById(em, id);
+        const body = await ctx.req.json();
+
+        const feedbackParams = parseInt(feedbackId)
+        if (!feedbackParams){
+            return ctx.json(createErrorResponse(400, 'Invalid feedbackId parameter'), 400)
+        }
+        const idParams = parseInt(id)
+        if (!idParams){
+            return ctx.json(createErrorResponse(400, 'Invalid id parameter'), 400)
+        }
+
+        if (feedback === null){
+            return ctx.json(createErrorResponse(404, 'Feedback not found'), 404)
+        }
+
+        if (highlight === null){
+            return ctx.json(createErrorResponse(404, 'Highlight not found'), 404)
+        }
+
+        const payload = ctx.get('jwtPayload') as User
+
+        const user = await getUserById(em, payload.id)
+
+        if (user === null){
+            return ctx.json(createErrorResponse(404, 'User not found'), 404);
+        }
+
+
+        if (payload.id !== feedback.user.id && !payload.isAdmin ){
+            return ctx.json(createErrorResponse(403,
+                'You are not allowed to update this feedback'), 403)
+        }
+
+        await em.populate(feedback, 'user')
+
+        feedback.comment = body.comment || feedback.comment;
+        feedback.rating = body.rating || feedback.rating;
+
+        await em.persistAndFlush(feedback);
+
+        return ctx.json({message: 'Feedback updated successfully'}, 200);
+    }catch (error){
+        logger.error('Error while updating feedback', { error: error });
+        return ctx.json(createErrorResponse(500, 'Internal error'), 500);
+    }
 })
+
 
 /**
  * Handles deleting a highlight.
@@ -262,5 +365,59 @@ highlights.delete('/:id', isLoggedIn, isAdmin, async (ctx) => {
         return ctx.json(createErrorResponse(500, 'Internal error'), 500);
     }
 })
+
+/**
+ * Handles deleting a feedback.
+ *
+ * @param ctx - The Hono context object.
+ * @returns A response with a success or error message.
+ */
+highlights.delete('/:id/feedbacks/:feedbackId', isLoggedIn, async (ctx) => {
+    try {
+        const em = ctx.get('em' as 'jwtPayload') as EntityManager;
+        const {id, feedbackId} = ctx.req.param();
+        const feedback = await getFeedbackById(em, feedbackId)
+        const highlight = await getHighlightById(em, id);
+
+        const feedbackParams = parseInt(feedbackId)
+        if (!feedbackParams){
+            return ctx.json(createErrorResponse(400, 'Invalid feedbackId parameter'), 400)
+        }
+        const idParams = parseInt(id)
+        if (!idParams){
+            return ctx.json(createErrorResponse(400, 'Invalid id parameter'), 400)
+        }
+
+        if (feedback === null){
+            return ctx.json(createErrorResponse(404, 'Feedback not found'), 404)
+        }
+
+        if (highlight === null){
+            return ctx.json(createErrorResponse(404, 'Highlight not found'), 404)
+        }
+
+        const payload = ctx.get('jwtPayload') as User
+
+        const user = await getUserById(em, payload.id)
+
+        if (user === null){
+            return ctx.json(createErrorResponse(404, 'User not found'), 404);
+        }
+
+
+        if (payload.id !== feedback.user.id && !payload.isAdmin ){
+            return ctx.json(createErrorResponse(403,
+                'You are not allowed to update this feedback'), 403)
+        }
+
+        await deleteFeedback(em, feedbackId);
+
+        return ctx.json({message: 'Feedback deleted successfully'}, 200);
+    } catch (error) {
+        logger.error('Error while deleting feedback', {error: error});
+        return ctx.json(createErrorResponse(500, 'Internal error'), 500);
+    }
+});
+
 
 export default highlights;

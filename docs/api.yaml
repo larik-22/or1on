@@ -11,7 +11,7 @@ tags:
   - name: PUT
   - name: DELETE
 paths:
-  /users:
+  /api/users:
     get:
       tags:
         - GET
@@ -19,7 +19,7 @@ paths:
       responses:
         '200':
           description: A list of users
-  /users/{userID}:
+  /api/users/{userID}:
     get:
       tags:
         - GET
@@ -84,7 +84,7 @@ paths:
           description: User updated
         '404':
           description: User not found
-  /users/{userID}/feedbacks:
+  /api/users/{userID}/feedbacks:
     get:
       tags:
         - GET
@@ -101,7 +101,7 @@ paths:
           description: A list of feedbacks
         '404':
           description: User not found
-  /users/{userID}/feedback/{feedbackID}:
+  /api/users/{userID}/feedback/{feedbackID}:
     delete:
       tags:
         - DELETE
@@ -124,7 +124,7 @@ paths:
           description: Feedback deleted
         '404':
           description: User or Feedback not found
-  /users/{userID}/suggestions/{suggestionID}:
+  /api/users/{userID}/suggestions/{suggestionID}:
     delete:
       tags:
         - DELETE
@@ -147,7 +147,7 @@ paths:
           description: Suggestion deleted
         '404':
           description: User or Suggestion not found
-  /auth:
+  /api/auth:
     post:
       tags:
         - POST
@@ -181,7 +181,7 @@ paths:
           description: Invalid email or password
         '500':
           description: Internal server error
-  /auth/login:
+  /api/auth/login:
     post:
       tags:
         - POST
@@ -205,7 +205,7 @@ paths:
           description: User logged in and token generated
         '404':
           description: Invalid email or password
-  /tours:
+  /api/tours:
     post:
       tags:
         - POST
@@ -238,7 +238,7 @@ paths:
           description: Invalid tour name, type or description or highlights.
         '500':
           description: Internal server error
-  /tours/{tourID}:
+  /api/tours/{tourID}:
     delete:
       tags:
         - DELETE
@@ -292,7 +292,7 @@ paths:
           description: Feedback updated
         '404':
           description: Highlight or Feedback not found
-  /tour/{tourID}/feedbacks:
+  /api/tour/{tourID}/feedbacks:
     post:
       tags:
         - POST
@@ -325,7 +325,7 @@ paths:
           description: Invalid rate or comment
         '500':
           description: Internal server error
-  /routes:
+  /api/routes:
     get:
       tags:
         - GET
@@ -333,7 +333,7 @@ paths:
       responses:
         '200':
           description: A list of routes
-  /routes/{routeID}:
+  /api/routes/{routeID}:
     get:
       tags:
         - GET
@@ -350,7 +350,7 @@ paths:
           description: Route found
         '404':
           description: Route not found.
-  /routes/{routeID}/highlights:
+  /api/routes/{routeID}/highlights:
     get:
       tags:
         - GET
@@ -367,7 +367,7 @@ paths:
           description: A list of highlights
         '404':
           description: Route not found
-  /routes/{routeID}/highlights/{highlightID}:
+  /api/routes/{routeID}/highlights/{highlightID}:
     get:
       tags:
         - GET
@@ -409,7 +409,7 @@ paths:
           description: Highlight information deleted
         '404':
           description: Route or Highlight not found
-  /highlights:
+  /api/highlights:
     get:
       tags:
         - GET
@@ -450,7 +450,7 @@ paths:
           description: Invalid highlight name, description , type or location
         '500':
           description: Internal server error
-  /highlights/{highlightID}:
+  /api/highlights/{highlightID}:
     get:
       tags:
         - GET
@@ -522,7 +522,7 @@ paths:
           description: Invalid name or type
         '404':
           description: Highlight or Feedback not found
-  /highlights/{highlightID}/feedbacks/{feedbackID}:
+  /api/highlights/{highlightID}/feedbacks/{feedbackID}:
     put:
       tags:
         - PUT
@@ -567,7 +567,7 @@ paths:
           description: Feedback updated
         '404':
           description: Highlight or Feedback not found
-  /highlights/{highlightID}/feedbacks:
+  /api/highlights/{highlightID}/feedbacks:
     get:
       tags:
         - GET
@@ -616,7 +616,7 @@ paths:
           description: Invalid rate or comment
         '500':
           description: Internal server error
-  /suggestions:
+  /api/suggestions:
     get:
       tags:
         - GET
@@ -653,7 +653,7 @@ paths:
           description: Invalid suggestion name, description or location
         '500':
           description: Internal server error
-  /suggestions/{suggestionID}:
+  /api/suggestions/{suggestionID}:
     get:
       tags:
         - GET
@@ -670,7 +670,7 @@ paths:
           description: Suggestion found
         '404':
           description: Suggestion not found
-  /map/highlights:
+  /api/map/highlights:
     get:
       tags:
         - GET
@@ -718,7 +718,7 @@ paths:
                               type: string
         '404':
           description: No highlights found
-  /userDashboard/update-username:
+  /api/userDashboard/update-username:
     post:
       tags:
         - POST
@@ -746,7 +746,7 @@ paths:
             description: Missing required fields
         '500':
           description: Internal server error
-  /userDashboard/update-password:
+  /api/userDashboard/update-password:
     post:
       tags:
         - POST
@@ -780,7 +780,7 @@ paths:
             description: Incorrect current password
         '500':
           description: Internal server error
-  /feedbacks:
+  /api/feedbacks:
     get:
       tags:
         - GET

@@ -1,6 +1,8 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Highlight } from "../models/highlight.js";
 import logger from "../utils/logger.js";
+import { User } from '../models/user.js';
+/*eslint-disable */
 
 /**
  * Fetches all highlights from the database.
@@ -11,33 +13,34 @@ import logger from "../utils/logger.js";
  */
 export const getAllHighlights = async (em: EntityManager): Promise<Highlight[] | null> => {
     try {
-        const highlights = await em.find(Highlight);
-        if (highlights.length === 0){
+        const highlights = await em.find(Highlight, {}, { populate: ['users'] });
+        if (highlights.length === 0) {
             return null;
         }
-        return highlights
-    } catch (error){
+
+        return highlights;
+    } catch (error) {
         logger.error('Failed to fetch highlights: ' + error);
         return null;
     }
 }
 
-/**
- * Fetches a highlight by its id from the database.
- *
- * @param em - The MikroORM EntityManager instance.
- * @param id - The id of the highlight to be found.
- * @returns {Promise<Highlight | null>} A promise resolving to the highlight object if found,
- * otherwise null.
- */
-export const getHighlightById = async (em: EntityManager, id: number):
-    Promise<Highlight | null> => {
+export const getHighlightById = async (em: EntityManager, id: number): Promise<Highlight | null> => {
     try {
-        return await em.findOne(Highlight, {id: id});
+        const highlight = await em.findOne(Highlight, { id }, { populate: ['users'] });
+        if (!highlight) {
+            return null;
+        }
+
+        return highlight;
     } catch (error) {
-        logger.error('Failed to fetch user with id: ' + id + ' error: ' + error);
+        logger.error('Failed to fetch highlight with id: ' + id + ' error: ' + error);
+        return null;
     }
 }
+
+
+
 
 /**
  * Creates a new highlight and stores it in the database.
@@ -46,10 +49,16 @@ export const getHighlightById = async (em: EntityManager, id: number):
  * @param data -  - The highlight data excluding the `id` field.
  * @returns {Promise<void>}
  */
-export const createHighlight = async (em: EntityManager, data: Omit<Highlight, 'id'>):
-    Promise<void> => {
-    try{
-        const {name,
+
+export const createHighlight = async (em: EntityManager, data: Omit<Highlight, 'id'>, userEmail: string): Promise<void> => {
+    try {
+        const user = await em.findOne(User, { email: userEmail });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const {
+            name,
             description,
             category,
             businessDescription,
@@ -57,20 +66,56 @@ export const createHighlight = async (em: EntityManager, data: Omit<Highlight, '
             longitude,
             is_approved
         } = data;
+
         const newHighlight = em.create(Highlight, {
-            name: name,
-            description: description,
-            category: category,
-            latitude: latitude  ?? null,
+            name,
+            description,
+            category,
+            latitude: latitude ?? null,
             longitude: longitude ?? null,
             is_approved: is_approved ?? false,
             businessDescription: businessDescription ?? 'none',
-            tours: []
-        })
+            tours: [],
+        });
 
-        await em.persistAndFlush(newHighlight)
-    }catch (error){
+        newHighlight.users.add(user);
+
+        await em.persistAndFlush(newHighlight);
+    } catch (error) {
         logger.error('Failed to create highlight: ' + error);
+        throw error;
+    }
+};
+
+export const createHighlightWithUser = async (em: EntityManager, data: Omit<Highlight, 'id'>, user: User) =>{
+    try {
+        const {
+            name,
+            description,
+            category,
+            businessDescription,
+            latitude,
+            longitude,
+            is_approved
+        } = data;
+
+        const newHighlight = em.create(Highlight, {
+            name,
+            description,
+            category,
+            latitude: latitude ?? null,
+            longitude: longitude ?? null,
+            is_approved: is_approved ?? false,
+            businessDescription: businessDescription ?? 'none',
+            tours: [],
+        });
+
+        newHighlight.users.add(user);
+
+        await em.persistAndFlush(newHighlight);
+    } catch (error) {
+        logger.error('Failed to create highlight: ' + error);
+        throw error;
     }
 }
 
@@ -98,8 +143,7 @@ export const approveHighlightSuggestion = async (em: EntityManager, id: number):
  * @param updatedData - The changed data of the updated attributes.
  * @returns {Promise<void>}
  */
-export const updateHighlight =
-    async (em: EntityManager, id: number, updatedData: Partial<Highlight>): Promise<void> =>{
+export const updateHighlight = async (em: EntityManager, id: number, updatedData: Partial<Highlight>): Promise<void> =>{
     const highlight = await em.findOne(Highlight, {id: id});
     if(!highlight){
         throw new Error('Highlight with id ${id} not found');
@@ -125,5 +169,50 @@ export const deleteHighlight = async (em: EntityManager, id: number): Promise<vo
         em.flush();
     }catch (error){
         logger.error('Failed to delete highlight with id: ' + id + ' error: ' + error);
+    }
+}
+/**
+ * Fetches highlights associated with a specific user.
+ *
+ * @param em - The MikroORM EntityManager instance.
+ * highlights are to be fetched.
+ * @returns {Promise<Highlight[] | null>} A promise resolving
+ * to a list of highlights if found,
+ * otherwise null.
+ */
+
+
+export const getHighlightsByUserToken = async (em: EntityManager, userEmail: string): Promise<Highlight[] | null> => {
+    try {
+        // First find the user
+        const user = await em.findOne(User, { email: userEmail }, { populate: ['highlights'] });
+        if (!user) {
+            return null;
+        }
+
+        // Get highlights through the user's highlights collection
+        const highlights = user.highlights.getItems();
+        if (highlights.length === 0) {
+            return null;
+        }
+
+        // Format the response
+        return highlights.map(highlight => ({
+            id: highlight.id,
+            name: highlight.name,
+            description: highlight.description,
+            category: highlight.category,
+            latitude: highlight.latitude,
+            longitude: highlight.longitude,
+            is_approved: highlight.is_approved,
+            businessDescription: highlight.businessDescription,
+            suggestedBy: {
+                username: user.username,
+                email: user.email
+            }
+        }));
+    } catch (error) {
+        logger.error('Failed to fetch highlights for user with email: ' + userEmail + ' error: ' + error);
+        return null;
     }
 }

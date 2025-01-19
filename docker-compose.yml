@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - 5437:5435
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - ${CLIENT_PORT}:${CLIENT_PORT}
+    environment:
+      VITE_GRASSHOPER_API_KEY: ${VITE_GRASSHOPER_API_KEY}
+      VITE_BACKEND_URL: ${VITE_BACKEND_URL}
+    depends_on:
+      - server
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - ${PORT}:3000
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+
+      DB_HOST: postgres
+      JWT_SECRET: ${JWT_SECRET}
+      HOST: ${HOST}
+      PORT: ${PORT}
+      CLIENT: client
+    depends_on:
+      - postgres

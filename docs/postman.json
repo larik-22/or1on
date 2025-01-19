@@ -21,7 +21,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/auth",
+					"raw": "http://localhost:3000/api/auth",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -49,7 +49,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/auth/tokens",
+					"raw": "http://localhost:3000/api/auth/tokens",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -75,7 +75,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/test/protected",
+					"raw": "http://localhost:3000/api/test/protected",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -101,7 +101,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/test/adminprotected",
+					"raw": "http://localhost:3000/api/test/adminprotected",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -130,7 +130,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/auth",
+					"raw": "http://localhost:3000/api/auth",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -158,7 +158,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/auth/tokens",
+					"raw": "http://localhost:3000/api/auth/tokens",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -184,7 +184,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/test/protected",
+					"raw": "http://localhost:3000/api/test/protected",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -210,7 +210,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/test/adminprotected",
+					"raw": "http://localhost:3000/api/test/adminprotected",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -248,7 +248,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/users",
+					"raw": "http://localhost:3000/api/users",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -273,7 +273,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/users/550e8400-e29b-41d4-a716-446655440000",
+					"raw": "http://localhost:3000/api/users/550e8400-e29b-41d4-a716-446655440000",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -299,7 +299,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/users/550e8400-e29b-41d4-a716-446655440000",
+					"raw": "http://localhost:3000/api/users/550e8400-e29b-41d4-a716-446655440000",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -319,7 +319,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/feedbacks/highlight/1",
+					"raw": "http://localhost:3000/api/feedbacks/highlight/1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -346,7 +346,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/feedbacks/user/550e8400-e29b-41d4-a716-446655440000",
+					"raw": "http://localhost:3000/api/feedbacks/user/550e8400-e29b-41d4-a716-446655440000",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -373,7 +373,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/feedbacks/5/approve",
+					"raw": "http://localhost:3000/api/feedbacks/5/approve",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -400,7 +400,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/feedbacks/5",
+					"raw": "http://localhost:3000/api/feedbacks/5",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -420,7 +420,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/tours",
+					"raw": "http://localhost:3000/api/tours",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -439,7 +439,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/tours/5",
+					"raw": "http://localhost:3000/api/tours/5",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -459,7 +459,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/tours/5/highlights",
+					"raw": "http://localhost:3000/api/tours/5/highlights",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -495,7 +495,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/tours/5",
+					"raw": "http://localhost:3000/api/tours/5",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -521,7 +521,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/tours/5",
+					"raw": "http://localhost:3000/api/tours/5",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -541,7 +541,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/highlights",
+					"raw": "http://localhost:3000/api/highlights",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -560,7 +560,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/highlights/1",
+					"raw": "http://localhost:3000/api/highlights/1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -586,7 +586,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/highlights/1/approve",
+					"raw": "http://localhost:3000/api/highlights/1/approve",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -622,7 +622,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/highlights/1",
+					"raw": "http://localhost:3000/api/highlights/1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -648,7 +648,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/highlights/1",
+					"raw": "http://localhost:3000/api/highlights/1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -683,7 +683,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/highlights",
+					"raw": "http://localhost:3000/api/highlights",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -691,6 +691,60 @@
 					"port": "3000",
 					"path": [
 						"highlights"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetches all feedbacks for a specific user",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/feedbacks/user/550e8400-e29b-41d4-a716-446655440000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"feedbacks",
+						"user",
+						"550e8400-e29b-41d4-a716-446655440000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetches feedback approval status",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 8085b6ab-3f61-45c2-889c-81718f0e8dad",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/feedbacks/approval",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"feedbacks",
+						"approval"
 					]
 				}
 			},

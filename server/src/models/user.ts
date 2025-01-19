@@ -1,4 +1,5 @@
-import { Entity, PrimaryKey, Property} from '@mikro-orm/core';
+import { Entity, PrimaryKey, Property, ManyToMany, Collection} from '@mikro-orm/core';
+import { Highlight } from './highlight.js';
 
 /**
  * Represents a user entity in the system.
@@ -22,4 +23,6 @@ export class User {
 
     @Property()
     verified = false;
+    @ManyToMany(() => Highlight, highlight => highlight.users, { owner: false })
+    highlights = new Collection<Highlight>(this);
 }

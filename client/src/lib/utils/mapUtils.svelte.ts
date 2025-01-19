@@ -57,7 +57,8 @@ export const openHighlightModal = async (feature: HighlightFeature) => {
 	await modals.open(HighlightModal, {
 		name: feature.properties.name,
 		description: feature.properties.description,
-		highlightId: feature.properties.id
+		highlightId: feature.properties.id,
+		businessDescription: feature.properties.businessDescription,
 	})
 }
 
@@ -65,7 +66,7 @@ export const openHighlightModal = async (feature: HighlightFeature) => {
 /**
  * Gets the user location. Returns a promise that resolves with the location or rejects with an error
  */
-export const getUserLocation = (): Promise<L.LatLng> => {
+export function getUserLocation  (): Promise<L.LatLng> {
 	return new Promise((resolve, reject) => {
 		navigator.geolocation.getCurrentPosition((position) => {
 			const latlng = L.latLng(position.coords.latitude, position.coords.longitude);
@@ -81,17 +82,22 @@ export const getUserLocation = (): Promise<L.LatLng> => {
  * @param latlng The location to display
  */
 export const getUserLocationMarker = (latlng: L.LatLng) => {
-	//map.setView(latlng, 15);
-
-	const marker = L.marker(latlng, {
-		icon: L.icon({
-			iconUrl: "/images/user-icon.svg",
-			iconSize: [30, 30],
-			iconAnchor: [15, 15],
-			popupAnchor: [0, -15]
-		})
+	const cssIcon = L.divIcon({
+		className: 'css-icon',
+		html: `
+            <div class="gps_ring"></div>
+            <div class="static_circle"></div>
+        `,
+		iconSize: [22, 22]
+		// ,iconAnchor: [11,11]
 	});
+
+	// Create a marker with the icon
+	const marker = L.marker(latlng, {
+		icon: cssIcon
+	});
+
 	marker.bindPopup("You are here");
 
 	return marker;
-}
+};

@@ -1,5 +1,6 @@
 import {authToken} from "../stores/auth";
 import page from "page";
+import {userLocation} from "../stores/userLocation";
 
 /**
  * Handles authentication errors based on the response status.
@@ -31,19 +32,36 @@ const handleAuthResponse = async (response: Response): Promise<Response> => {
 	}
 
 	const data = await response.json();
-	localStorage.setItem("token", data.token);
-	authToken.set(data.token);
+	setToken(data.token);
 
 	return response;
 };
+
+
+/**
+ * Saves the authentication token to localStorage and the authToken store.
+ * This makes the token available for the app to use later.
+ * Does nothing if the token is null.
+ *
+ * @param token - The authentication token to save, or null to skip saving.
+ */
+const setToken = (token: string | null) => {
+	if (!token) {
+		return;
+	}
+
+	localStorage.setItem("token", token);
+	authToken.set(token);
+}
 
 /**
  * Logs out the user by clearing the token and redirecting to the login page.
  */
 const logout = () => {
+	userLocation.set(null);
 	authToken.set(null);
 	localStorage.removeItem('token');
 	page.redirect('/login');
 }
 
-export {logout, handleAuthError, handleAuthResponse};
+export {logout, handleAuthError, handleAuthResponse, setToken};

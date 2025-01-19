@@ -19,35 +19,44 @@
     if (userPayload !== null) {
         userId = userPayload.id;
     }
-    const feedbackUrl = `${import.meta.env.VITE_BACKEND_URL}users/${userId}/feedbacks`;
+    const feedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/users/${userId}/feedbacks`;
 
-    /* eslint-disable @typescript-eslint/no-empty-object-type */
-    async function fetchUserFeedbacks(): Promise<{}[]> {
+    async function fetchUserFeedbacks(): Promise<object[]> {
         let data = await fetchWithAuthSvelte(feedbackUrl)
         return await data.json()
     }
-    /* eslint-enable @typescript-eslint/no-empty-object-type */
 
     /**
      * Convert the fetched data into a table that is readable by the Table component
      * @param data
      * */
 
-    /* eslint-disable @typescript-eslint/no-empty-object-type */
-    function DataToTable(data: {}[]): TableType {
-        let columns: string[] = ["Id", "Tour", "HighlightId", "Username", "Rating", "Comment", "Approved State"];
+    function DataToTable(data: object[]): TableType {
+        let columns: string[] = ["Id", "Tour Id", "Highlight Id", "User Id", "Rating", "Comment", "Approved State"];
         let rows: Row[] = [];
 
         for (let i = 0; i < data.length; i++) {
             let objectEntries = Object.entries(data[i]);
+            let tempRow: [] = [];
+            let actionsVisibility : boolean[] = [];
             let row: Row = {
-                row: [],
-                actionsVisibility: [true, true, true]
+                row: tempRow,
+                actionsVisibility: actionsVisibility
             };
             for (let j = 0; j < objectEntries.length; j++) {
+                if (objectEntries[j][0] === "is_approved"  && objectEntries[j][1] === true) {
+                    actionsVisibility = [false]
+                }else{
+                    actionsVisibility = [true]
+                }
+
                 if (objectEntries[j][0] === "user") {
                     let user: User = objectEntries[j][1] as User;
-                    row.row.push(`${user.username}`);
+                    row.row.push(`${user.id}`);
+                } else if (objectEntries[j][0] === "highlight" && objectEntries[j][1] !== null) {
+                    row.row.push(`${objectEntries[j][1].id}`);
+                } else if (objectEntries[j][0] === "tour" && objectEntries[j][1] !== null) {
+                    row.row.push(`${objectEntries[j][1].id}`);
                 } else {
                     row.row.push(`${objectEntries[j][1]}`);
                 }
@@ -60,31 +69,36 @@
             rows: rows
         };
     }
-    /* eslint-enable @typescript-eslint/no-empty-object-type */
 
     /*
    * Function to execute when confirming the editing
    * In this case for test purposes we edit the array.
    * In production this will be replaced with an api call
    * */
-    // let onConfirmEdit = async (newText: string) => {
-    //     currentRow.row[4] = newText;
-    //     const approveFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/highlights/${currentRow.row[2]}/feedbacks/${currentRow.row[0]}`;
-    //     await fetchWithAuthSvelte(approveFeedbackUrl, {
-    //         method: "PUT",
-    //         body: JSON.stringify({
-    //             name: currentRow[4],
-    //             approvedState: currentRow[5]
-    //         }),
-    //     })
-    // };
+    let onConfirmEdit = async () => {
 
+        const approveFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/feedbacks/${currentRow.row[0]}`;
+        await fetchWithAuthSvelte(approveFeedbackUrl, {
+            method: "PUT",
+            body: JSON.stringify({
+                "comment": currentRow.row[5],
+                "rating": currentRow.row[4]
+            }),
+        });
+    };
+
+    let onRemoveFeedback = async () => {
+        const removeFeedbackUrl = `${import.meta.env.VITE_BACKEND_URL}/feedbacks/${currentRow.row[0]}`;
+        await fetchWithAuthSvelte(removeFeedbackUrl, {
+            method: "DELETE",
+        });
+    };
 
     let enableEditComment = $state(false);
+    let deleteFeedbackModal = $state(false)
 
     let feedBackValue: string = $state("");
     let ratingValue = $state();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let currentRow: Row;
 
     let actionCssConfig: string = "border-[1px] bg-zinc-950 text-neutral-100 p-[5px] rounded-[6px] border-transparent";
@@ -92,7 +106,6 @@
     let editActionConfig: ActionConfig = {
         actionName: "Edit",
         actionFunction: (row: any) => {
-            console.log("Hi :3");
             currentRow = row;
             enableEditComment = true;
             feedBackValue = row.row[5];
@@ -100,12 +113,22 @@
         actionClassStyle: actionCssConfig,
     };
 
-    let configs: ActionConfig[] = [editActionConfig];
+    let deleteActionConfig: ActionConfig = {
+        actionName: "Delete",
+        actionFunction: (row: any) => {
+            currentRow = row;
+            deleteFeedbackModal = true;
+            feedBackValue = row.row[5];
+        },
+        actionClassStyle: actionCssConfig,
+    };
+
+    let configs: ActionConfig[] = [editActionConfig, deleteActionConfig];
 
     let modal: ModalType = $state({
-        title: "User Feedback",
+        title: "Edit Feedback",
         confirmFunction: () => {
-            console.log("User Feedback Confirm");
+            onConfirmEdit()
         },
         sections : [
             {
@@ -134,6 +157,14 @@
         ]
     })
 
+    let deleteModal : ModalType = $state({
+        title: "Delete Feedback",
+        confirmFunction: () => {
+            onRemoveFeedback()
+        },
+        sections : []
+    })
+
 </script>
 
 <main class="w-[100%] flex justify-center">
@@ -148,6 +179,9 @@
             <div>
                 <Modal bind:modal={modal} bind:enableEditModal={enableEditComment}></Modal>
             </div>
+        {/if}
+        {#if deleteFeedbackModal}
+            <Modal bind:modal={deleteModal} bind:enableEditModal={deleteFeedbackModal} ></Modal>
         {/if}
     {/await}
 </main>
