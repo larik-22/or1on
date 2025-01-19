@@ -1,5 +1,65 @@
 # Test report
 
+## Traceability matrix
+
+### Functional
+
+The table below shows an overview of which test covers which functional requirements
+
+| Test | F1 | F2 | F3 | F4 | F5 | F6 | F7 | F8 | F9 | F10 | 
+|:----:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:---:|
+|  T1  |    |    |    |    |    |    |    |    |    |     | 
+|  T2  |    |    |    |    |    |    |    |    |    |     |
+|  T3  |    |    |    |    |    |    |    |    |    |     |
+|  T4  |    |    |    |    |    |    |    |    |    |     |
+|  T5  |    |    |    |    |    |    |    |    |    |     |  
+|  T6  |    |    |    |    |    |    |    |    |    |     |
+|  T7  |    |    |    |    |    |    |    |    |    |     |
+|  T8  |    |    |    |    |    |    |    |    |    |     | 
+|  T9  |    |    |    |    |    |    |    |    |    |     |
+| T10  |    |    |    |    |    |    |    |    |    |     |
+| T11  |    |    |    |    |    |    |    |    |    |     |
+| T12  |    |    |    |    |    |    |    |    |    |     |  
+| T13  |    |    |    |    |    |    |    |    |    |     |
+| T14  |    |    |    |    |    |    |    |    |    |     |
+| T15  |    |    |    |    |    |    |    |    |    |     | 
+| T16  |    |    |    |    |    |    |    |    |    |     |
+| T17  |    |    |    |    |    |    |    |    |    |     |
+| T18  |    |    |    |    |    |    |    |    |    |     |
+| T19  |    |    |    |    |    |    |    |    |    |     |  
+| T20  |    |    |    |    |    |    |    |    |    |     |
+| T21  |    |    |    |    |    |    |    |    |    |     |
+
+### Non funtional
+
+The table below shows an overview of which test covers which non-functional requirements
+
+##### Unst = (untestable) not able to test it.
+
+| Test | NF1 | NF2 | NF3 | NF4 | NF5 | NF6 | NF7 | NF8 | NF9 | NF10 | NF11 | NF12 | NF13 | NF14 | NF15 | NF16 | NF17 | NF18 | NF19 | 
+|:----:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
+|  T1  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+|  T2  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+|  T3  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+|  T4  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+|  T5  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+|  T6  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+|  T7  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+|  T8  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+|  T9  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+| T10  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+| T11  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+| T12  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+| T13  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+| T14  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+| T15  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+| T16  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+| T17  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+| T18  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+| T19  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+| T20  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+| T21  |     |     |     |     |     |     |     |     |     |      |      |      |      |      |      |      |      |      |      |
+
 Here you can find the results of the tests that were executed.<br>
 Tester: Rafael Tavares, Botond Vendler, Sarina Bameriniya, Jan <br>
 Date: 17-01-2025<br>
@@ -7,7 +67,9 @@ Date: 17-01-2025<br>
 ----------------------------------------------------
 
 # Test cases for a Non-admin user
+
 ## Test Case 1
+
 Name: User can log in. <br>
 Status: Success
 
@@ -27,8 +89,8 @@ After these 3 steps the user is successfully logged in.
 
 ![alt_text](img/test_cases/login_case1_result.png)<br>
 
-
 ## Test Case 2
+
 Name: User can't log in with incorrect password. <br>
 Status: Success
 
@@ -49,14 +111,13 @@ After these 3 steps the user isn't logged in and the site displays a warning.
 ![alt_text](img/test_cases/login_case2_result.png)<br>
 
 ## Test Case 3
+
 Name: User can't log in with invalid password. <br>
 Status: Success
-
 
 Step 1 - User starts by clicking the Login button on the navbar.
 
 ![alt_text](img/test_cases/login_case1_step1.png)<br>
-
 
 Step 2 - User enters their correct email but invalid password into the correct fields.
 
@@ -71,6 +132,7 @@ After these 3 steps the user isn't logged in and the site displays a warning.
 ![alt_text](img/test_cases/login_case3_result.png)<br>
 
 ### Test Case 4
+
 Name: User can't log in with invalid email. <br>
 Status: Success
 
@@ -91,6 +153,7 @@ After these 3 steps the user isn't logged in and the site displays a warning.
 ![alt_text](img/test_cases/login_case4_result.png)<br>
 
 ## Test Case 5
+
 Name: User can suggest a new highlight. <br>
 Status: Success
 
@@ -113,6 +176,7 @@ Sept 4 - After all fields are completed user can submit the request.
 After all 4 steps user is done by requesting for a new highlight.
 
 ## Test Case 6
+
 Name: User can change their username <br>
 Status: Success
 
@@ -137,6 +201,7 @@ Step 4 - After all 3 steps user is done by changing their username.
 ![alt text](img/test_cases/userdashboard-8-changeusername-after.png)<br>
 
 ## Test Case 7
+
 Name: User can't change their password if it's not more than 4 characters long.<br>
 Status: Success
 
@@ -144,23 +209,26 @@ Sept 1 - User starts by putting a username that is less than 5 characters long.
 
 ![alt text](img/test_cases/userdashboard-9-changeusername-error.png)<br>
 
-after this step user cannot change their username and a warning is shown. 
+after this step user cannot change their username and a warning is shown.
 
 ## Test Case 8
+
 Name: User can change their password<br>
 Status: Success
 
-Step 1 - User clicks on change password in user dashboard and encounter the form for filling the required areas for changing password.
+Step 1 - User clicks on change password in user dashboard and encounter the form for filling the required areas for
+changing password.
 
 ![alt text](img/test_cases/userdashboard-3-changePassword.png)<br>
 
-Step 2 - User clicks on submit after filling current and new password. They encounter with the success message. 
+Step 2 - User clicks on submit after filling current and new password. They encounter with the success message.
 
 ![alt text](img/test_cases/userdashboard-4-changePassword-sucess.png)<br>
 
 After these steps, user's password is successfully changed.
 
 ## Test Case 9
+
 Name: User cannot change their password if current password does not match OR new password do not match<br>
 Status: Success
 
@@ -175,6 +243,7 @@ Step 2 - User enters invalid new passwords without using an Uppercase at the beg
 After doing these steps, user cannot change their password.
 
 ## Test Case 10
+
 Name: User can log out<br>
 Status: Success
 
@@ -186,14 +255,15 @@ Step 2 - User clicks on Logout button until they encounter the confirmation of t
 
 ![alt text](img/test_cases/userdashboard-11-logout-confirmation.png)<br>
 
-After these steps user will successfully log out and redirect to the login page. 
+After these steps user will successfully log out and redirect to the login page.
 
 
 ---------------------------------------------------
 
-# Test cases for Moderator 
+# Test cases for Moderator
 
-## Test Case 1
+## Test Case 11
+
 Name: Moderator can manage highlights<br>
 Status: Success
 
@@ -205,7 +275,8 @@ Step 2 - Moderator clicks on highlights then on the Manage bar.
 
 ![alt text](img/test_cases/moderator-highlightManage1.png)<br>
 
-## Test Case 2
+## Test Case 12
+
 Name: Moderator can edit highlights<br>
 Status: Success
 
@@ -221,7 +292,8 @@ After all these steps moderator can see the result of edited data on the table.
 
 ![alt text](img/test_cases/moderator-highlightsManage4-edit-result.png)<br>
 
-## Test Case 3
+## Test Case 13
+
 Name: Moderator can add new highlights<br>
 Status: Success
 
@@ -229,7 +301,8 @@ Step 1 - Moderator starts by clicking on the add highlight button in manage high
 
 ![alt text](img/test_cases/moderator-highlightsManage5-add-button.png)<br>
 
-step 2 - Moderator fills in accurate data for adding a new highlight then clicks on the confirm button. (make sure to add none for business description if it is not needed).
+step 2 - Moderator fills in accurate data for adding a new highlight then clicks on the confirm button. (make sure to
+add none for business description if it is not needed).
 
 ![alt text](img/test_cases/moderator-highlightsManage6-add-confirm.png)<br>
 
@@ -239,7 +312,8 @@ Step 3 - Moderator can check the newly added highlight in the table as well as t
 
 After all these steps moderator can see the result of newly added data on the table.
 
-## Test Case 4
+## Test Case 14
+
 Name: Moderator can delete highlight.<br>
 Status: Success
 
@@ -253,7 +327,8 @@ Step 2 - Moderator clicks on the "Yes" button to confirm the elimination of the 
 
 After all these steps moderator can see the result of the deleted highlight on the table.
 
-## Test Case 5
+## Test Case 15
+
 Name: Moderator can manage highlight suggestions<br>
 Status: Success
 
@@ -261,11 +336,12 @@ Step 1 - Moderator starts by clicking on the Suggestions in the moderator dashbo
 
 ![alt text](img/test_cases/moderator-highlightSuggestion1.png)<br>
 
-## Test Case 6
+## Test Case 16
+
 Name: Moderator can Accept a highlight suggested by a non-admin user.<br>
 Status: Success
 
-Step 1 - Moderator clicks on the "Accept" button for the selected highlight from user. 
+Step 1 - Moderator clicks on the "Accept" button for the selected highlight from user.
 
 ![alt text](img/test_cases/moderator-highlightSuggestion2-accept.png)<br>
 
@@ -276,9 +352,11 @@ Step 2 - Moderator clicks on "Yes" button to once more confirm the highlight.
 Step 3 - Moderator goes to highlight management page to check the accepted highlight.
 ![alt text](img/test_cases/moderator-highlightSuggestion4-result.png)<br>
 
-After all these steps moderator can accept the suggested highlight from user and add it to all highlights. They can also check it on the map.
+After all these steps moderator can accept the suggested highlight from user and add it to all highlights. They can also
+check it on the map.
 
-## Test Case 7
+## Test Case 17
+
 Name: Moderator can reject a highlight suggested by a non-admin user.<br>
 Status: Success
 
@@ -294,7 +372,8 @@ After all these steps moderator can see the state of rejecting a highlight on th
 
 ![alt text](img/test_cases/moderator-highlightSuggestion7-reject-result.png)<br>
 
-## Test Case 8
+## Test Case 18
+
 Name: Administrator can manage tours<br>
 Status: Success
 
@@ -306,7 +385,8 @@ Step 2 - Administrator can see all the tours and can edit, delete or add new tou
 
 ![alt text](img/test_cases/pic_2.png)<br>
 
-## Test Case 9
+## Test Case 19
+
 Name: Administrator can edit tours<br>
 Status: Success
 
@@ -318,7 +398,8 @@ Step 2 - Administrator can edit the tour and save the changes.
 
 ![alt text](img/test_cases/pic_4.png)<br>
 
-## Test Case 10
+## Test Case 20
+
 Name: Administrator can delete tours<br>
 Status: Success
 
@@ -326,7 +407,8 @@ Step 1 - Administrator starts by clicking delete button on the tour they want to
 
 ![alt text](img/test_cases/pic_5.png)<br>
 
-## Test Case 11
+## Test Case 21
+
 Name: Administrator can add tours<br>
 Status: Success
 
