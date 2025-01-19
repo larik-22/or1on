@@ -563,7 +563,7 @@ import {createHighlight, createHighlightWithUser} from "../controllers/highlight
 
 
     for (const highlightData of highlights) {
-        const highlight = createHighlightWithUser(em, highlightData, highlightData.user)
+        await createHighlightWithUser(em, highlightData, highlightData.user)
     }
 
     await em.flush();
