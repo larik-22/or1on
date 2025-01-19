@@ -96,7 +96,7 @@ tours.get(':id/highlights', async (ctx) => {
  * @param ctx - The Hono context object.
  * @returns A response with the GeoJSON object or an error message.
  */
-tours.get('/:id/map/highlights', async (ctx) => {
+tours.get(':id/map/highlights', async (ctx) => {
     try {
         const em = ctx.get('em' as 'jwtPayload') as EntityManager;
         const { id } = ctx.req.param();

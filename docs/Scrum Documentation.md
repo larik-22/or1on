@@ -376,4 +376,28 @@ Absentees: None;
 ### 6th Meeting (17/01/2024)
 
 Meeting Notes:
-- Ignat: Done with ORN-092.
+- All members have mostly finished their tasks.
+- Team worked together on fixing issues and writing documentation.
+
+Attendees: Rafael, Ilarion, Ignat, Jan, Sarina, Robert, Petko, Botond;
+Absentees: None;
+
+### Sprint End Backlog:
+![backlog](img/sprint_3_end_part1.png)
+![backlog](img/sprint_3_end_part2.png)
+![backlog](img/sprint_3_end_part3.png)
+
+### Sprint-3 Retrospective
+
+- What went well:
+  - The team was able to address the issues of unequal involvement in the project.
+  - The team had a productive sprint, closing 25 issues with total weight of 74
+  - The team addressed issues with tasks not being completed on time
+  - The team was able to fix and test the issues in the sprint
+- What could have gone better:
+  - Some team members could have tested their work more thoroughly, as it would prevent some issues from being pushed to the next sprint
+
+Overall, the Sprint turned out to be productive. Although it started with unpleasant note of resolving conflicts about 
+unequal involvement in the project, the team managed to address the issues and move forward. The team members, who committed less to the project
+showed a significant improvement in terms of productivity. The conflicts were addressed and a decent plan of resolving issues was made. 
+Because of that, the team was able to close 25 issues with total weight of 74 and generally had a productive sprint.
