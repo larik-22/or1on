@@ -1,7 +1,7 @@
 # Test report
 
 Here you can find the results of the tests that were executed.<br>
-Tester: Rafael Tavares, Botond Vendler 😎 <br>
+Tester: Rafael Tavares, Botond Vendler 😎, Sarina Bameriniya <br>
 Date: 17-01-2025<br>
 
 ## Test Case 1
@@ -92,15 +92,100 @@ Name: User can suggest a new highlight. <br>
 Status: Success
 
 Sept 1 - User starts by clicking in the suggest highlight tab in the navigation bar.
+
 ![alt text](img/test_cases/suggest-highlight1.png)<br>
 
-Sept 2 - User enter the form and needs to fill all information.
+Sept 2 - User enters the form and needs to fill all information.
+
 ![alt text](img/test_cases/suggest-highlight2.png)<br>
 
-Sept 3 - User choses the location from the map.
+Sept 3 - User chooses the location from the map.
+
 ![alt text](img/test_cases/suggest-highlight3.png)<br>
 
 Sept 4 - After all fields are completed user can submit the request.
+
 ![alt text](img/test_cases/suggest-highlight4.1.png)<br>
 
 After all 4 steps user is done by requesting for a new highlight.
+
+## Test Case 6
+Name: User can change their username <br>
+Status: Success
+
+Sept 1 - User starts by clicking on the User dashboard tab in the navigation bar.
+
+![alt text](img/test_cases/userdashboard-1-bar.png)<br>
+
+Step 2 - User clicks on the change username tab in the navigation bar.
+
+![alt text](img/test_cases/userdashboard-2-options-userdashboard.png)<br>
+
+Step 3 - User fills in the form by putting their new username.
+
+![alt text](img/test_cases/userdashboard-6-changeUsername.png)<br>
+
+Step 3 - User sees the success message for changing their username.
+
+![alt text](img/test_cases/userdashboard-7-changeUsername-success.png)<br>
+
+Step 4 - After all 3 steps user is done by changing their username.
+
+![alt text](img/test_cases/userdashboard-8-changeusername-after.png)<br>
+
+## Test Case 7
+Name: User can't change their password if it's not more than 4 characters long.<br>
+Status: Success
+
+Sept 1 - User starts by putting a username that is less than 5 characters long.
+
+![alt text](img/test_cases/userdashboard-9-changeusername-error.png)<br>
+
+after this step user cannot change their username and a warning is shown. 
+
+## Test Case 8
+Name: User can change their password<br>
+Status: Success
+
+Step 1 - User clicks on change password in user dashboard and encounter the form for filling the required areas for changing password.
+
+![alt text](img/test_cases/userdashboard-3-changePassword.png)<br>
+
+Step 2 - User clicks on submit after filling current and new password. They encounter with the success message. 
+
+![alt text](img/test_cases/userdashboard-4-changePassword-sucess.png)<br>
+
+After these steps, user's password is successfully changed.
+
+## Test Case 9
+Name: User cannot change their password if current password does not match OR new password do not match<br>
+Status: Success
+
+step 1 - User enters an invalid current password.
+
+![alt text](img/test_cases/userdashboard-5-changePassword-error.png)<br>
+
+Step 2 - User enters invalid new passwords without using an Uppercase at the beginning of the password.
+
+![alt text](img/test_cases/userdashboard-changePassword-error2.png)<br>
+
+After doing these steps, user cannot change their password.
+
+## Test Case 10
+Name: User can log out<br>
+Status: Success
+
+Step 1 - User clicks on logout in user dashboard navigation bar.
+
+![alt text](img/test_cases/userdashboard-10-logout.png)<br>
+
+Step 2 - User clicks on Logout button until they encounter the confirmation of their request.
+
+![alt text](img/test_cases/userdashboard-11-logout-confirmation.png)<br>
+
+After these steps user will successfully log out and redirect to the login page. 
+
+
+
+
+
