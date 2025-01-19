@@ -138,7 +138,6 @@
                     return feedBackValue;
                 },
                 setValue: (newValue: any) => {
-                    console.log("newValue: ", newValue);
                     feedBackValue = newValue;
                 }
             },

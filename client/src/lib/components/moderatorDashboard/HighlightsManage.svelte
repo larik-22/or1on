@@ -163,7 +163,6 @@
 
     // Save new highlight to backend
     async function saveNewHighlight() {
-        console.log("payload sent to backend: ", currentHighlight)
         try {
             const response = await fetch(API_BASE, {
                 method: "POST",
