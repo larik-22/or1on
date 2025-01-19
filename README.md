@@ -29,6 +29,12 @@ Visitors can choose tours based on their interests, such as:
 The app is web-based and compatible with any device that supports location services and navigation, such as smartphones.
 
 ---
+## Technical Highlights
+The project is covered by automated tests ensuring *90%* code coverage,
+guaranteeing a reliable and high-quality user experience.
+Additionally, an automated CI/CD pipeline is set up for seamless deployment to a public host,
+ensuring rapid delivery of updates and bug fixes.
+---
 
 ## Team Members
 - Rafael Tavares
