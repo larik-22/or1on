@@ -63,8 +63,7 @@
                 formData.currentUsername = decodeToken(result.token)?.username ?? ""; // update the shown username
             }
         } catch(error) {
-            errors = {message: ["An unexpected error occurred. Please try again."]};
-            console.log(error)
+            errors = {message: ["An unexpected error occurred. Please try again: " + error]};
         } finally {
             isSubmitting = false;
         }
