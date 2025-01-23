@@ -20,7 +20,9 @@ if (!JWT_SECRET) {
  * @throws An error if the token generation process fails.
  */
 export const generateToken = async (user: User): Promise<string> => {
-    const { ...payload } = user;
+    const { id, email, isAdmin, verified } = user;
+    const payload = { id, email, isAdmin, verified };
+
     try {
         logger.info(`Generating token for user with id: ${payload.id}`);
         return await sign(payload, JWT_SECRET, 'HS256');
