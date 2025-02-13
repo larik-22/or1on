@@ -49,12 +49,6 @@ ensuring rapid delivery of updates and bug fixes.
 - Petko Vragov
 - Botond Vendiler
 
----
-
-## Client Information
-- **Name**: Eelco Jannink
-- **Role**: Course Manager / Client
-- **Email**: [e.h.a.jannink@saxion.nl](mailto:e.h.a.jannink@saxion.nl)
 
 ---
 
